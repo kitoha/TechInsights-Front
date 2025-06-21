@@ -5,40 +5,42 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
+import axios from 'axios'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from '@/components/ui/pagination';
 
-export default function HomePage() {
+export default async function HomePage({ searchParams }: { searchParams: any }) {
+  const params = await searchParams;
+  const page = Number(params?.page) || 0;
   const categories = ["All", "FrontEnd", "BackEnd", "AI", "Big Data", "Infra", "Architecture"]
 
-  const latestPosts = [
-    {
-      category: "FrontEnd",
-      title: "Building Responsive Layouts with CSS Grid",
-      description:
-        "Learn how to create flexible and responsive web layouts using CSS Grid, a powerful tool for modern web development.",
-      image: "/placeholder.svg?height=120&width=120",
-    },
-    {
-      category: "BackEnd",
-      title: "Optimizing Database Queries for Performance",
-      description:
-        "Discover techniques to optimize your database queries, ensuring faster response times and improved application performance.",
-      image: "/placeholder.svg?height=120&width=120",
-    },
-    {
-      category: "AI",
-      title: "Introduction to Neural Networks",
-      description:
-        "Get started with neural networks, understanding their structure, and how they can be applied to solve complex problems.",
-      image: "/placeholder.svg?height=120&width=120",
-    },
-    {
-      category: "Big Data",
-      title: "Processing Large Datasets with Spark",
-      description:
-        "Explore how Apache Spark can be used to efficiently process and analyze large datasets, enabling insights from big data.",
-      image: "/placeholder.svg?height=120&width=120",
-    },
-  ]
+  let data = { content: [], totalPages: 1 };
+  try {
+    const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts`, {
+      params: {
+        page,
+        size: 10
+      }
+    });
+    data = res.data;
+  } catch (error) {
+    console.error('Posts fetch error:', error);
+  }
+
+  const latestPosts = (data.content || []).map((item: any) => ({
+    category: item.companyName || "기타",
+    title: item.title,
+    description: item.content?.replace(/<[^>]+>/g, '').slice(0, 120) + '...',
+    image: item.thumbnail || "/placeholder.svg?height=120&width=120",
+    url: item.url,
+  }))
 
   const popularPosts = [
     {
@@ -75,6 +77,16 @@ export default function HomePage() {
     { name: "Software Solutions Ltd.", color: "bg-amber-600" },
     { name: "Digital Systems Corp.", color: "bg-blue-600" },
   ]
+
+  // Pagination range 계산 (현재 페이지 기준 앞뒤 2개만 보여줌)
+  const totalPages = data.totalPages || 1;
+  const maxVisible = 5; // 한 번에 보여줄 최대 페이지 수
+  let start = Math.max(0, page - 2);
+  let end = Math.min(totalPages, start + maxVisible);
+  if (end - start < maxVisible) {
+    start = Math.max(0, end - maxVisible);
+  }
+  const pageNumbers = Array.from({ length: end - start }, (_, i) => start + i);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -147,7 +159,7 @@ export default function HomePage() {
             <section className="mb-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Latest Posts</h2>
               <div className="space-y-6">
-                {latestPosts.map((post, index) => (
+                {latestPosts.map((post: any, index: number) => (
                   <Card key={index} className="bg-white border-gray-200 hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
@@ -167,7 +179,7 @@ export default function HomePage() {
                             alt=""
                             width={96}
                             height={96}
-                            className="w-full h-full object-cover rounded-lg opacity-60"
+                            className="w-full h-full object-cover rounded-lg"
                           />
                         </div>
                       </div>
@@ -175,6 +187,48 @@ export default function HomePage() {
                   </Card>
                 ))}
               </div>
+              {/* shadcn Pagination for latestPosts */}
+              <Pagination className="mt-8">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious href={`?page=${page - 1}`} aria-disabled={page <= 0} />
+                  </PaginationItem>
+                  {start > 0 && (
+                    <>
+                      <PaginationItem>
+                        <PaginationLink href={`?page=0`}>1</PaginationLink>
+                      </PaginationItem>
+                      {start > 1 && (
+                        <PaginationItem>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )}
+                    </>
+                  )}
+                  {pageNumbers.map((p) => (
+                    <PaginationItem key={p}>
+                      <PaginationLink href={`?page=${p}`} isActive={p === page}>
+                        {p + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  {end < totalPages && (
+                    <>
+                      {end < totalPages - 1 && (
+                        <PaginationItem>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )}
+                      <PaginationItem>
+                        <PaginationLink href={`?page=${totalPages - 1}`}>{totalPages}</PaginationLink>
+                      </PaginationItem>
+                    </>
+                  )}
+                  <PaginationItem>
+                    <PaginationNext href={`?page=${page + 1}`} aria-disabled={page + 1 >= totalPages} />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </section>
 
             {/* Popular Posts */}
@@ -209,6 +263,20 @@ export default function HomePage() {
                   </Card>
                 ))}
               </div>
+              {/* shadcn Pagination for popularPosts (UI only) */}
+              <Pagination className="mt-8">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious aria-disabled />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLink isActive>1</PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationNext aria-disabled />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </section>
           </div>
 
