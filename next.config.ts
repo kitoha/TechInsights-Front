@@ -11,7 +11,8 @@ const nextConfig: NextConfig = {
       'techblog.woowa.in',
       'thefarmersfront.github.io',
       't1.kakaocdn.net',
-      'blog.banksalad.com'
+      'blog.banksalad.com',
+      'oliveyoung.tech'
     ],
   },
 };

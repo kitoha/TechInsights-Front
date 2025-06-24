@@ -15,6 +15,7 @@ import {
   PaginationNext,
   PaginationEllipsis,
 } from '@/components/ui/pagination';
+import Link from "next/link"
 
 export default async function HomePage({ searchParams }: { searchParams: any }) {
   const params = await searchParams;
@@ -35,6 +36,7 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
   }
 
   const latestPosts = (data.content || []).map((item: any) => ({
+    id: item.id,
     category: item.companyName || "기타",
     title: item.title,
     description: item.content?.replace(/<[^>]+>/g, '').slice(0, 120) + '...',
@@ -162,12 +164,15 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
                 {latestPosts.map((post: any, index: number) => (
                   <Card key={index} className="bg-white border-gray-200 hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
+                    <Link href={`/post/${post.id}`}>
                       <div className="flex items-start justify-between">
                         <div className="flex-1 pr-6">
                           <Badge variant="secondary" className="mb-3 text-xs">
                             {post.category}
                           </Badge>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">{post.title}</h3>
+                     
+                              <h3 className="text-xl font-semibold text-gray-900 mb-2">{post.title}</h3>
+                   
                           <p className="text-gray-600 mb-4 leading-relaxed">{post.description}</p>
                           <Button variant="outline" size="sm">
                             See More
@@ -183,6 +188,7 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
                           />
                         </div>
                       </div>
+                      </Link>
                     </CardContent>
                   </Card>
                 ))}
@@ -226,54 +232,6 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
                   )}
                   <PaginationItem>
                     <PaginationNext href={`?page=${page + 1}`} aria-disabled={page + 1 >= totalPages} />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </section>
-
-            {/* Popular Posts */}
-            <section>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Popular Posts</h2>
-              <div className="space-y-6">
-                {popularPosts.map((post, index) => (
-                  <Card key={index} className="bg-white border-gray-200 hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 pr-6">
-                          <Badge variant="secondary" className="mb-3 text-xs">
-                            {post.category}
-                          </Badge>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">{post.title}</h3>
-                          <p className="text-gray-600 mb-4 leading-relaxed">{post.description}</p>
-                          <Button variant="outline" size="sm">
-                            See More
-                          </Button>
-                        </div>
-                        <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 rounded-lg flex-shrink-0">
-                          <Image
-                            src={post.image || "/placeholder.svg"}
-                            alt=""
-                            width={96}
-                            height={96}
-                            className="w-full h-full object-cover rounded-lg opacity-60"
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              {/* shadcn Pagination for popularPosts (UI only) */}
-              <Pagination className="mt-8">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious aria-disabled />
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink isActive>1</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationNext aria-disabled />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
