@@ -16,6 +16,7 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination';
 import Link from "next/link"
+import { RankingItem } from "@/components/RankingItem";
 
 export default async function HomePage({ searchParams }: { searchParams: any }) {
   const params = await searchParams;
@@ -44,35 +45,25 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
     url: item.url,
   }))
 
-  const popularPosts = [
-    {
-      category: "Infra",
-      title: "Setting Up a CI/CD Pipeline",
-      description:
-        "Learn how to automate your software delivery process by setting up a Continuous Integration and Continuous Deployment pipeline.",
-      image: "/placeholder.svg?height=120&width=120",
-    },
-    {
-      category: "Architecture",
-      title: "Microservices Architecture Patterns",
-      description:
-        "Dive into microservices architecture, exploring common patterns and best practices for building scalable and resilient systems.",
-      image: "/placeholder.svg?height=120&width=120",
-    },
-    {
-      category: "All",
-      title: "The Future of Cloud Computing",
-      description:
-        "Explore the trends shaping the future of cloud computing, from serverless architectures to edge computing.",
-      image: "/placeholder.svg?height=120&width=120",
-    },
-  ]
+  
+  let trendingCompanies = [];
+  try {
+    const companiesRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies/top-by-views`, {
+      params: {
+        page: 0,
+        size: 5
+      }
+    });
+    trendingCompanies = companiesRes.data.content || [];
+  } catch (error) {
+    console.error('Companies fetch error:', error);
+  }
 
-  const trendingPosts = [
-    { title: "CSS Grid Layouts", category: "FrontEnd" },
-    { title: "Database Optimization", category: "BackEnd" },
-    { title: "Neural Networks", category: "AI" },
-  ]
+  const trendingPosts = trendingCompanies.map((company: any) => ({
+    logoImage: `/logos/${company.logoImageName}`,
+    title: company.name.length > 20 ? `${company.name.slice(0, 20)}...` : company.name,
+    viewCount: company.totalViewCount
+  }))
 
   const companies = [
     { name: "Tech Innovators Inc.", color: "bg-emerald-600" },
@@ -80,9 +71,8 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
     { name: "Digital Systems Corp.", color: "bg-blue-600" },
   ]
 
-  // Pagination range 계산 (현재 페이지 기준 앞뒤 2개만 보여줌)
   const totalPages = data.totalPages || 1;
-  const maxVisible = 5; // 한 번에 보여줄 최대 페이지 수
+  const maxVisible = 5;
   let start = Math.max(0, page - 2);
   let end = Math.min(totalPages, start + maxVisible);
   if (end - start < maxVisible) {
@@ -271,18 +261,18 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
             {/* Popular Posts */}
             <Card className="bg-white border-gray-200">
               <CardHeader>
-                <CardTitle className="text-lg font-semibold">Popular Posts</CardTitle>
+                <CardTitle className="text-lg font-semibold">게시물 조회 수 랭킹</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {trendingPosts.map((post, index) => (
-                    <div key={index} className="flex items-center space-x-3">
-                      <span className="text-gray-400 font-mono text-lg">#</span>
-                      <div>
-                        <p className="font-medium text-gray-900">{post.title}</p>
-                        <p className="text-sm text-gray-500">{post.category}</p>
-                      </div>
-                    </div>
+                <div className="divide-y">
+                  {trendingPosts.map((post: any, idx: number) => (
+                    <RankingItem
+                      key={idx}
+                      rank={idx}
+                      logo={post.logoImage}
+                      name={post.title}
+                      score={post.viewCount}
+                    />
                   ))}
                 </div>
               </CardContent>
