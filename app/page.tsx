@@ -17,6 +17,8 @@ import {
 } from '@/components/ui/pagination';
 import Link from "next/link"
 import { RankingItem } from "@/components/RankingItem";
+import FeaturedCompanies from "@/components/FeaturedCompanies";
+import TopCompaniesByPosts from "@/components/TopCompaniesByPosts";
 
 export default async function HomePage({ searchParams }: { searchParams: any }) {
   const params = await searchParams;
@@ -65,11 +67,21 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
     viewCount: company.totalViewCount
   }))
 
-  const companies = [
-    { name: "Tech Innovators Inc.", color: "bg-emerald-600" },
-    { name: "Software Solutions Ltd.", color: "bg-amber-600" },
-    { name: "Digital Systems Corp.", color: "bg-blue-600" },
-  ]
+  let companies = [];
+  try {
+    const companiesRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies`, {
+      params: {
+        page: 0,
+        size: 15
+      }
+    });
+    companies = (companiesRes.data.content || []).map((company: any) => ({
+      name: company.name,
+      logoImage: `/logos/${company.logoImageName}`
+    }));
+  } catch (error) {
+    console.error('Companies fetch error:', error);
+  }
 
   const totalPages = data.totalPages || 1;
   const maxVisible = 5;
@@ -281,40 +293,20 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
             {/* Featured Companies */}
             <Card className="bg-white border-gray-200">
               <CardHeader>
-                <CardTitle className="text-lg font-semibold">Featured Companies</CardTitle>
+                <CardTitle className="text-lg font-semibold"> 기술 블로그 기업 리스트 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {companies.map((company, index) => (
-                    <div key={index} className="flex items-center space-x-3">
-                      <div className={`w-8 h-8 ${company.color} rounded-full flex items-center justify-center`}>
-                        <span className="text-white text-xs font-bold">{company.name.charAt(0)}</span>
-                      </div>
-                      <span className="text-gray-900 font-medium">{company.name}</span>
-                    </div>
-                  ))}
-                </div>
+                <FeaturedCompanies companies={companies} />
               </CardContent>
             </Card>
 
             {/* Top Companies by Posts */}
             <Card className="bg-white border-gray-200">
               <CardHeader>
-                <CardTitle className="text-lg font-semibold">Top Companies by Posts</CardTitle>
+                <CardTitle className="text-lg font-semibold">기술 블로그 TOP 15</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {companies.map((company, index) => (
-                    <div key={index} className="flex items-center space-x-3">
-                      <div className={`w-6 h-6 ${company.color} rounded-full flex items-center justify-center`}>
-                        <span className="text-white text-xs font-bold">{index + 1}</span>
-                      </div>
-                      <span className="text-gray-900">
-                        {index + 1}. {company.name}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <TopCompaniesByPosts companies={companies} />
               </CardContent>
             </Card>
           </div>
