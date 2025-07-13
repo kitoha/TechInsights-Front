@@ -1,7 +1,9 @@
 import { Search, Bell } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import InfoBadge from "@/components/InfoBadge"
+import CategoryBadges from "@/components/CategoryBadges"
+import { formatDate } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
@@ -40,11 +42,14 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
 
   const latestPosts = (data.content || []).map((item: any) => ({
     id: item.id,
-    category: item.companyName || "기타",
+    companyName: item.companyName || "기타",
     title: item.title,
-    description: item.content?.replace(/<[^>]+>/g, '').slice(0, 120) + '...',
+    description: item.preview?.replace(/<[^>]+>/g, ''),
     image: item.thumbnail || "/placeholder.svg?height=120&width=120",
     url: item.url,
+    publishedAt: formatDate(item.publishedAt),
+    logoImageName: item.logoImageName,
+    categories: item.categories || [],
   }))
 
   
@@ -165,31 +170,41 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
               <div className="space-y-6">
                 {latestPosts.map((post: any, index: number) => (
                   <Card key={index} className="bg-white border-gray-200 hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                    <Link href={`/post/${post.id}`}>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 pr-6">
-                          <Badge variant="secondary" className="mb-3 text-xs">
-                            {post.category}
-                          </Badge>
-                     
+                    <CardContent className="px-6 py-0">
+                      <Link href={`/post/${post.id}`}>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 pr-6 flex flex-col min-h-[150px] justify-between">
+                            <div>
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  {post.logoImageName && (
+                                    <Image
+                                      src={`/logos/${post.logoImageName}`}
+                                      alt={post.companyName}
+                                      width={24}
+                                      height={24}
+                                      className="object-contain w-6 h-6 rounded-full bg-white border"
+                                    />
+                                  )}
+                                  <span className="text-sm font-semibold text-gray-800">{post.companyName}</span>
+                                </div>
+                                <span className="text-xs text-gray-500 font-medium">{post.publishedAt}</span>
+                              </div>
                               <h3 className="text-xl font-semibold text-gray-900 mb-2">{post.title}</h3>
-                   
-                          <p className="text-gray-600 mb-4 leading-relaxed">{post.description}</p>
-                          <Button variant="outline" size="sm">
-                            See More
-                          </Button>
+                              <p className="text-gray-600 mb-4 leading-relaxed">{post.description}</p>
+                            </div>
+                            <CategoryBadges categories={post.categories} />
+                          </div>
+                          <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 rounded-lg flex-shrink-0">
+                            <Image
+                              src={post.image || "/placeholder.svg"}
+                              alt=""
+                              width={96}
+                              height={96}
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                          </div>
                         </div>
-                        <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 rounded-lg flex-shrink-0">
-                          <Image
-                            src={post.image || "/placeholder.svg"}
-                            alt=""
-                            width={96}
-                            height={96}
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        </div>
-                      </div>
                       </Link>
                     </CardContent>
                   </Card>
