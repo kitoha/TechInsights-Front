@@ -5,15 +5,15 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
-import { marked } from "marked";
+import ReactMarkdown from "react-markdown";
 import Image from "next/image"
 import Link from "next/link"
 import axios from 'axios'
 
 interface PostDetailProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 interface PostData {
@@ -37,7 +37,8 @@ async function getPostData(postId: string): Promise<PostData | null> {
 }
 
 export default async function PostDetailPage({ params }: PostDetailProps) {
-  const post = await getPostData(params.slug)
+  const resolvedParams = await params;
+  const post = await getPostData(resolvedParams.slug)
 
   if (!post) {
     return (
@@ -52,7 +53,6 @@ export default async function PostDetailPage({ params }: PostDetailProps) {
     )
   }
 
-  // publishedAt을 읽기 쉬운 형식으로 변환
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
@@ -146,8 +146,8 @@ export default async function PostDetailPage({ params }: PostDetailProps) {
             </div>
 
             {/* Article Content */}
-            <div className="prose prose-lg max-w-none mb-8">
-              <div dangerouslySetInnerHTML={{ __html: marked(post.content) }} />
+            <div className="markdown-body mb-8">
+              <ReactMarkdown>{post.content}</ReactMarkdown>
             </div>
 
             {/* View Original Button */}

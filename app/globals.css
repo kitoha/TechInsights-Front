@@ -1,6 +1,34 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+.markdown-body h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+.markdown-body h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+.markdown-body ul {
+  list-style: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+.markdown-body li {
+  margin-bottom: 0.5rem;
+}
+.markdown-body p {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+.markdown-body strong {
+  font-weight: 700;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
