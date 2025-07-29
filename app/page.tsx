@@ -20,19 +20,26 @@ import Link from "next/link"
 import { RankingItem } from "@/components/RankingItem";
 import FeaturedCompanies from "@/components/FeaturedCompanies";
 import TopCompaniesByPosts from "@/components/TopCompaniesByPosts";
+import PostList from "@/components/PostList";
 
 export default async function HomePage({ searchParams }: { searchParams: any }) {
   const params = await searchParams;
   const page = Number(params?.page) || 0;
-  const categories = ["All", "FrontEnd", "BackEnd", "AI", "Big Data", "Infra", "Architecture"]
+  const categories = ["All", "FrontEnd", "BackEnd", "AI", "Big Data", "Infra", "Architecture"];
+  const selectedCategory = params?.category || "All";
 
   let data = { content: [], totalPages: 1 };
   try {
+    const apiParams: any = {
+      page,
+      size: 10,
+    };
+    if (selectedCategory && selectedCategory !== "All") {
+      apiParams.category = selectedCategory;
+    }
+
     const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts`, {
-      params: {
-        page,
-        size: 10
-      }
+      params: apiParams
     });
     data = res.data;
   } catch (error) {
@@ -150,109 +157,8 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
               />
             </div>
 
-            {/* Category Tabs */}
-            <div className="flex flex-wrap gap-2 mb-8">
-              {categories.map((category, index) => (
-                <Button
-                  key={category}
-                  variant={index === 0 ? "default" : "ghost"}
-                  className={index === 0 ? "bg-gray-900 text-white" : "text-gray-600 hover:text-gray-900"}
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
-
-            {/* Latest Posts */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Latest Posts</h2>
-              <div className="space-y-6">
-                {latestPosts.map((post: any, index: number) => (
-                  <Card key={index} className="bg-white border-gray-200 hover:shadow-md transition-shadow">
-                    <CardContent className="px-6 py-0">
-                      <Link href={`/post/${post.id}`}>
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1 pr-6 flex flex-col min-h-[150px] justify-between">
-                            <div>
-                              <div className="flex items-start justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                  {post.logoImageName && (
-                                    <Image
-                                      src={`/logos/${post.logoImageName}`}
-                                      alt={post.companyName}
-                                      width={24}
-                                      height={24}
-                                      className="object-contain w-6 h-6 rounded-full bg-white border"
-                                    />
-                                  )}
-                                  <span className="text-sm font-semibold text-gray-800">{post.companyName}</span>
-                                </div>
-                                <span className="text-xs text-gray-500 font-medium">{post.publishedAt}</span>
-                              </div>
-                              <h3 className="text-xl font-semibold text-gray-900 mb-2">{post.title}</h3>
-                              <p className="text-gray-600 mb-4 leading-relaxed">{post.description}</p>
-                            </div>
-                            <CategoryBadges categories={post.categories} />
-                          </div>
-                          <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
-                            <Image
-                              src={post.image || "/placeholder.svg"}
-                              alt=""
-                              width={192}
-                              height={192}
-                              quality={90}
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-                        </div>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              {/* shadcn Pagination for latestPosts */}
-              <Pagination className="mt-8">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious href={`?page=${page - 1}`} aria-disabled={page <= 0} />
-                  </PaginationItem>
-                  {start > 0 && (
-                    <>
-                      <PaginationItem>
-                        <PaginationLink href={`?page=0`}>1</PaginationLink>
-                      </PaginationItem>
-                      {start > 1 && (
-                        <PaginationItem>
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )}
-                    </>
-                  )}
-                  {pageNumbers.map((p) => (
-                    <PaginationItem key={p}>
-                      <PaginationLink href={`?page=${p}`} isActive={p === page}>
-                        {p + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  {end < totalPages && (
-                    <>
-                      {end < totalPages - 1 && (
-                        <PaginationItem>
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      )}
-                      <PaginationItem>
-                        <PaginationLink href={`?page=${totalPages - 1}`}>{totalPages}</PaginationLink>
-                      </PaginationItem>
-                    </>
-                  )}
-                  <PaginationItem>
-                    <PaginationNext href={`?page=${page + 1}`} aria-disabled={page + 1 >= totalPages} />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </section>
+            {/* Category Tabs + Post List (CSR) */}
+            <PostList categories={categories} />
           </div>
 
           {/* Sidebar */}
