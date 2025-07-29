@@ -1,7 +1,6 @@
 import { Search, Bell } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import InfoBadge from "@/components/InfoBadge"
 import CategoryBadges from "@/components/CategoryBadges"
 import { formatDate } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -172,7 +171,7 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
                   <Card key={index} className="bg-white border-gray-200 hover:shadow-md transition-shadow">
                     <CardContent className="px-6 py-0">
                       <Link href={`/post/${post.id}`}>
-                        <div className="flex items-start justify-between">
+                        <div className="flex items-center justify-between">
                           <div className="flex-1 pr-6 flex flex-col min-h-[150px] justify-between">
                             <div>
                               <div className="flex items-start justify-between mb-2">
@@ -195,12 +194,13 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
                             </div>
                             <CategoryBadges categories={post.categories} />
                           </div>
-                          <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 rounded-lg flex-shrink-0">
+                          <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
                             <Image
                               src={post.image || "/placeholder.svg"}
                               alt=""
-                              width={96}
-                              height={96}
+                              width={192}
+                              height={192}
+                              quality={90}
                               className="w-full h-full object-cover rounded-lg"
                             />
                           </div>
