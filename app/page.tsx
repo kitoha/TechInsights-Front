@@ -21,6 +21,7 @@ import { RankingItem } from "@/components/RankingItem";
 import FeaturedCompanies from "@/components/FeaturedCompanies";
 import TopCompaniesByPosts from "@/components/TopCompaniesByPosts";
 import PostList from "@/components/PostList";
+import AIRecommendedPosts from "@/components/AIRecommendedPosts";
 
 export default async function HomePage({ searchParams }: { searchParams: any }) {
   const params = await searchParams;
@@ -161,35 +162,10 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
             <PostList categories={categories} />
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Trending Now */}
-            <Card className="bg-white border-gray-200">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">Trending Now</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-1">Popular Posts Over Time</p>
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-2xl font-bold text-green-600">+15%</span>
-                    <span className="text-sm text-gray-500">Last 7 Days +15%</span>
-                  </div>
-                </div>
-                <div className="h-20 bg-gradient-to-r from-blue-100 to-blue-200 rounded-lg mb-4 flex items-center justify-center">
-                  <svg viewBox="0 0 200 40" className="w-full h-full">
-                    <path d="M0,30 Q50,10 100,20 T200,15" stroke="#3b82f6" strokeWidth="2" fill="none" />
-                  </svg>
-                </div>
-                <div className="grid grid-cols-7 gap-1 text-xs text-gray-500">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                    <div key={day} className="text-center">
-                      {day}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                     {/* Sidebar */}
+           <div className="space-y-6">
+             {/* AI 추천 게시물 */}
+             <AIRecommendedPosts />
 
             {/* Popular Posts */}
             <Card className="bg-white border-gray-200">
