@@ -22,6 +22,7 @@ import FeaturedCompanies from "@/components/FeaturedCompanies";
 import TopCompaniesByPosts from "@/components/TopCompaniesByPosts";
 import PostList from "@/components/PostList";
 import AIRecommendedPosts from "@/components/AIRecommendedPosts";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default async function HomePage({ searchParams }: { searchParams: any }) {
   const params = await searchParams;
@@ -105,34 +106,35 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
   const pageNumbers = Array.from({ length: end - start }, (_, i) => start + i);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
                 <span className="text-white text-sm font-bold">T</span>
               </div>
-              <span className="text-xl font-semibold text-gray-900">Tech Insights</span>
+              <span className="text-xl font-semibold text-gray-900 dark:text-white">Tech Insights</span>
             </div>
 
             <nav className="hidden md:flex space-x-8">
-              <a href="#" className="text-gray-900 hover:text-gray-600">
+              <a href="#" className="text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300">
                 Home
               </a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">
+              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                 Categories
               </a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">
+              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                 Trending
               </a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">
+              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                 Companies
               </a>
             </nav>
 
             <div className="flex items-center space-x-4">
+              <ThemeToggle />
               <Button variant="ghost" size="icon">
                 <Bell className="h-5 w-5" />
               </Button>
@@ -154,7 +156,7 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
                 placeholder="Search for posts, topics, or companies"
-                className="pl-10 bg-white border-gray-200 h-12"
+                className="pl-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 h-12 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
 
@@ -167,45 +169,45 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
              {/* AI 추천 게시물 */}
              <AIRecommendedPosts />
 
-            {/* Popular Posts */}
-            <Card className="bg-white border-gray-200">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">게시물 조회 수 랭킹</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="divide-y">
-                  {trendingPosts.map((post: any, idx: number) => (
-                    <RankingItem
-                      key={idx}
-                      rank={idx}
-                      logo={post.logoImage}
-                      name={post.title}
-                      score={post.viewCount}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                         {/* Popular Posts */}
+             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+               <CardHeader>
+                 <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">게시물 조회 수 랭킹</CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                   {trendingPosts.map((post: any, idx: number) => (
+                     <RankingItem
+                       key={idx}
+                       rank={idx}
+                       logo={post.logoImage}
+                       name={post.title}
+                       score={post.viewCount}
+                     />
+                   ))}
+                 </div>
+               </CardContent>
+             </Card>
 
-            {/* Featured Companies */}
-            <Card className="bg-white border-gray-200">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold"> 기술 블로그 기업 리스트 </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <FeaturedCompanies companies={companies} />
-              </CardContent>
-            </Card>
+             {/* Featured Companies */}
+             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+               <CardHeader>
+                 <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200"> 기술 블로그 기업 리스트 </CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <FeaturedCompanies companies={companies} />
+               </CardContent>
+             </Card>
 
-            {/* Top Companies by Posts */}
-            <Card className="bg-white border-gray-200">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">기술 블로그 TOP 15</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TopCompaniesByPosts companies={companies} />
-              </CardContent>
-            </Card>
+             {/* Top Companies by Posts */}
+             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+               <CardHeader>
+                 <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">기술 블로그 TOP 15</CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <TopCompaniesByPosts companies={companies} />
+               </CardContent>
+             </Card>
           </div>
         </div>
       </div>

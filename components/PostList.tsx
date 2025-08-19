@@ -11,14 +11,14 @@ import { formatDate } from "@/lib/utils";
 
 function PostSkeleton() {
   return (
-    <div className="animate-pulse flex items-center justify-between bg-white border rounded-lg p-6 min-h-[150px]">
+    <div className="animate-pulse flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 min-h-[150px]">
       <div className="flex-1 pr-6">
-        <div className="h-4 bg-gray-200 rounded w-24 mb-2" />
-        <div className="h-6 bg-gray-200 rounded w-48 mb-2" />
-        <div className="h-4 bg-gray-100 rounded w-64 mb-4" />
-        <div className="h-6 bg-gray-100 rounded w-32" />
+        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24 mb-2" />
+        <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-48 mb-2" />
+        <div className="h-4 bg-gray-100 dark:bg-gray-700 rounded w-64 mb-4" />
+        <div className="h-6 bg-gray-100 dark:bg-gray-700 rounded w-32" />
       </div>
-      <div className="w-24 h-24 bg-gray-100 rounded-lg" />
+      <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-lg" />
     </div>
   );
 }
@@ -116,8 +116,8 @@ export default function PostList({ categories }: { categories: string[] }) {
             variant={selectedCategory === category ? "default" : "ghost"}
             className={
               (selectedCategory === category
-                ? "bg-gray-900 text-white"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100") +
+                ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+                : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700") +
               " cursor-pointer transition-colors"
             }
             onClick={() => handleTabClick(category)}
@@ -128,12 +128,12 @@ export default function PostList({ categories }: { categories: string[] }) {
       </div>
       {/* Latest Posts */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Latest Posts</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Latest Posts</h2>
         <div className="space-y-6">
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => <PostSkeleton key={i} />)
           ) : posts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+            <div className="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-gray-500">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -141,7 +141,7 @@ export default function PostList({ categories }: { categories: string[] }) {
             </div>
           ) : (
             posts.map((post: any, index: number) => (
-              <Card key={index} className="bg-white border-gray-200 hover:shadow-md transition-shadow">
+              <Card key={index} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
                 <CardContent className="px-6 py-0">
                   <Link href={`/post/${post.id}`}>
                     <div className="flex items-center justify-between">
@@ -155,19 +155,19 @@ export default function PostList({ categories }: { categories: string[] }) {
                                   alt={post.companyName}
                                   width={24}
                                   height={24}
-                                  className="object-contain w-6 h-6 rounded-full bg-white border"
+                                  className="object-contain w-6 h-6 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
                                 />
                               )}
-                              <span className="text-sm font-semibold text-gray-800">{post.companyName}</span>
+                              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{post.companyName}</span>
                             </div>
-                            <span className="text-xs text-gray-500 font-medium">{post.publishedAt}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{post.publishedAt}</span>
                           </div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">{post.title}</h3>
-                          <p className="text-gray-600 mb-4 leading-relaxed">{post.description}</p>
+                          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{post.title}</h3>
+                          <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{post.description}</p>
                         </div>
                         <CategoryBadges categories={post.categories} />
                       </div>
-                      <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
+                      <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 dark:from-amber-900 dark:to-orange-800 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
                         <Image
                           src={post.image || "/placeholder.svg"}
                           alt=""

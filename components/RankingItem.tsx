@@ -16,8 +16,8 @@ export function RankingItem({ rank, logo, name, score }: RankingItemProps) {
         <AvatarImage src={logo} alt={name} />
         <AvatarFallback>{name.charAt(0)}</AvatarFallback>
       </Avatar>
-      <div className="flex-1 font-medium truncate">{name}</div>
-      <div className="text-right tabular-nums font-semibold text-gray-800 min-w-[90px]">
+      <div className="flex-1 font-medium truncate text-gray-800 dark:text-gray-200">{name}</div>
+      <div className="text-right tabular-nums font-semibold text-gray-800 dark:text-gray-200 min-w-[90px]">
         {score.toLocaleString()}회
       </div>
     </div>
