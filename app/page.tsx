@@ -164,12 +164,11 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
             <PostList categories={categories} />
           </div>
 
-                     {/* Sidebar */}
+          {/* Sidebar */}
            <div className="space-y-6">
              {/* AI 추천 게시물 */}
              <AIRecommendedPosts />
-
-                         {/* Popular Posts */}
+             {/* Popular Posts */}
              <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                <CardHeader>
                  <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">게시물 조회 수 랭킹</CardTitle>
