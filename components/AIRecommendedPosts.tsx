@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
 import Link from "next/link"
-import axios from "axios"
+import { apiGet } from "@/lib/api";
 
 interface RecommendedPost {
   title: string
@@ -26,7 +26,7 @@ export default function AIRecommendedPosts() {
   useEffect(() => {
     async function fetchRecommendations() {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/recommendations`)
+        const res = await apiGet("/api/v1/recommendations");
         const data = res.data
         const mapped = data.map((item: any, idx: number) => {
           const colorIdx = idx % colorSets.length

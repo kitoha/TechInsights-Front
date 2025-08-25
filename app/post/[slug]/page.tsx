@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import ReactMarkdown from "react-markdown";
 import Image from "next/image"
 import Link from "next/link"
-import axios from 'axios'
+import { apiGet } from "@/lib/api";
 
 interface PostDetailProps {
   params: Promise<{
@@ -29,7 +29,7 @@ interface PostData {
 
 async function getPostData(postId: string): Promise<PostData | null> {
   try {
-    const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts/${postId}`);
+    const res = await apiGet(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts/${postId}`);
     return res.data;
   } catch (error) {
     console.error('Post fetch error:', error);

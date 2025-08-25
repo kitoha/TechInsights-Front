@@ -6,7 +6,7 @@ import { formatDate } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
-import axios from 'axios'
+import { apiGet } from "@/lib/api";
 import {
   Pagination,
   PaginationContent,
@@ -40,7 +40,7 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
       apiParams.category = selectedCategory;
     }
 
-    const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts`, {
+    const res = await apiGet(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts`, {
       params: apiParams
     });
     data = res.data;
@@ -63,7 +63,7 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
   
   let trendingCompanies = [];
   try {
-    const companiesRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies/top-by-views`, {
+    const companiesRes = await apiGet(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies/top-by-views`, {
       params: {
         page: 0,
         size: 5
@@ -82,7 +82,7 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
 
   let companies = [];
   try {
-    const companiesRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies`, {
+    const companiesRes = await apiGet(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies`, {
       params: {
         page: 0,
         size: 15
