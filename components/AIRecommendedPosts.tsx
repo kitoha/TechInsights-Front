@@ -1,9 +1,7 @@
 'use client'
-import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
 import Link from "next/link"
-import { apiGet } from "@/lib/api";
 
 interface RecommendedPost {
   title: string
@@ -12,39 +10,11 @@ interface RecommendedPost {
   borderColor: string
 }
 
-const colorSets = [
-  { color: "bg-gradient-to-br from-blue-50 to-blue-100", borderColor: "border-blue-200" },
-  { color: "bg-gradient-to-br from-yellow-50 to-yellow-100", borderColor: "border-yellow-200" },
-  { color: "bg-gradient-to-br from-green-50 to-green-100", borderColor: "border-green-200" },
-  { color: "bg-gradient-to-br from-gray-50 to-gray-100", borderColor: "border-gray-200" },
-  { color: "bg-gradient-to-br from-emerald-50 to-emerald-100", borderColor: "border-emerald-200" },
-]
+interface AIRecommendedPostsProps {
+  posts: RecommendedPost[]
+}
 
-export default function AIRecommendedPosts() {
-  const [recommended, setRecommended] = useState<RecommendedPost[]>([])
-
-  useEffect(() => {
-    async function fetchRecommendations() {
-      try {
-        const res = await apiGet("/api/v1/recommendations");
-        const data = res.data
-        const mapped = data.map((item: any, idx: number) => {
-          const colorIdx = idx % colorSets.length
-          return {
-            title: item.title,
-            logo: `/logos/${item.logoImageName}`,
-            color: colorSets[colorIdx].color,
-            borderColor: colorSets[colorIdx].borderColor,
-          }
-        })
-        setRecommended(mapped)
-      } catch (e) {
-        setRecommended([])
-      }
-    }
-    fetchRecommendations()
-  }, [])
-
+export default function AIRecommendedPosts({ posts }: AIRecommendedPostsProps) {
   return (
     <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200">
       <CardHeader className="px-4 py-3 pb-1">
@@ -63,7 +33,7 @@ export default function AIRecommendedPosts() {
       </CardHeader>
       <CardContent className="px-4 pt-0 pb-3">
         <div className="space-y-2">
-          {recommended.map((post, index) => (
+          {posts.map((post, index) => (
             <div key={index} className="group cursor-pointer">
               <div className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                 <div className="flex-shrink-0">

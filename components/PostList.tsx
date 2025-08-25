@@ -1,12 +1,17 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/components/ui/pagination";
 import CategoryBadges from "@/components/CategoryBadges";
 import Image from "next/image";
-import { formatDate } from "@/lib/utils";
+
+interface PostListProps {
+  posts: any[];
+  totalPages: number;
+  page: number;
+  selectedCategory: string;
+  categories: string[];
+}
 
 function PostSkeleton() {
   return (
@@ -22,67 +27,7 @@ function PostSkeleton() {
   );
 }
 
-export default function PostList({ categories }: { categories: string[] }) {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [posts, setPosts] = useState<any[]>([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [page, setPage] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
-
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
-  useEffect(() => {
-    const pageParam = Number(searchParams.get("page")) || 0;
-    const categoryParam = searchParams.get("category") || categories[0];
-    setPage(pageParam);
-    setSelectedCategory(categoryParam);
-  }, [searchParams, categories]);
-
-  useEffect(() => {
-    let ignore = false;
-    async function fetchPosts() {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        params.set("page", String(page));
-        params.set("size", "10");
-        if (selectedCategory && selectedCategory !== "All") {
-          params.set("category", selectedCategory);
-        }
-        const res = await fetch(`${API_URL}/api/v1/posts?${params.toString()}`);
-        const data = await res.json();
-        if (!ignore) {
-          const mapped = (data.content || []).map((item: any) => ({
-            id: item.id,
-            companyName: item.companyName || "기타",
-            title: item.title,
-            description: item.preview
-              ? item.preview.replace(/<[^>]+>/g, "")
-              : "미리보기가 없습니다.",
-            image: item.thumbnail || "/placeholder.svg?height=120&width=120",
-            url: item.url,
-            publishedAt: formatDate(item.publishedAt),
-            logoImageName: item.logoImageName,
-            categories: item.categories || [],
-          }));
-          setPosts(mapped);
-          setTotalPages(data.totalPages || 1);
-        }
-      } catch (e) {
-        if (!ignore) {
-          setPosts([]);
-          setTotalPages(1);
-        }
-      } finally {
-        if (!ignore) setLoading(false);
-      }
-    }
-    fetchPosts();
-    return () => { ignore = true; };
-  }, [selectedCategory, page]);
-
+export default function PostList({ posts, totalPages, page, selectedCategory, categories }: PostListProps) {
   const maxVisible = 5;
   let start = Math.max(0, page - 2);
   let end = Math.min(totalPages, start + maxVisible);
@@ -92,17 +37,17 @@ export default function PostList({ categories }: { categories: string[] }) {
   const pageNumbers = Array.from({ length: end - start }, (_, i) => start + i);
 
   const handleTabClick = (category: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(window.location.search);
     params.set("category", category);
     params.set("page", "0");
-    router.push(`?${params.toString()}`);
+    window.location.search = params.toString();
   };
 
   const handlePageClick = (p: number) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(window.location.search);
     params.set("category", selectedCategory);
     params.set("page", String(p));
-    router.push(`?${params.toString()}`);
+    window.location.search = params.toString();
   };
 
   return (
@@ -128,9 +73,7 @@ export default function PostList({ categories }: { categories: string[] }) {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Latest Posts</h2>
         <div className="space-y-6">
-          {loading ? (
-            Array.from({ length: 3 }).map((_, i) => <PostSkeleton key={i} />)
-          ) : posts.length === 0 ? (
+          {posts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-gray-500">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

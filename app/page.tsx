@@ -100,6 +100,30 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
   }
   const pageNumbers = Array.from({ length: end - start }, (_, i) => start + i);
 
+  // SSR로 추천 게시물 데이터 패칭
+  let recommendedPosts = [];
+  try {
+    const res = await apiGet("/api/v1/recommendations");
+    const colorSets = [
+      { color: "bg-gradient-to-br from-blue-50 to-blue-100", borderColor: "border-blue-200" },
+      { color: "bg-gradient-to-br from-yellow-50 to-yellow-100", borderColor: "border-yellow-200" },
+      { color: "bg-gradient-to-br from-green-50 to-green-100", borderColor: "border-green-200" },
+      { color: "bg-gradient-to-br from-gray-50 to-gray-100", borderColor: "border-gray-200" },
+      { color: "bg-gradient-to-br from-emerald-50 to-emerald-100", borderColor: "border-emerald-200" },
+    ];
+    recommendedPosts = res.data.map((item: any, idx: number) => {
+      const colorIdx = idx % colorSets.length;
+      return {
+        title: item.title,
+        logo: `/logos/${item.logoImageName}`,
+        color: colorSets[colorIdx].color,
+        borderColor: colorSets[colorIdx].borderColor,
+      };
+    });
+  } catch (e) {
+    recommendedPosts = [];
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
@@ -117,53 +141,57 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
               />
             </div>
 
-            {/* Category Tabs + Post List (CSR) */}
-            <PostList categories={categories} />
+            {/* Category Tabs + Post List (SSR) */}
+            <PostList
+              posts={latestPosts}
+              totalPages={totalPages}
+              page={page}
+              selectedCategory={selectedCategory}
+              categories={categories}
+            />
           </div>
 
           {/* Sidebar */}
-           <div className="space-y-6">
-             {/* AI 추천 게시물 */}
-             <AIRecommendedPosts />
-             {/* Popular Posts */}
-             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-               <CardHeader>
-                 <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">게시물 조회 수 랭킹</CardTitle>
-               </CardHeader>
-               <CardContent>
-                 <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                   {trendingPosts.map((post: any, idx: number) => (
-                     <RankingItem
-                       key={idx}
-                       rank={idx}
-                       logo={post.logoImage}
-                       name={post.title}
-                       score={post.viewCount}
-                     />
-                   ))}
-                 </div>
-               </CardContent>
-             </Card>
-
-             {/* Featured Companies */}
-             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-               <CardHeader>
-                 <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200"> 기술 블로그 기업 리스트 </CardTitle>
-               </CardHeader>
-               <CardContent>
-                 <FeaturedCompanies companies={companies} />
-               </CardContent>
-             </Card>
-
-             {/* Top Companies by Posts */}
-             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-               <CardHeader>
-                 <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">기술 블로그 TOP 15</CardTitle>
-               </CardHeader>
-               <CardContent>
-                 <TopCompaniesByPosts companies={companies} />
-               </CardContent>
-             </Card>
+          <div className="space-y-6">
+            {/* AI 추천 게시물 */}
+            <AIRecommendedPosts posts={recommendedPosts} />
+            {/* Popular Posts */}
+            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">게시물 조회 수 랭킹</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {trendingPosts.map((post: any, idx: number) => (
+                    <RankingItem
+                      key={idx}
+                      rank={idx}
+                      logo={post.logoImage}
+                      name={post.title}
+                      score={post.viewCount}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            {/* Featured Companies */}
+            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200"> 기술 블로그 기업 리스트 </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FeaturedCompanies companies={companies} />
+              </CardContent>
+            </Card>
+            {/* Top Companies by Posts */}
+            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">기술 블로그 TOP 15</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TopCompaniesByPosts companies={companies} />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

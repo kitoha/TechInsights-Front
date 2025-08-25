@@ -11,13 +11,18 @@ interface TopCompaniesByPostsProps {
 
 export default function TopCompaniesByPosts({ companies }: TopCompaniesByPostsProps) {
   return (
-    <div className="space-y-3">
-      {companies.map((company, index) => (
-        <div key={index} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-          <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-            <Image src={company.logoImage} alt={company.name} width={32} height={32} className="object-contain w-full h-full" />
-          </div>
-          <span className="text-gray-900 dark:text-gray-200 font-medium truncate">{company.name}</span>
+    <div className="flex flex-col gap-3">
+      {companies.map((company, idx) => (
+        <div key={idx} className="flex items-center gap-3">
+          <span className="w-6 text-center font-bold text-lg text-emerald-600 dark:text-emerald-400">{idx + 1}</span>
+          <Image
+            src={company.logoImage}
+            alt={company.name}
+            width={28}
+            height={28}
+            className="rounded-full bg-white border border-gray-200 dark:border-gray-700"
+          />
+          <span className="flex-1 truncate font-medium text-gray-800 dark:text-gray-200">{company.name}</span>
         </div>
       ))}
     </div>
