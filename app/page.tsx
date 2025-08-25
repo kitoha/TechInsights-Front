@@ -1,11 +1,13 @@
-import { Search, Bell } from "lucide-react"
+import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import CategoryBadges from "@/components/CategoryBadges"
-import { formatDate } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import Image from "next/image"
+import Link from "next/link"
+import { RankingItem } from "@/components/RankingItem";
+import FeaturedCompanies from "@/components/FeaturedCompanies";
+import TopCompaniesByPosts from "@/components/TopCompaniesByPosts";
+import PostList from "@/components/PostList";
+import AIRecommendedPosts from "@/components/AIRecommendedPosts";
+import { Header } from "@/components/Header";
 import { apiGet } from "@/lib/api";
 import {
   Pagination,
@@ -16,13 +18,6 @@ import {
   PaginationNext,
   PaginationEllipsis,
 } from '@/components/ui/pagination';
-import Link from "next/link"
-import { RankingItem } from "@/components/RankingItem";
-import FeaturedCompanies from "@/components/FeaturedCompanies";
-import TopCompaniesByPosts from "@/components/TopCompaniesByPosts";
-import PostList from "@/components/PostList";
-import AIRecommendedPosts from "@/components/AIRecommendedPosts";
-import { Header } from "@/components/Header";
 
 export default async function HomePage({ searchParams }: { searchParams: any }) {
   const params = await searchParams;
@@ -55,7 +50,7 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
     description: item.preview?.replace(/<[^>]+>/g, ''),
     image: item.thumbnail || "/placeholder.svg?height=120&width=120",
     url: item.url,
-    publishedAt: formatDate(item.publishedAt),
+    publishedAt: item.publishedAt,
     logoImageName: item.logoImageName,
     categories: item.categories || [],
   }))

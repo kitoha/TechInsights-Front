@@ -1,8 +1,7 @@
 "use client";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/components/ui/pagination";
 import CategoryBadges from "@/components/CategoryBadges";
@@ -111,9 +110,8 @@ export default function PostList({ categories }: { categories: string[] }) {
       {/* Category Tabs */}
       <div className="flex flex-wrap gap-2 mb-8">
         {categories.map((category) => (
-          <Button
+          <button
             key={category}
-            variant={selectedCategory === category ? "default" : "ghost"}
             className={
               (selectedCategory === category
                 ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
@@ -123,7 +121,7 @@ export default function PostList({ categories }: { categories: string[] }) {
             onClick={() => handleTabClick(category)}
           >
             {category}
-          </Button>
+          </button>
         ))}
       </div>
       {/* Latest Posts */}
