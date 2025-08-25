@@ -5,7 +5,7 @@ import Link from "next/link"
 import { RankingItem } from "@/components/RankingItem";
 import FeaturedCompanies from "@/components/FeaturedCompanies";
 import TopCompaniesByPosts from "@/components/TopCompaniesByPosts";
-import PostList from "@/components/PostList";
+import PostListFade from "@/components/PostListFade";
 import AIRecommendedPosts from "@/components/AIRecommendedPosts";
 import { Header } from "@/components/Header";
 import { apiGet } from "@/lib/api";
@@ -100,7 +100,6 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
   }
   const pageNumbers = Array.from({ length: end - start }, (_, i) => start + i);
 
-  // SSR로 추천 게시물 데이터 패칭
   let recommendedPosts = [];
   try {
     const res = await apiGet("/api/v1/recommendations");
@@ -142,7 +141,7 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
             </div>
 
             {/* Category Tabs + Post List (SSR) */}
-            <PostList
+            <PostListFade
               posts={latestPosts}
               totalPages={totalPages}
               page={page}
