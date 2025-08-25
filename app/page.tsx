@@ -22,7 +22,7 @@ import FeaturedCompanies from "@/components/FeaturedCompanies";
 import TopCompaniesByPosts from "@/components/TopCompaniesByPosts";
 import PostList from "@/components/PostList";
 import AIRecommendedPosts from "@/components/AIRecommendedPosts";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { Header } from "@/components/Header";
 
 export default async function HomePage({ searchParams }: { searchParams: any }) {
   const params = await searchParams;
@@ -107,45 +107,7 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-                <span className="text-white text-sm font-bold">T</span>
-              </div>
-              <span className="text-xl font-semibold text-gray-900 dark:text-white">Tech Insights</span>
-            </div>
-
-            <nav className="hidden md:flex space-x-8">
-              <a href="#" className="text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300">
-                Home
-              </a>
-              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Categories
-              </a>
-              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Trending
-              </a>
-              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Companies
-              </a>
-            </nav>
-
-            <div className="flex items-center space-x-4">
-              <ThemeToggle />
-              <Button variant="ghost" size="icon">
-                <Bell className="h-5 w-5" />
-              </Button>
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
