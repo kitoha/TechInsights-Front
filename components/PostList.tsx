@@ -53,15 +53,15 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
   return (
     <>
       {/* Category Tabs */}
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div className="flex flex-wrap gap-3 mb-8">
         {categories.map((category) => (
           <button
             key={category}
             className={
+              "px-4 py-2 rounded-full font-medium transition shadow-sm border cursor-pointer " +
               (selectedCategory === category
-                ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
-                : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700") +
-              " cursor-pointer transition-colors"
+                ? "bg-blue-600 text-white border-blue-600 shadow-md dark:bg-blue-500 dark:text-white dark:border-blue-400"
+                : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-blue-900 dark:hover:text-blue-200 dark:hover:border-blue-500")
             }
             onClick={() => handleTabClick(category)}
           >
