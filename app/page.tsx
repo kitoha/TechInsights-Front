@@ -167,8 +167,8 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
                         {idx + 1}
                       </span>
                     </div>
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow duration-200">
-                      <img src={post.logoImage} alt="logo" width={18} height={18} className="w-4.5 h-4.5" />
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <img src={post.logoImage} alt="logo" width={36} height={36} className="object-cover w-full h-full rounded-lg" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-gray-700 dark:text-gray-300 font-medium leading-tight group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors duration-200">
@@ -192,8 +192,8 @@ export default async function HomePage({ searchParams }: { searchParams: any }) 
                         {idx + 1}
                       </span>
                     </div>
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-green-50 to-green-100 border border-green-200 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow duration-200">
-                      <img src={company.logoImage} alt="logo" width={18} height={18} className="w-4.5 h-4.5" />
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <img src={company.logoImage} alt="logo" width={36} height={36} className="object-cover w-full h-full rounded-lg" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-gray-700 dark:text-gray-300 font-medium leading-tight group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors duration-200">

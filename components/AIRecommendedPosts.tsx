@@ -41,13 +41,13 @@ export default function AIRecommendedPosts({ posts }: AIRecommendedPostsProps) {
                     {index + 1}
                   </span>
                 </div>
-                <div className={`w-9 h-9 rounded-lg ${post.color} border ${post.borderColor} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow duration-200`}>
+                <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center flex-shrink-0 overflow-hidden">
                   <Image
                     src={post.logo}
                     alt="Company logo"
-                    width={18}
-                    height={18}
-                    className="w-4.5 h-4.5"
+                    width={36}
+                    height={36}
+                    className="object-cover w-full h-full rounded-lg"
                   />
                 </div>
                 <div className="flex-1 min-w-0">
