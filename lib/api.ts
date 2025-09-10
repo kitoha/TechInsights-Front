@@ -10,4 +10,3 @@ export const api = axios.create({
 
 export const apiGet = <T = any>(url: string, config?: any) => api.get<T>(url, config);
 export const apiPost = <T = any>(url: string, data?: any, config?: any) => api.post<T>(url, data, config);
-// 필요시 put, delete 등도 추가 가능
