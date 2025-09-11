@@ -121,9 +121,6 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   }
 
   const totalPages = data.totalPages || 1;
-  const maxVisible = 5;
-  const start = Math.max(0, page - 2);
-  const end = Math.min(totalPages, start + maxVisible);
 
   let recommendedPosts: Array<{ title: string; logo: string; color: string; borderColor: string }> = [];
   try {
