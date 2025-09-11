@@ -50,6 +50,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   let data: { content: Post[]; totalPages: number } = { content: [], totalPages: 1 };
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts`;
+    console.log('url', url);
     const paramsObj = {
       page,
       size: 10,
