@@ -21,7 +21,7 @@ interface PostData {
 
 async function getPostData(postId: string): Promise<PostData | null> {
   try {
-    const res = await apiGet(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts/${postId}`);
+    const res = await apiGet<PostData>(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts/${postId}`);
     return res.data;
   } catch (error) {
     console.error('Post fetch error:', error);
