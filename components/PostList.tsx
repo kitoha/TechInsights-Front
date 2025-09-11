@@ -76,7 +76,7 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
               <span className="text-lg font-medium">데이터가 없습니다.</span>
             </div>
           ) : (
-            posts.map((post, index) => (
+            posts.map((post) => (
               <Card key={post.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
                 <CardContent className="px-6 py-0">
                   <Link href={`/post/${post.id}`}>

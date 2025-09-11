@@ -5,7 +5,6 @@ import AIRecommendedPosts from "@/components/AIRecommendedPosts";
 import { Header } from "@/components/Header";
 import { apiGet } from "@/lib/api";
 import SidebarListCard from "@/components/SidebarListCard";
-import type { ReactNode } from "react";
 import Image from "next/image";
 
 export interface Post {
@@ -88,11 +87,11 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies/top-by-views`;
     const paramsObj = { page: 0, size: 5 };
-    const res = await apiGet<ApiResponse<any>>(url, {
+    const res = await apiGet<ApiResponse<{logoImageName: string; name: string; totalViewCount: number}>>(url, {
       params: paramsObj
     });
     if (res && typeof res === 'object' && 'data' in res && res.data && 'content' in res.data && Array.isArray(res.data.content)) {
-      trendingCompanies = res.data.content.map((company: any): TrendingPost => ({
+      trendingCompanies = res.data.content.map((company): TrendingPost => ({
         logoImage: `/logos/${company.logoImageName}`,
         title: typeof company.name === 'string' ? (company.name.length > 20 ? `${company.name.slice(0, 20)}...` : company.name) : '',
         viewCount: company.totalViewCount ?? 0
@@ -108,11 +107,11 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies`;
     const paramsObj = { page: 0, size: 15 };
-    const res = await apiGet<ApiResponse<any>>(url, {
+    const res = await apiGet<ApiResponse<{name: string; logoImageName: string}>>(url, {
       params: paramsObj
     });
     if (res && typeof res === 'object' && 'data' in res && res.data && 'content' in res.data && Array.isArray(res.data.content)) {
-      companies = res.data.content.map((company: any): Company => ({
+      companies = res.data.content.map((company): Company => ({
         name: company.name,
         logoImage: `/logos/${company.logoImageName}`
       }));
@@ -125,12 +124,11 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const maxVisible = 5;
   const start = Math.max(0, page - 2);
   const end = Math.min(totalPages, start + maxVisible);
-  const pageNumbers = Array.from({ length: end - start }, (_, i) => start + i);
 
   let recommendedPosts: Array<{ title: string; logo: string; color: string; borderColor: string }> = [];
   try {
     const url = `/api/v1/recommendations`;
-    const res = await apiGet<ApiResponse<any>>(url);
+    const res = await apiGet<{title: string; logoImageName: string}[]>(url);
     const colorSets = [
       { color: "bg-gradient-to-br from-blue-50 to-blue-100", borderColor: "border-blue-200" },
       { color: "bg-gradient-to-br from-yellow-50 to-yellow-100", borderColor: "border-yellow-200" },
@@ -140,7 +138,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     ];
 
     if (res && typeof res === 'object' && 'data' in res && res.data && Array.isArray(res.data)) {
-      recommendedPosts = res.data.map((item: any, idx: number) => {
+      recommendedPosts = res.data.map((item, idx: number) => {
         const colorIdx = idx % colorSets.length;
         return {
           title: item.title,
@@ -150,7 +148,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         };
       });
     }
-  } catch (_e) {
+  } catch {
     recommendedPosts = [];
   }
 
