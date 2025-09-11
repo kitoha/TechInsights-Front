@@ -5,35 +5,30 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import CategoryBadges from "@/components/CategoryBadges";
 import Image from "next/image";
 
+interface Post {
+  id: string;
+  companyName: string;
+  title: string;
+  description?: string;
+  image?: string;
+  url: string;
+  publishedAt: string;
+  logoImageName?: string;
+  categories?: string[];
+}
+
 interface PostListProps {
-  posts: any[];
+  posts: Post[];
   totalPages: number;
   page: number;
   selectedCategory: string;
   categories: string[];
 }
 
-function PostSkeleton() {
-  return (
-    <div className="animate-pulse flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 min-h-[150px]">
-      <div className="flex-1 pr-6">
-        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24 mb-2" />
-        <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-48 mb-2" />
-        <div className="h-4 bg-gray-100 dark:bg-gray-700 rounded w-64 mb-4" />
-        <div className="h-6 bg-gray-100 dark:bg-gray-700 rounded w-32" />
-      </div>
-      <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-lg" />
-    </div>
-  );
-}
-
 export default function PostList({ posts, totalPages, page, selectedCategory, categories }: PostListProps) {
   const maxVisible = 5;
-  let start = Math.max(0, page - 2);
-  let end = Math.min(totalPages, start + maxVisible);
-  if (end - start < maxVisible) {
-    start = Math.max(0, end - maxVisible);
-  }
+  const start = Math.max(0, page - 2);
+  const end = Math.min(totalPages, start + maxVisible);
   const pageNumbers = Array.from({ length: end - start }, (_, i) => start + i);
 
   const handleTabClick = (category: string) => {
@@ -81,8 +76,8 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
               <span className="text-lg font-medium">데이터가 없습니다.</span>
             </div>
           ) : (
-            posts.map((post: any, index: number) => (
-              <Card key={index} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+            posts.map((post, index) => (
+              <Card key={post.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
                 <CardContent className="px-6 py-0">
                   <Link href={`/post/${post.id}`}>
                     <div className="flex items-center justify-between">
@@ -106,12 +101,12 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
                           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{post.title}</h3>
                           <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{post.description}</p>
                         </div>
-                        <CategoryBadges categories={post.categories} />
+                        <CategoryBadges categories={post.categories || []} />
                       </div>
                       <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 dark:from-amber-900 dark:to-orange-800 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
                         <Image
                           src={post.image || "/placeholder.svg"}
-                          alt=""
+                          alt={post.title}
                           width={192}
                           height={192}
                           quality={90}

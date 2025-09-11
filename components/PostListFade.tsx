@@ -3,11 +3,31 @@ import { useEffect, useState } from "react";
 import PostList from "./PostList";
 import { Card, CardContent } from "@/components/ui/card";
 
+interface Post {
+  id: string;
+  companyName: string;
+  title: string;
+  description?: string;
+  image?: string;
+  url: string;
+  publishedAt: string;
+  logoImageName?: string;
+  categories?: string[];
+}
+
+interface PostListProps {
+  posts: Post[];
+  totalPages: number;
+  page: number;
+  selectedCategory: string;
+  categories: string[];
+}
+
 function SkeletonBox({ className = "" }: { className?: string }) {
   return <div className={`animate-pulse bg-gray-200 dark:bg-gray-700 rounded ${className}`} />;
 }
 
-export default function PostListFade(props: any) {
+export default function PostListFade(props: PostListProps) {
   const { posts } = props;
   const [isLoaded, setIsLoaded] = useState(false);
 

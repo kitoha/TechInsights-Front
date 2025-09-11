@@ -2,14 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { ReactNode } from "react";
 
-interface SidebarListCardProps {
+interface SidebarListCardProps<T = unknown> {
   title: string;
-  items: any[];
-  itemRender: (item: any, idx: number) => ReactNode;
+  items: T[];
+  itemRender: (item: T, idx: number) => React.ReactNode;
   moreLink?: string;
 }
 
-export default function SidebarListCard({ title, items, itemRender, moreLink }: SidebarListCardProps) {
+export default function SidebarListCard<T = unknown>({ title, items, itemRender, moreLink }: SidebarListCardProps<T>) {
   return (
     <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200">
       <CardHeader className="px-4 py-3 pb-1">

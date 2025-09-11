@@ -8,11 +8,24 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import ReactMarkdown from "react-markdown";
 
+interface Post {
+  id: string;
+  companyName: string;
+  title: string;
+  description?: string;
+  content: string;
+  url: string;
+  publishedAt: string;
+  thumbnail?: string;
+  logoImageName?: string;
+  categories?: string[];
+}
+
 function SkeletonBox({ className = "" }: { className?: string }) {
   return <div className={`animate-pulse bg-gray-200 dark:bg-gray-700 rounded ${className}`} />;
 }
 
-export default function PostDetailFade({ post }: { post: any }) {
+export default function PostDetailFade({ post }: { post: Post }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {

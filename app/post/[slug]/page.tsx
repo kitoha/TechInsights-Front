@@ -1,14 +1,5 @@
-import { Header } from "@/components/Header";
-import { Search, Bell, Heart, Share2, ArrowLeft } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Textarea } from "@/components/ui/textarea"
-import ReactMarkdown from "react-markdown";
-import Image from "next/image"
-import Link from "next/link"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { apiGet } from "@/lib/api";
 import PostDetailFade from "@/components/PostDetailFade";
 
