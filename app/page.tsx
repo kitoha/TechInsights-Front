@@ -4,6 +4,7 @@ import PostListFade from "@/components/PostListFade";
 import AIRecommendedPosts from "@/components/AIRecommendedPosts";
 import { Header } from "@/components/Header";
 import { apiGet } from "@/lib/api";
+import { redirect } from "next/navigation";
 import SidebarListCard from "@/components/SidebarListCard";
 import Image from "next/image";
 
@@ -65,7 +66,11 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         totalPages: res.data.totalPages
       };
     }
-  } catch (error) {
+  } catch (error: unknown) {
+    const status = typeof error === 'object' && error && 'response' in error ? (error as any).response?.status : undefined;
+    if (status === 503) {
+      redirect('/maintenance.html');
+    }
     console.error('Posts fetch error:', error);
   }
 
