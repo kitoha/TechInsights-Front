@@ -145,12 +145,12 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
         <Pagination className="mt-8">
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious onClick={() => handlePageClick(page - 1)} aria-disabled={page <= 0} />
+              <PaginationPrevious className="cursor-pointer" onClick={() => handlePageClick(page - 1)} aria-disabled={page <= 0} />
             </PaginationItem>
             {start > 0 && (
               <>
                 <PaginationItem>
-                  <PaginationLink onClick={() => handlePageClick(0)}>1</PaginationLink>
+                  <PaginationLink className="cursor-pointer" onClick={() => handlePageClick(0)}>1</PaginationLink>
                 </PaginationItem>
                 {start > 1 && (
                   <PaginationItem>
@@ -161,7 +161,7 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
             )}
             {pageNumbers.map((p) => (
               <PaginationItem key={p}>
-                <PaginationLink onClick={() => handlePageClick(p)} isActive={p === page}>
+                <PaginationLink className="cursor-pointer" onClick={() => handlePageClick(p)} isActive={p === page}>
                   {p + 1}
                 </PaginationLink>
               </PaginationItem>
@@ -174,12 +174,12 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
                   </PaginationItem>
                 )}
                 <PaginationItem>
-                  <PaginationLink onClick={() => handlePageClick(totalPages - 1)}>{totalPages}</PaginationLink>
+                  <PaginationLink className="cursor-pointer" onClick={() => handlePageClick(totalPages - 1)}>{totalPages}</PaginationLink>
                 </PaginationItem>
               </>
             )}
             <PaginationItem>
-              <PaginationNext onClick={() => handlePageClick(page + 1)} aria-disabled={page + 1 >= totalPages} />
+              <PaginationNext className="cursor-pointer" onClick={() => handlePageClick(page + 1)} aria-disabled={page + 1 >= totalPages} />
             </PaginationItem>
           </PaginationContent>
         </Pagination>

@@ -10,6 +10,23 @@ export const api = axios.create({
     : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    if (status === 503) {
+      if (typeof window !== 'undefined') {
+        try {
+          window.location.href = '/maintenance.html';
+        } catch (_) {
+          // no-op
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export async function apiGet<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
   return api.get<T>(url, config);
 }

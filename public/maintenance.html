@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>System Maintenance | Tech Insights</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/maintenance.css" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="brand">
+        <div class="brand__dot"></div>
+        <h1 class="brand__title">Tech Insights</h1>
+      </header>
+
+      <section class="card">
+        <div class="illustration" aria-hidden="true">
+          <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" role="img">
+            <defs>
+              <linearGradient id="g" x1="0" x2="1">
+                <stop offset="0%" stop-color="#6ee7b7" />
+                <stop offset="100%" stop-color="#22d3ee" />
+              </linearGradient>
+              <linearGradient id="g2" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#94a3b8" stop-opacity=".2" />
+                <stop offset="100%" stop-color="#94a3b8" stop-opacity=".05" />
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="400" height="200" fill="url(#g2)" rx="16" />
+            <g>
+              <circle cx="110" cy="120" r="28" fill="url(#g)" />
+              <rect x="150" y="70" width="140" height="90" rx="10" fill="#111827" />
+              <rect x="160" y="82" width="120" height="10" rx="5" fill="#1f2937" />
+              <rect x="160" y="100" width="90" height="10" rx="5" fill="#1f2937" />
+              <rect x="160" y="118" width="70" height="10" rx="5" fill="#1f2937" />
+            </g>
+          </svg>
+        </div>
+        <h2 class="headline">시스템 점검 중입니다</h2>
+        <p class="desc">안정적인 서비스 제공을 위해 시스템 점검을 진행 중이에요.</p>
+        <p class="eta">
+          예상 복구 시간: <span id="eta-text">오늘 22:00 (KST)</span>
+        </p>
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65">
+          <div class="progress__bar" style="width: 65%"></div>
+        </div>
+        <div class="tips">
+          <p>잠시 후 다시 접속해 주세요. 브라우저 새로고침으로 최신 상태를 확인할 수 있어요.</p>
+        </div>
+        <a class="cta" href="/" aria-label="홈으로">홈으로 이동</a>
+      </section>
+
+      <footer class="footer">
+        <span>© <span id="year"></span> Tech Insights</span>
+        <span class="dot">•</span>
+        <a href="mailto:support@techinsights.example" class="link">문의하기</a>
+      </footer>
+    </main>
+
+    <script>
+      (function () {
+        const y = document.getElementById('year');
+        if (y) y.textContent = String(new Date().getFullYear());
+      })();
+    </script>
+  </body>
+  </html>
+
+
