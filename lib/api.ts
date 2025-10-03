@@ -18,7 +18,7 @@ api.interceptors.response.use(
       if (typeof window !== 'undefined') {
         try {
           window.location.href = '/maintenance.html';
-        } catch (_) {
+        } catch {
           // no-op
         }
       }
