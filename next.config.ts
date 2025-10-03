@@ -12,7 +12,8 @@ const nextConfig: NextConfig = {
       'thefarmersfront.github.io',
       't1.kakaocdn.net',
       'blog.banksalad.com',
-      'oliveyoung.tech'
+      'oliveyoung.tech',
+      'miro.medium.com'
     ],
   },
 };

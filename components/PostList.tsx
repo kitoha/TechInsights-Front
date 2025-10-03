@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/components/ui/pagination";
 import CategoryBadges from "@/components/CategoryBadges";
 import Image from "next/image";
+import { useState } from "react";
 
 interface Post {
   id: string;
@@ -43,6 +44,33 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
     params.set("category", selectedCategory);
     params.set("page", String(p));
     window.location.search = params.toString();
+  };
+
+  const FallbackPostImage = ({ post }: { post: Post }) => {
+    const initialSrc = post.image || "/placeholder.svg";
+    const [imgSrc, setImgSrc] = useState<string>(initialSrc);
+
+    const handleError = () => {
+      if (post.logoImageName && !imgSrc.includes("/logos/")) {
+        setImgSrc(`/logos/${post.logoImageName}`);
+        return;
+      }
+      if (imgSrc !== "/placeholder.svg") {
+        setImgSrc("/placeholder.svg");
+      }
+    };
+
+    return (
+      <Image
+        src={imgSrc}
+        alt={post.title}
+        width={192}
+        height={192}
+        quality={90}
+        className="w-full h-full object-cover rounded-lg"
+        onError={handleError}
+      />
+    );
   };
 
   return (
@@ -104,14 +132,7 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
                         <CategoryBadges categories={post.categories || []} />
                       </div>
                       <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 dark:from-amber-900 dark:to-orange-800 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
-                        <Image
-                          src={post.image || "/placeholder.svg"}
-                          alt={post.title}
-                          width={192}
-                          height={192}
-                          quality={90}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
+                        <FallbackPostImage post={post} />
                       </div>
                     </div>
                   </Link>
