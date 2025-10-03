@@ -1,4 +1,5 @@
 import { Search } from "lucide-react"
+import { isAxiosError } from "axios"
 import { Input } from "@/components/ui/input"
 import PostListFade from "@/components/PostListFade";
 import AIRecommendedPosts from "@/components/AIRecommendedPosts";
@@ -67,7 +68,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       };
     }
   } catch (error: unknown) {
-    const status = typeof error === 'object' && error && 'response' in error ? (error as any).response?.status : undefined;
+    const status: number | undefined = isAxiosError(error) ? error.response?.status : undefined;
     if (status === 503) {
       redirect('/maintenance.html');
     }
