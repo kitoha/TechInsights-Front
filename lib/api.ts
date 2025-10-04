@@ -34,3 +34,11 @@ export async function apiGet<T = unknown>(url: string, config?: AxiosRequestConf
 export async function apiPost<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
   return api.post<T>(url, data, config);
 }
+
+export async function apiPut<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  return api.put<T>(url, data, config);
+}
+
+export async function apiDelete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  return api.delete<T>(url, config);
+}

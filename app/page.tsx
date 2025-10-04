@@ -1,12 +1,11 @@
-import { Search } from "lucide-react"
 import { isAxiosError } from "axios"
-import { Input } from "@/components/ui/input"
 import PostListFade from "@/components/PostListFade";
 import AIRecommendedPosts from "@/components/AIRecommendedPosts";
 import { Header } from "@/components/Header";
 import { apiGet } from "@/lib/api";
 import { redirect } from "next/navigation";
 import SidebarListCard from "@/components/SidebarListCard";
+import SearchBar from "@/components/SearchBar";
 import Image from "next/image";
 
 export interface Post {
@@ -19,7 +18,6 @@ export interface Post {
   publishedAt: string;
   logoImageName?: string;
   categories?: string[];
-  // 아래는 API 응답에 따라 optional로 추가
   preview?: string;
   thumbnail?: string;
 }
@@ -163,13 +161,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Search Bar */}
-            <div className="relative mb-6">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <Input
-                placeholder="Search for posts, topics, or companies"
-                className="pl-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 h-12 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-              />
-            </div>
+            <SearchBar className="mb-6" />
             {/* Category Tabs + Post List (SSR) */}
             <PostListFade
               posts={latestPosts}
