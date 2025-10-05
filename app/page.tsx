@@ -7,7 +7,7 @@ import {
   fetchCompanies, 
   fetchRecommendedPosts
 } from "@/lib/dataFetchers";
-import { Post, Company, TrendingPost, RecommendedPost } from "@/lib/types";
+import { Post } from "@/lib/types";
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;

@@ -1,8 +1,9 @@
 import PostListFade from "./PostListFade";
 import SearchBar from "./SearchBar";
+import { Post } from "@/lib/types";
 
 interface MainContentProps {
-  posts: any[];
+  posts: Post[];
   totalPages: number;
   page: number;
   selectedCategory: string;

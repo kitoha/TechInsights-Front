@@ -1,8 +1,5 @@
 "use client"
 
-import { Bell } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { usePathname } from "next/navigation"
