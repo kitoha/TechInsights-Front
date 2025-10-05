@@ -22,7 +22,6 @@ const nextConfig: NextConfig = {
   },
   // 성능 최적화 설정
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['@/components', '@/lib'],
   },
   // 압축 설정
