@@ -3,8 +3,8 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/components/ui/pagination";
 import CategoryBadges from "@/components/CategoryBadges";
-import Image from "next/image";
-import { useState } from "react";
+import { OptimizedImage } from "@/components/OptimizedImage";
+import { useState, memo, useCallback } from "react";
 
 interface Post {
   id: string;
@@ -26,52 +26,26 @@ interface PostListProps {
   categories: string[];
 }
 
-export default function PostList({ posts, totalPages, page, selectedCategory, categories }: PostListProps) {
+const PostList = memo(function PostList({ posts, totalPages, page, selectedCategory, categories }: PostListProps) {
   const maxVisible = 5;
   const start = Math.max(0, page - 2);
   const end = Math.min(totalPages, start + maxVisible);
   const pageNumbers = Array.from({ length: end - start }, (_, i) => start + i);
 
-  const handleTabClick = (category: string) => {
+  const handleTabClick = useCallback((category: string) => {
     const params = new URLSearchParams(window.location.search);
     params.set("category", category);
     params.set("page", "0");
     window.location.search = params.toString();
-  };
+  }, []);
 
-  const handlePageClick = (p: number) => {
+  const handlePageClick = useCallback((p: number) => {
     const params = new URLSearchParams(window.location.search);
     params.set("category", selectedCategory);
     params.set("page", String(p));
     window.location.search = params.toString();
-  };
+  }, [selectedCategory]);
 
-  const FallbackPostImage = ({ post }: { post: Post }) => {
-    const initialSrc = post.image || "/placeholder.svg";
-    const [imgSrc, setImgSrc] = useState<string>(initialSrc);
-
-    const handleError = () => {
-      if (post.logoImageName && !imgSrc.includes("/logos/")) {
-        setImgSrc(`/logos/${post.logoImageName}`);
-        return;
-      }
-      if (imgSrc !== "/placeholder.svg") {
-        setImgSrc("/placeholder.svg");
-      }
-    };
-
-    return (
-      <Image
-        src={imgSrc}
-        alt={post.title}
-        width={192}
-        height={192}
-        quality={90}
-        className="w-full h-full object-cover rounded-lg"
-        onError={handleError}
-      />
-    );
-  };
 
   return (
     <>
@@ -104,39 +78,7 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
             </div>
           ) : (
             posts.map((post) => (
-              <Card key={post.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-                <CardContent className="px-6 py-0">
-                  <Link href={`/post/${post.id}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 pr-6 flex flex-col min-h-[150px] justify-between">
-                        <div>
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                              {post.logoImageName && (
-                                <Image
-                                  src={`/logos/${post.logoImageName}`}
-                                  alt={post.companyName}
-                                  width={24}
-                                  height={24}
-                                  className="object-contain w-6 h-6 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
-                                />
-                              )}
-                              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{post.companyName}</span>
-                            </div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{post.publishedAt}</span>
-                          </div>
-                          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{post.title}</h3>
-                          <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{post.description}</p>
-                        </div>
-                        <CategoryBadges categories={post.categories || []} />
-                      </div>
-                      <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 dark:from-amber-900 dark:to-orange-800 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
-                        <FallbackPostImage post={post} />
-                      </div>
-                    </div>
-                  </Link>
-                </CardContent>
-              </Card>
+              <PostCard key={post.id} post={post} />
             ))
           )}
         </div>
@@ -185,4 +127,49 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
       </section>
     </>
   );
-} 
+});
+
+const PostCard = memo(({ post }: { post: Post }) => (
+  <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+    <CardContent className="px-6 py-0">
+      <Link href={`/post/${post.id}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex-1 pr-6 flex flex-col min-h-[150px] justify-between">
+            <div>
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  {post.logoImageName && (
+                    <OptimizedImage
+                      src={`/logos/${post.logoImageName}`}
+                      alt={post.companyName}
+                      width={24}
+                      height={24}
+                      className="object-contain w-6 h-6 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
+                    />
+                  )}
+                  <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{post.companyName}</span>
+                </div>
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{post.publishedAt}</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{post.title}</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{post.description}</p>
+            </div>
+            <CategoryBadges categories={post.categories || []} />
+          </div>
+          <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 dark:from-amber-900 dark:to-orange-800 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
+            <OptimizedImage
+              src={post.image || "/placeholder.svg"}
+              alt={post.title}
+              width={192}
+              height={192}
+              className="w-full h-full object-cover rounded-lg"
+              fallbackSrc={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
+            />
+          </div>
+        </div>
+      </Link>
+    </CardContent>
+  </Card>
+));
+
+export default PostList; 

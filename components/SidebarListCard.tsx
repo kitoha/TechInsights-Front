@@ -1,14 +1,24 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { SidebarItem } from "./SidebarItem";
 
 interface SidebarListCardProps<T = unknown> {
   title: string;
   items: T[];
-  itemRender: (item: T, idx: number) => React.ReactNode;
+  itemRender?: (item: T, idx: number) => React.ReactNode;
   moreLink?: string;
+  loading?: boolean;
+  emptyMessage?: string;
 }
 
-export default function SidebarListCard<T = unknown>({ title, items, itemRender, moreLink }: SidebarListCardProps<T>) {
+export default function SidebarListCard<T = unknown>({ 
+  title, 
+  items, 
+  itemRender, 
+  moreLink, 
+  loading = false,
+  emptyMessage = "데이터가 없습니다."
+}: SidebarListCardProps<T>) {
   return (
     <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200">
       <CardHeader className="px-4 py-3 pb-1">
@@ -29,7 +39,17 @@ export default function SidebarListCard<T = unknown>({ title, items, itemRender,
       </CardHeader>
       <CardContent className="px-4 pt-0 pb-3">
         <div className="space-y-2">
-          {items.map((item, idx) => itemRender(item, idx))}
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            </div>
+          ) : items.length === 0 ? (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400 text-sm">
+              {emptyMessage}
+            </div>
+          ) : (
+            items.map((item, idx) => itemRender ? itemRender(item, idx) : null)
+          )}
         </div>
       </CardContent>
     </Card>

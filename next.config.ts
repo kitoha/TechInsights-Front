@@ -15,7 +15,22 @@ const nextConfig: NextConfig = {
       'oliveyoung.tech',
       'miro.medium.com'
     ],
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  // 성능 최적화 설정
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['@/components', '@/lib'],
+  },
+  // 압축 설정
+  compress: true,
+  // 정적 파일 최적화
+  trailingSlash: false,
+  // 빌드 최적화
+  swcMinify: true,
 };
 
 export default nextConfig;
