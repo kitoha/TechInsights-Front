@@ -42,7 +42,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
         setResults(response.data)
         setIsOpen(true)
         setSelectedIndex(-1)
-      } catch (err) {
+      } catch {
         setError("검색 중 오류가 발생했습니다.")
         setResults(null)
         setIsOpen(false)
