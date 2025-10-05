@@ -29,8 +29,6 @@ const nextConfig: NextConfig = {
   compress: true,
   // 정적 파일 최적화
   trailingSlash: false,
-  // 빌드 최적화
-  swcMinify: true,
 };
 
 export default nextConfig;
