@@ -16,26 +16,22 @@ export default async function CategoriesPage() {
   let categories: CategoryStats[] = [];
 
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/categories/stats`;
-    const paramsObj = { page: 0, size: 10 };
-    const res = await apiGet<ApiResponse<{
-      name: string;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/categories/summary`;
+    const res = await apiGet<{
+      category: string;
       postCount: number;
       totalViewCount: number;
-      latestPostAt: string;
-    }>>(url, {
-      params: paramsObj
-    });
+      latestPostDate: string;
+    }[]>(url);
 
-    if (res && typeof res === 'object' && 'data' in res && res.data && 'content' in res.data) {
-      categories = res.data.content.map((category): CategoryStats => ({
-        id: category.name.toLowerCase(),
-        name: category.name,
+    if (res && typeof res === 'object' && 'data' in res && res.data && Array.isArray(res.data)) {
+      categories = res.data.map((category): CategoryStats => ({
+        id: category.category.toLowerCase(),
+        name: category.category,
         postCount: category.postCount,
         totalViews: category.totalViewCount,
-        latestPost: formatTimeAgo(category.latestPostAt),
-        color: getCategoryColor(category.name),
-        icon: getCategoryIcon(category.name)
+        latestPost: formatTimeAgo(category.latestPostDate),
+        logoImage: `/categories/${category.category.toLowerCase()}.svg`
       }));
     }
   } catch (error: unknown) {
@@ -50,65 +46,58 @@ export default async function CategoriesPage() {
       {
         id: "all",
         name: "All",
-        postCount: 1245,
-        totalViews: 15600000,
-        latestPost: "1시간 전",
-        color: "bg-gradient-to-br from-gray-500 to-gray-600",
-        icon: "A"
+        postCount: 36,
+        totalViews: 1,
+        latestPost: "2022년 9월",
+        logoImage: "/categories/all.svg"
       },
       {
         id: "frontend",
         name: "FrontEnd",
-        postCount: 342,
-        totalViews: 4200000,
-        latestPost: "2시간 전",
-        color: "bg-gradient-to-br from-blue-500 to-blue-600",
-        icon: "F"
+        postCount: 26,
+        totalViews: 2,
+        latestPost: "2022년 9월",
+        logoImage: "/categories/frontend.svg"
       },
       {
         id: "backend",
         name: "BackEnd",
-        postCount: 456,
-        totalViews: 5800000,
-        latestPost: "30분 전",
-        color: "bg-gradient-to-br from-green-500 to-green-600",
-        icon: "B"
+        postCount: 54,
+        totalViews: 4,
+        latestPost: "2022년 9월",
+        logoImage: "/categories/backend.svg"
       },
       {
         id: "ai",
         name: "AI",
-        postCount: 234,
-        totalViews: 3200000,
-        latestPost: "3시간 전",
-        color: "bg-gradient-to-br from-purple-500 to-purple-600",
-        icon: "AI"
+        postCount: 3,
+        totalViews: 1,
+        latestPost: "2022년 2월",
+        logoImage: "/categories/ai.svg"
       },
       {
         id: "bigdata",
-        name: "Big Data",
-        postCount: 189,
-        totalViews: 2100000,
-        latestPost: "5시간 전",
-        color: "bg-gradient-to-br from-orange-500 to-orange-600",
-        icon: "BD"
+        name: "BigData",
+        postCount: 10,
+        totalViews: 2,
+        latestPost: "2022년 8월",
+        logoImage: "/categories/bigdata.svg"
       },
       {
         id: "infra",
         name: "Infra",
-        postCount: 298,
-        totalViews: 3800000,
-        latestPost: "1일 전",
-        color: "bg-gradient-to-br from-red-500 to-red-600",
-        icon: "I"
+        postCount: 31,
+        totalViews: 5,
+        latestPost: "2022년 8월",
+        logoImage: "/categories/infra.svg"
       },
       {
         id: "architecture",
         name: "Architecture",
-        postCount: 167,
-        totalViews: 1900000,
-        latestPost: "2일 전",
-        color: "bg-gradient-to-br from-indigo-500 to-indigo-600",
-        icon: "AR"
+        postCount: 59,
+        totalViews: 6,
+        latestPost: "2022년 9월",
+        logoImage: "/categories/architecture.svg"
       }
     ];
   }
@@ -155,28 +144,3 @@ function formatTimeAgo(dateString: string): string {
   }
 }
 
-function getCategoryColor(categoryName: string): string {
-  const colorMap: { [key: string]: string } = {
-    "All": "bg-gradient-to-br from-gray-500 to-gray-600",
-    "FrontEnd": "bg-gradient-to-br from-blue-500 to-blue-600",
-    "BackEnd": "bg-gradient-to-br from-green-500 to-green-600",
-    "AI": "bg-gradient-to-br from-purple-500 to-purple-600",
-    "Big Data": "bg-gradient-to-br from-orange-500 to-orange-600",
-    "Infra": "bg-gradient-to-br from-red-500 to-red-600",
-    "Architecture": "bg-gradient-to-br from-indigo-500 to-indigo-600"
-  };
-  return colorMap[categoryName] || "bg-gradient-to-br from-gray-500 to-gray-600";
-}
-
-function getCategoryIcon(categoryName: string): string {
-  const iconMap: { [key: string]: string } = {
-    "All": "A",
-    "FrontEnd": "F",
-    "BackEnd": "B",
-    "AI": "AI",
-    "Big Data": "BD",
-    "Infra": "I",
-    "Architecture": "AR"
-  };
-  return iconMap[categoryName] || "?";
-}

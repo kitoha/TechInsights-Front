@@ -94,7 +94,6 @@ export default function PostList({ posts, totalPages, page, selectedCategory, ca
       </div>
       {/* Latest Posts */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">신규 콘텐츠</h2>
         <div className="space-y-6">
           {posts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-gray-500">

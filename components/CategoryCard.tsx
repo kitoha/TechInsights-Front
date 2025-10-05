@@ -1,4 +1,6 @@
 import { Card } from "@/components/ui/card";
+import Image from "next/image";
+import Link from "next/link";
 
 export interface CategoryStats {
   id: string;
@@ -6,8 +8,7 @@ export interface CategoryStats {
   postCount: number;
   totalViews: number;
   latestPost: string;
-  color: string;
-  icon: string;
+  logoImage: string;
 }
 
 interface CategoryCardProps {
@@ -24,15 +25,24 @@ export function CategoryCard({ category }: CategoryCardProps) {
     return views.toString();
   };
 
+  const getCategoryUrl = (categoryName: string) => {
+    return `/?category=${encodeURIComponent(categoryName)}&page=0`;
+  };
+
   return (
-    <Card className="p-6 hover:shadow-lg transition-shadow duration-200">
+    <Link href={getCategoryUrl(category.name)} className="block">
+      <Card className="p-6 hover:shadow-lg hover:scale-105 transition-all duration-200 cursor-pointer group">
       <div className="flex items-center gap-4 mb-4">
-        <div 
-          className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${category.color}`}
-        >
-          {category.icon}
+        <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden group-hover:bg-gray-200 dark:group-hover:bg-gray-600 transition-colors duration-200">
+          <Image 
+            src={category.logoImage} 
+            alt={`${category.name} logo`} 
+            width={48} 
+            height={48} 
+            className="object-cover w-full h-full"
+          />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
           {category.name}
         </h3>
       </div>
@@ -62,6 +72,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
           </span>
         </div>
       </div>
-    </Card>
+      </Card>
+    </Link>
   );
 }

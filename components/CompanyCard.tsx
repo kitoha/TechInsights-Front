@@ -30,7 +30,6 @@ export function CompanyCard({ company }: CompanyCardProps) {
       const urlObj = new URL(url);
       return urlObj.hostname;
     } catch {
-      // URL 파싱 실패 시 원본 URL 반환
       return url;
     }
   };
