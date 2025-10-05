@@ -1,4 +1,6 @@
-type Props = { categories: string[] };
+type Props = { 
+  categories: string[];
+};
 
 export default function CategoryBadges({ categories }: Props) {
   return (

@@ -6,6 +6,16 @@ import CategoryBadges from "@/components/CategoryBadges";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { memo, useCallback } from "react";
 
+// 날짜를 한국어 형식으로 변환하는 함수
+function formatKoreanDate(dateString: string): string {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  
+  return `${year}년${month}월${day}일`;
+}
+
 interface Post {
   id: string;
   companyName: string;
@@ -137,35 +147,50 @@ const PostCard = memo(function PostCard({ post }: { post: Post }) {
         <div className="flex items-center justify-between">
           <div className="flex-1 pr-6 flex flex-col min-h-[150px] justify-between">
             <div>
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  {post.logoImageName && (
-                    <OptimizedImage
-                      src={`/logos/${post.logoImageName}`}
-                      alt={post.companyName}
-                      width={24}
-                      height={24}
-                      className="object-contain w-6 h-6 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
-                    />
-                  )}
-                  <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{post.companyName}</span>
-                </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{post.publishedAt}</span>
+              <div className="flex items-center gap-2 mb-2">
+                {post.logoImageName && (
+                  <OptimizedImage
+                    src={`/logos/${post.logoImageName}`}
+                    alt={post.companyName}
+                    width={24}
+                    height={24}
+                    className="object-contain w-6 h-6 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
+                  />
+                )}
+                <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{post.companyName}</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{post.title}</h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{post.description}</p>
             </div>
-            <CategoryBadges categories={post.categories || []} />
+            <div className="flex items-center justify-between">
+              <CategoryBadges categories={post.categories || []} />
+              <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap">
+                <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>
+                  {(() => {
+                    const date = new Date(post.publishedAt);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}년${month}월${day}일`;
+                  })()}
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-200 dark:from-amber-900 dark:to-orange-800 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
-            <OptimizedImage
-              src={post.image || "/placeholder.svg"}
-              alt={post.title}
-              width={192}
-              height={192}
-              className="w-full h-full object-cover rounded-lg"
-              fallbackSrc={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
-            />
+          <div className="w-24 flex-shrink-0">
+            <div className="w-24 h-24 rounded-lg overflow-hidden">
+              <OptimizedImage
+                src={post.image || "/placeholder.svg"}
+                alt={post.title}
+                width={192}
+                height={192}
+                className="w-full h-full object-cover rounded-lg"
+                fallbackSrc={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
+              />
+            </div>
           </div>
         </div>
       </Link>
