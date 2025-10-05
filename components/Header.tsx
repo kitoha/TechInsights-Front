@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/ThemeToggle"
+import { usePathname } from "next/navigation"
 
 export function Header() {
+  const pathname = usePathname()
   return (
     <header className="bg-card border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,18 +21,46 @@ export function Header() {
           </div>
 
           <nav className="hidden md:flex space-x-8">
-            <Link href="/" className="text-foreground hover:text-muted-foreground">
+            <Link 
+              href="/" 
+              className={`hover:text-muted-foreground transition-colors ${
+                pathname === "/" 
+                  ? "text-foreground font-semibold" 
+                  : "text-muted-foreground"
+              }`}
+            >
               Home
             </Link>
-            <a href="#" className="text-muted-foreground hover:text-foreground">
+            <Link 
+              href="/categories" 
+              className={`hover:text-foreground transition-colors ${
+                pathname === "/categories" 
+                  ? "text-foreground font-semibold" 
+                  : "text-muted-foreground"
+              }`}
+            >
               Categories
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-foreground">
+            </Link>
+            <a 
+              href="#" 
+              className={`hover:text-foreground transition-colors ${
+                pathname === "/trending" 
+                  ? "text-foreground font-semibold" 
+                  : "text-muted-foreground"
+              }`}
+            >
               Trending
             </a>
-            <a href="#" className="text-muted-foreground hover:text-foreground">
+            <Link 
+              href="/companies" 
+              className={`hover:text-foreground transition-colors ${
+                pathname === "/companies" 
+                  ? "text-foreground font-semibold" 
+                  : "text-muted-foreground"
+              }`}
+            >
               Companies
-            </a>
+            </Link>
           </nav>
 
           <div className="flex items-center space-x-4">
