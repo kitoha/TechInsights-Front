@@ -6,15 +6,6 @@ import CategoryBadges from "@/components/CategoryBadges";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { memo, useCallback } from "react";
 
-// 날짜를 한국어 형식으로 변환하는 함수
-function formatKoreanDate(dateString: string): string {
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  
-  return `${year}년${month}월${day}일`;
-}
 
 interface Post {
   id: string;
