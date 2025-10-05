@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiGet } from '@/lib/api';
 
 interface UseApiDataOptions {
@@ -8,7 +8,7 @@ interface UseApiDataOptions {
 
 export function useApiData<T>(
   url: string, 
-  params?: Record<string, any>,
+  params?: Record<string, unknown>,
   options: UseApiDataOptions = {}
 ) {
   const [data, setData] = useState<T | null>(null);
@@ -17,7 +17,7 @@ export function useApiData<T>(
 
   const { enabled = true, refetchInterval } = options;
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!enabled) return;
     
     try {
@@ -30,18 +30,20 @@ export function useApiData<T>(
     } finally {
       setLoading(false);
     }
-  };
+  }, [url, params, enabled]);
 
+  const paramsString = JSON.stringify(params);
+  
   useEffect(() => {
     fetchData();
-  }, [url, JSON.stringify(params), enabled]);
+  }, [url, paramsString, enabled, fetchData]);
 
   useEffect(() => {
     if (refetchInterval) {
       const interval = setInterval(fetchData, refetchInterval);
       return () => clearInterval(interval);
     }
-  }, [refetchInterval]);
+  }, [refetchInterval, fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 }

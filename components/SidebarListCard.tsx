@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { SidebarItem } from "./SidebarItem";
 
 interface SidebarListCardProps<T = unknown> {
   title: string;

@@ -1,7 +1,6 @@
 import { SidebarItem } from "./SidebarItem";
 import SidebarListCard from "./SidebarListCard";
 import AIRecommendedPosts from "./AIRecommendedPosts";
-import Image from "next/image";
 
 interface TrendingPost {
   logoImage: string;

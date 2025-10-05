@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/components/ui/pagination";
 import CategoryBadges from "@/components/CategoryBadges";
 import { OptimizedImage } from "@/components/OptimizedImage";
-import { useState, memo, useCallback } from "react";
+import { memo, useCallback } from "react";
 
 interface Post {
   id: string;
@@ -129,7 +129,8 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
   );
 });
 
-const PostCard = memo(({ post }: { post: Post }) => (
+const PostCard = memo(function PostCard({ post }: { post: Post }) {
+  return (
   <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
     <CardContent className="px-6 py-0">
       <Link href={`/post/${post.id}`}>
@@ -170,6 +171,7 @@ const PostCard = memo(({ post }: { post: Post }) => (
       </Link>
     </CardContent>
   </Card>
-));
+  );
+});
 
 export default PostList; 
