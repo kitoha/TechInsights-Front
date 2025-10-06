@@ -69,10 +69,8 @@ export async function fetchPostsByCompany(
   }
 }
 
-// 회사 정보 가져오기 (단건 조회)
 export async function fetchCompanyInfo(companyId: string): Promise<{ name: string; logoImageName: string } | null> {
   try {
-    // /api/v1/companies/{companyId} API를 사용해서 단건 조회
     const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies/${companyId}`;
     const res = await apiGet<{ name: string; logoImageName: string }>(url);
     
@@ -114,11 +112,10 @@ export async function fetchTrendingCompanies(): Promise<TrendingPost[]> {
   }
 }
 
-// 회사 목록 데이터 페칭
 export async function fetchCompanies(): Promise<Company[]> {
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies`;
-    const paramsObj = { page: 0, size: 15 };
+    const paramsObj = { page: 0, size: 30 };
     const res = await apiGet<ApiResponse<{name: string; logoImageName: string}>>(url, {
       params: paramsObj
     });
