@@ -1,7 +1,6 @@
 'use client'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
-import Link from "next/link"
 
 interface RecommendedPost {
   title: string
