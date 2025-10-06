@@ -108,7 +108,8 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     const posts = results.posts?.slice(0, 5) || []
     
     if (index < maxCompanies) {
-      router.push(`/company/${companies[index].id}`)
+      // 회사 클릭 시 홈으로 이동하면서 companyId 파라미터 전달
+      router.push(`/?companyId=${companies[index].id}`)
     } else {
       const postIndex = index - maxCompanies
       router.push(`/post/${posts[postIndex].id}`)

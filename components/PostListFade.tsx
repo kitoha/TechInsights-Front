@@ -21,6 +21,7 @@ interface PostListProps {
   page: number;
   selectedCategory: string;
   categories: string[];
+  companyId?: string;
 }
 
 function SkeletonBox({ className = "" }: { className?: string }) {
@@ -32,7 +33,7 @@ export default function PostListFade(props: PostListProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    if (posts && posts.length > 0) {
+    if (posts !== undefined) {
       const t = setTimeout(() => setIsLoaded(true), 200);
       return () => clearTimeout(t);
     } else {

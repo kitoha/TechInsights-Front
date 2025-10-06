@@ -36,6 +36,60 @@ export async function fetchPosts(
   }
 }
 
+// 회사별 게시물 데이터 페칭
+export async function fetchPostsByCompany(
+  companyId: string,
+  page: number = 0
+): Promise<{ content: Post[]; totalPages: number }> {
+  try {
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts`;
+    const paramsObj = {
+      page,
+      size: 10,
+      companyId
+    };
+    
+    const res = await apiGet<ApiResponse<Post>>(url, { params: paramsObj });
+
+    if (res && typeof res === 'object' && 'data' in res && res.data && 'content' in res.data) {
+      return {
+        content: res.data.content,
+        totalPages: res.data.totalPages
+      };
+    }
+    
+    return { content: [], totalPages: 1 };
+  } catch (error: unknown) {
+    const status: number | undefined = isAxiosError(error) ? error.response?.status : undefined;
+    if (status === 503) {
+      redirect('/maintenance.html');
+    }
+    console.error('Company posts fetch error:', error);
+    return { content: [], totalPages: 1 };
+  }
+}
+
+// 회사 정보 가져오기 (단건 조회)
+export async function fetchCompanyInfo(companyId: string): Promise<{ name: string; logoImageName: string } | null> {
+  try {
+    // /api/v1/companies/{companyId} API를 사용해서 단건 조회
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies/${companyId}`;
+    const res = await apiGet<{ name: string; logoImageName: string }>(url);
+    
+    if (res && typeof res === 'object' && 'data' in res && res.data) {
+      return {
+        name: res.data.name,
+        logoImageName: res.data.logoImageName
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Company info fetch error:', error);
+    return null;
+  }
+}
+
 // 트렌딩 회사 데이터 페칭
 export async function fetchTrendingCompanies(): Promise<TrendingPost[]> {
   try {

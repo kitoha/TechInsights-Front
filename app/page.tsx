@@ -3,6 +3,8 @@ import { MainContent } from "@/components/MainContent";
 import { Sidebar } from "@/components/Sidebar";
 import { 
   fetchPosts, 
+  fetchPostsByCompany,
+  fetchCompanyInfo,
   fetchTrendingCompanies, 
   fetchCompanies, 
   fetchRecommendedPosts
@@ -14,11 +16,14 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const page = Number(params?.page) || 0;
   const categories = ["All", "FrontEnd", "BackEnd", "AI", "Big Data", "Infra", "Architecture"];
   const selectedCategory = params?.category || "All";
-  const [postsData, trendingCompanies, companies, recommendedPosts] = await Promise.all([
-    fetchPosts(page, selectedCategory),
+  const companyId = params?.companyId;
+  
+  const [postsData, trendingCompanies, companies, recommendedPosts, companyInfo] = await Promise.all([
+    companyId ? fetchPostsByCompany(companyId, page) : fetchPosts(page, selectedCategory),
     fetchTrendingCompanies(),
     fetchCompanies(),
-    fetchRecommendedPosts()
+    fetchRecommendedPosts(),
+    companyId ? fetchCompanyInfo(companyId) : null
   ]);
 
   const latestPosts: Post[] = (postsData.content || []).map((item) => ({
@@ -47,6 +52,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
             page={page}
             selectedCategory={selectedCategory}
             categories={categories}
+            companyId={companyId}
+            companyInfo={companyInfo}
           />
           {/* Sidebar */}
           <Sidebar
