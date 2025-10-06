@@ -91,14 +91,9 @@ export function CompanyCard({ company }: CompanyCardProps) {
           <div className="flex-1 min-w-0">
             <span className="text-sm text-gray-600 dark:text-gray-300">기술 블로그</span>
             <div className="mt-1">
-              <a 
-                href={company.blogUrl} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-sm text-blue-600 dark:text-blue-400 break-all hover:underline"
-              >
+              <span className="text-sm text-gray-500 dark:text-gray-400 break-all">
                 {formatUrl(company.blogUrl)}
-              </a>
+              </span>
             </div>
           </div>
         </div>
@@ -113,18 +108,11 @@ export function CompanyCard({ company }: CompanyCardProps) {
           회사 게시글 보기
         </Button>
         <Button 
-          asChild
           variant="outline"
-          className="flex-1 cursor-pointer"
+          className="flex-1 cursor-not-allowed opacity-50"
+          disabled
         >
-          <a 
-            href={company.blogUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="cursor-pointer"
-          >
-            기술블로그
-          </a>
+          기술블로그
         </Button>
       </div>
     </Card>
