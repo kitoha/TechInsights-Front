@@ -5,6 +5,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import CategoryBadges from "@/components/CategoryBadges";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { memo, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 
 interface Post {
@@ -29,6 +30,7 @@ interface PostListProps {
 }
 
 const PostList = memo(function PostList({ posts, totalPages, page, selectedCategory, categories, companyId }: PostListProps) {
+  const router = useRouter();
   const maxVisible = 5;
   const start = Math.max(0, page - 2);
   const end = Math.min(totalPages, start + maxVisible);
@@ -38,19 +40,22 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
     const params = new URLSearchParams(window.location.search);
     params.set("category", category);
     params.set("page", "0");
-    window.location.search = params.toString();
-  }, []);
+    router.push(`?${params.toString()}`);
+  }, [router]);
 
   const handlePageClick = useCallback((p: number) => {
     const params = new URLSearchParams(window.location.search);
     if (companyId) {
-      params.set("companyId", companyId);
+      // 회사 페이지에서는 companyId를 URL 파라미터로 유지
+      params.set("page", String(p));
+      router.push(`/company/${companyId}?${params.toString()}`);
     } else {
+      // 홈페이지에서는 category 파라미터 사용
       params.set("category", selectedCategory);
+      params.set("page", String(p));
+      router.push(`?${params.toString()}`);
     }
-    params.set("page", String(p));
-    window.location.search = params.toString();
-  }, [selectedCategory, companyId]);
+  }, [selectedCategory, companyId, router]);
 
 
   return (

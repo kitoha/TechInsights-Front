@@ -41,7 +41,7 @@ export function CompanyCard({ company }: CompanyCardProps) {
   };
 
   const handleViewPosts = () => {
-    router.push(`/?companyId=${company.id}`);
+    router.push(`/company/${company.id}`);
   };
 
   return (
