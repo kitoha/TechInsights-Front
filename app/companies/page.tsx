@@ -13,7 +13,7 @@ export interface ApiResponse<T> {
 }
 
 export default async function CompaniesPage() {
-  let companies: CompanyStats[] = [];
+  let companies: (CompanyStats & { rank: number })[] = [];
 
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companiesSummaries`;
@@ -25,19 +25,21 @@ export default async function CompaniesPage() {
       totalViewCount: number;
       postCount: number;
       lastPostedAt: string | null;
+      rank?: number;
     }[]>(url);
 
     if (res?.data && Array.isArray(res.data)) {
       companies = res.data
         .filter((company) => (company.postCount ?? 0) > 0)
-        .map((company): CompanyStats => ({
+        .map((company, index): CompanyStats & { rank: number } => ({
           id: company.id,
           name: company.name,
           logoImage: `/logos/${company.logoImageName}`,
           postCount: company.postCount ?? 0,
           totalViews: company.totalViewCount ?? 0,
           latestPost: company.lastPostedAt ? formatTimeAgo(company.lastPostedAt) : "게시글 없음",
-          blogUrl: company.blogUrl
+          blogUrl: company.blogUrl,
+          rank: index + 1
         }));
     } else {
       console.error('Invalid API response structure:', res);
@@ -50,7 +52,7 @@ export default async function CompaniesPage() {
     console.error('Companies stats fetch error:', error);
     
     // Fallback data for development
-    companies = [
+    const fallbackData = [
       {
         id: "0MEK6CR5RRRQP",
         name: "AWS",
@@ -124,6 +126,13 @@ export default async function CompaniesPage() {
         blogUrl: "https://blog.banksalad.com/rss.xml"
       }
     ];
+    
+    companies = fallbackData
+      .filter((company) => company.postCount > 0)
+      .map((company) => ({
+        ...company,
+        rank: 0
+      }));
   }
 
   return (
@@ -141,7 +150,7 @@ export default async function CompaniesPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {companies.map((company) => (
-            <CompanyCard key={company.id} company={company} />
+            <CompanyCard key={company.id} company={company} rank={company.rank} />
           ))}
         </div>
       </div>
