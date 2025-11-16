@@ -27,16 +27,18 @@ export default async function CompaniesPage() {
       lastPostedAt: string | null;
     }[]>(url);
 
-    if (res && typeof res === 'object' && 'data' in res && res.data && Array.isArray(res.data)) {
+    if (res?.data && Array.isArray(res.data)) {
       companies = res.data.map((company): CompanyStats => ({
         id: company.id,
         name: company.name,
         logoImage: `/logos/${company.logoImageName}`,
-        postCount: company.postCount,
-        totalViews: company.totalViewCount,
+        postCount: company.postCount ?? 0,
+        totalViews: company.totalViewCount ?? 0,
         latestPost: company.lastPostedAt ? formatTimeAgo(company.lastPostedAt) : "게시글 없음",
         blogUrl: company.blogUrl
       }));
+    } else {
+      console.error('Invalid API response structure:', res);
     }
   } catch (error: unknown) {
     const status: number | undefined = isAxiosError(error) ? error.response?.status : undefined;
