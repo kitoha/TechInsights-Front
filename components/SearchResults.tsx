@@ -27,9 +27,12 @@ export default function SearchResults({
   const searchParams = useSearchParams();
 
   const handleSortChange = (newSortBy: SortBy) => {
+    if (sortBy === newSortBy) {
+      return;
+    }
     const params = new URLSearchParams(searchParams);
     params.set('sortBy', newSortBy);
-    params.set('page', '0'); // 정렬 변경 시 첫 페이지로
+    params.set('page', '0');
     router.push(`/search?${params.toString()}`);
   };
 
@@ -104,6 +107,7 @@ export default function SearchResults({
             variant={sortBy === "RELEVANCE" ? "default" : "outline"}
             size="sm"
             onClick={() => handleSortChange("RELEVANCE")}
+            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md"
           >
             관련도순
           </Button>
@@ -111,6 +115,7 @@ export default function SearchResults({
             variant={sortBy === "LATEST" ? "default" : "outline"}
             size="sm"
             onClick={() => handleSortChange("LATEST")}
+            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md"
           >
             최신순
           </Button>
@@ -118,6 +123,7 @@ export default function SearchResults({
             variant={sortBy === "POPULAR" ? "default" : "outline"}
             size="sm"
             onClick={() => handleSortChange("POPULAR")}
+            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md"
           >
             인기순
           </Button>
