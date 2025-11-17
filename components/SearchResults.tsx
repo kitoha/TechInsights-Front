@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { SearchResponse, SortBy } from "@/lib/searchTypes"
 import { Card, CardContent } from "@/components/ui/card"
@@ -25,6 +26,7 @@ export default function SearchResults({
 }: SearchResultsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [thumbnailErrors, setThumbnailErrors] = useState<Set<string>>(new Set());
 
   const handleSortChange = (newSortBy: SortBy) => {
     if (sortBy === newSortBy) {
@@ -151,17 +153,28 @@ export default function SearchResults({
               <CardContent className="p-6">
                 <div className="flex gap-4">
                   {/* 썸네일 */}
-                  {post.thumbnail && (
-                    <div className="flex-shrink-0">
+                  <div className="flex-shrink-0">
+                    {post.thumbnail && !thumbnailErrors.has(post.id) ? (
                       <Image
                         src={post.thumbnail}
                         alt={post.title}
                         width={120}
                         height={80}
                         className="rounded-lg object-cover"
+                        onError={() => {
+                          setThumbnailErrors((prev) => new Set(prev).add(post.id));
+                        }}
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <Image
+                        src={`/logos/${post.companyLogo}`}
+                        alt={post.companyName}
+                        width={120}
+                        height={80}
+                        className="rounded-lg object-cover bg-gray-100 dark:bg-gray-700 p-2"
+                      />
+                    )}
+                  </div>
 
                   <div className="flex-1 min-w-0">
                     {/* 회사 정보 */}
