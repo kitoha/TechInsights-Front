@@ -29,9 +29,10 @@ export default async function CompaniesPage() {
     }[]>(url);
 
     if (res?.data && Array.isArray(res.data)) {
+      let rank = 1;
       companies = res.data
         .filter((company) => (company.postCount ?? 0) > 0)
-        .map((company, index): CompanyStats & { rank: number } => ({
+        .map((company): CompanyStats & { rank: number } => ({
           id: company.id,
           name: company.name,
           logoImage: `/logos/${company.logoImageName}`,
@@ -39,7 +40,7 @@ export default async function CompaniesPage() {
           totalViews: company.totalViewCount ?? 0,
           latestPost: company.lastPostedAt ? formatTimeAgo(company.lastPostedAt) : "게시글 없음",
           blogUrl: company.blogUrl,
-          rank: index + 1
+          rank: rank++
         }));
     } else {
       console.error('Invalid API response structure:', res);
