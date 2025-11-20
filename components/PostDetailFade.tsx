@@ -37,6 +37,35 @@ export default function PostDetailFade({ post }: { post: Post }) {
     }
   }, [post]);
 
+  useEffect(() => {
+    if (!post?.id) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!baseUrl) {
+        console.warn('NEXT_PUBLIC_API_URL is not configured; skip view recording');
+        return;
+      }
+
+      fetch(`${baseUrl}/api/v1/posts/${post.id}/view`, {
+        method: 'POST',
+        signal: controller.signal,
+      }).catch((error) => {
+        if (error.name !== 'AbortError') {
+          console.error('Failed to record post view:', error);
+        }
+      });
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [post?.id]);
+
   return (
     <div className="relative">
       {/* Skeleton */}
