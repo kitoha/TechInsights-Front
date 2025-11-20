@@ -1,13 +1,26 @@
 export type ApiResponse<T> = { data: T; meta?: { total?: number; page?: number } };
 
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosHeaders, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 const isProd = process.env.VERCEL_ENV === 'production';
+const isServer = typeof window === 'undefined';
 
 export const api = axios.create({
   baseURL: isProd
     ? 'https://api.techinsights.shop'
     : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
+});
+
+api.interceptors.request.use((config) => {
+  if (isServer) {
+    const cloudflareSecret = process.env.CLOUDFLARE_SECRET_KEY;
+    if (cloudflareSecret) {
+      const headers = AxiosHeaders.from(config.headers || {});
+      headers.set('x-auth-secret', cloudflareSecret);
+      config.headers = headers;
+    }
+  }
+  return config;
 });
 
 api.interceptors.response.use(
