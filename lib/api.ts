@@ -18,6 +18,11 @@ api.interceptors.request.use((config) => {
       const headers = AxiosHeaders.from(config.headers || {});
       headers.set('x-auth-secret', cloudflareSecret);
       config.headers = headers;
+      const maskedSecret =
+        cloudflareSecret.length > 8
+          ? `${cloudflareSecret.slice(0, 4)}...${cloudflareSecret.slice(-4)}`
+          : cloudflareSecret;
+      console.info(`[api] x-auth-secret 헤더 적용: ${maskedSecret}`);
     }
   }
   return config;
