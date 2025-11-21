@@ -12,6 +12,15 @@ interface SearchBarProps {
   className?: string;
 }
 
+// 검색 결과 캐시 (메모리 기반)
+interface CacheEntry {
+  data: InstantSearchResponse
+  timestamp: number
+}
+
+const searchCache = new Map<string, CacheEntry>()
+const CACHE_DURATION = 5 * 60 * 1000 // 5분
+
 export default function SearchBar({ className = "" }: SearchBarProps) {
   const [query, setQuery] = useState("")
   const [isOpen, setIsOpen] = useState(false)
@@ -22,9 +31,38 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
   const router = useRouter()
 
-  // Debounce 검색
+  useEffect(() => {
+    const isProd = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+    const apiBaseUrl = isProd 
+      ? 'https://api.techinsights.shop' 
+      : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+    
+    const preconnect = document.createElement('link')
+    preconnect.rel = 'preconnect'
+    preconnect.href = apiBaseUrl
+    preconnect.crossOrigin = 'anonymous'
+    
+    const dnsPrefetch = document.createElement('link')
+    dnsPrefetch.rel = 'dns-prefetch'
+    dnsPrefetch.href = apiBaseUrl
+    
+    document.head.appendChild(preconnect)
+    document.head.appendChild(dnsPrefetch)
+    
+    return () => {
+      if (document.head.contains(preconnect)) {
+        document.head.removeChild(preconnect)
+      }
+      if (document.head.contains(dnsPrefetch)) {
+        document.head.removeChild(dnsPrefetch)
+      }
+    }
+  }, [])
+
+  // Debounce 검색 with 캐싱
   useEffect(() => {
     if (!query.trim()) {
       setResults(null)
@@ -32,26 +70,77 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
       return
     }
 
+    // 이전 요청 취소
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
     const timeoutId = setTimeout(async () => {
+      const trimmedQuery = query.trim().toLowerCase()
+      
+      const cached = searchCache.get(trimmedQuery)
+      const now = Date.now()
+      
+      if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+        setResults(cached.data)
+        setIsOpen(true)
+        setSelectedIndex(-1)
+        setIsLoading(false)
+        return
+      }
+
+      const abortController = new AbortController()
+      abortControllerRef.current = abortController
+
       try {
         setIsLoading(true)
         setError(null)
+        
         const response = await apiGet<InstantSearchResponse>(
-          `/api/v1/search/instant?query=${encodeURIComponent(query)}`
+          `/api/v1/search/instant?query=${encodeURIComponent(query)}`,
+          { signal: abortController.signal }
         )
-        setResults(response.data)
-        setIsOpen(true)
-        setSelectedIndex(-1)
-      } catch {
-        setError("검색 중 오류가 발생했습니다.")
-        setResults(null)
-        setIsOpen(false)
+        
+        if (!abortController.signal.aborted) {
+          setResults(response.data)
+          setIsOpen(true)
+          setSelectedIndex(-1)
+          
+          searchCache.set(trimmedQuery, {
+            data: response.data,
+            timestamp: now
+          })
+          
+          if (searchCache.size > 100) {
+            const entries = Array.from(searchCache.entries())
+            entries.sort((a, b) => b[1].timestamp - a[1].timestamp)
+            const toKeep = entries.slice(0, 50)
+            searchCache.clear()
+            toKeep.forEach(([key, value]) => searchCache.set(key, value))
+          }
+        }
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          return
+        }
+        if (!abortController.signal.aborted) {
+          setError("검색 중 오류가 발생했습니다.")
+          setResults(null)
+          setIsOpen(false)
+        }
       } finally {
-        setIsLoading(false)
+        if (!abortController.signal.aborted) {
+          setIsLoading(false)
+        }
       }
     }, 300)
 
-    return () => clearTimeout(timeoutId)
+    return () => {
+      clearTimeout(timeoutId)
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
   }, [query])
 
   // 외부 클릭 시 드롭다운 닫기

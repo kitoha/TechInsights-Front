@@ -9,6 +9,11 @@ export const api = axios.create({
   baseURL: isProd
     ? 'https://api.techinsights.shop'
     : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
+  timeout: 10000, // 10초 타임아웃
+  // HTTP Keep-Alive는 브라우저가 자동으로 처리하지만, 명시적으로 설정
+  headers: {
+    'Connection': 'keep-alive',
+  },
 });
 
 api.interceptors.request.use((config) => {
