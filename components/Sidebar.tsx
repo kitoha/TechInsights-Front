@@ -48,11 +48,13 @@ export function Sidebar({ trendingPosts, companies, recommendedPosts }: SidebarP
       const res = await apiGet<ApiResponse<TrendingCompany>>(url, { params });
       const content = res.data?.content;
       if (Array.isArray(content)) {
-        setLatestTrending(content.map((company) => ({
-          logoImage: `/logos/${company.logoImageName}`,
-          title: typeof company.name === 'string' ? (company.name.length > 20 ? `${company.name.slice(0, 20)}...` : company.name) : '',
-          viewCount: company.totalViewCount ?? 0,
-        })));
+        setLatestTrending(content
+          .filter((company) => company.logoImageName && company.logoImageName.trim() !== '')
+          .map((company) => ({
+            logoImage: `/logos/${company.logoImageName}`,
+            title: typeof company.name === 'string' ? (company.name.length > 20 ? `${company.name.slice(0, 20)}...` : company.name) : '',
+            viewCount: company.totalViewCount ?? 0,
+          })));
       }
     } catch (error) {
       console.error('Trending refresh error:', error);

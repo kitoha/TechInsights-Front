@@ -98,11 +98,13 @@ export async function fetchTrendingCompanies(): Promise<TrendingPost[]> {
     });
     
     if (res && typeof res === 'object' && 'data' in res && res.data && 'content' in res.data && Array.isArray(res.data.content)) {
-      return res.data.content.map((company): TrendingPost => ({
-        logoImage: `/logos/${company.logoImageName}`,
-        title: typeof company.name === 'string' ? (company.name.length > 20 ? `${company.name.slice(0, 20)}...` : company.name) : '',
-        viewCount: company.totalViewCount ?? 0
-      }));
+      return res.data.content
+        .filter((company) => company.logoImageName && company.logoImageName.trim() !== '')
+        .map((company): TrendingPost => ({
+          logoImage: `/logos/${company.logoImageName}`,
+          title: typeof company.name === 'string' ? (company.name.length > 20 ? `${company.name.slice(0, 20)}...` : company.name) : '',
+          viewCount: company.totalViewCount ?? 0
+        }));
     }
     
     return [];
@@ -121,10 +123,12 @@ export async function fetchCompanies(): Promise<Company[]> {
     });
     
     if (res && typeof res === 'object' && 'data' in res && res.data && 'content' in res.data && Array.isArray(res.data.content)) {
-      return res.data.content.map((company): Company => ({
-        name: company.name,
-        logoImage: `/logos/${company.logoImageName}`
-      }));
+      return res.data.content
+        .filter((company) => company.logoImageName && company.logoImageName.trim() !== '')
+        .map((company): Company => ({
+          name: company.name,
+          logoImage: `/logos/${company.logoImageName}`
+        }));
     }
     
     return [];
@@ -149,15 +153,17 @@ export async function fetchRecommendedPosts(): Promise<RecommendedPost[]> {
     ];
 
     if (res && typeof res === 'object' && 'data' in res && res.data && Array.isArray(res.data)) {
-      return res.data.map((item, idx: number) => {
-        const colorIdx = idx % colorSets.length;
-        return {
-          title: item.title,
-          logo: `/logos/${item.logoImageName}`,
-          color: colorSets[colorIdx].color,
-          borderColor: colorSets[colorIdx].borderColor,
-        };
-      });
+      return res.data
+        .filter((item) => item.logoImageName && item.logoImageName.trim() !== '')
+        .map((item, idx: number) => {
+          const colorIdx = idx % colorSets.length;
+          return {
+            title: item.title,
+            logo: `/logos/${item.logoImageName}`,
+            color: colorSets[colorIdx].color,
+            borderColor: colorSets[colorIdx].borderColor,
+          };
+        });
     }
     
     return [];

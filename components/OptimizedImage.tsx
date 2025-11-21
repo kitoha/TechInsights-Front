@@ -21,23 +21,46 @@ export function OptimizedImage({
   fallbackSrc = "/placeholder.svg",
   priority = false 
 }: OptimizedImageProps) {
-  const [imgSrc, setImgSrc] = useState<string>(src);
+  const isValidSrc = src && src.trim() !== '' && !src.includes('null') && !src.includes('undefined');
+  const [imgSrc, setImgSrc] = useState<string>(isValidSrc ? src : fallbackSrc);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    setImgSrc(src);
-    setIsLoading(true);
-  }, [src]);
+    const validSrc = src && src.trim() !== '' && !src.includes('null') && !src.includes('undefined');
+    if (validSrc) {
+      setImgSrc(src);
+      setIsLoading(true);
+      setHasError(false);
+    } else {
+      setImgSrc(fallbackSrc);
+      setIsLoading(false);
+      setHasError(false);
+    }
+  }, [src, fallbackSrc]);
 
   const handleError = () => {
-    if (imgSrc !== fallbackSrc) {
+    if (imgSrc !== fallbackSrc && !hasError) {
+      setHasError(true);
       setImgSrc(fallbackSrc);
+      setIsLoading(false);
     }
   };
 
   const handleLoad = () => {
     setIsLoading(false);
+    setHasError(false);
   };
+
+  useEffect(() => {
+    if (isLoading) {
+      const timeout = setTimeout(() => {
+        setIsLoading(false);
+      }, 5000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isLoading]);
 
   return (
     <div className="relative">
@@ -56,6 +79,7 @@ export function OptimizedImage({
         quality={85}
         placeholder="blur"
         blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+        unoptimized={imgSrc === fallbackSrc}
       />
     </div>
   );
