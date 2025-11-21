@@ -306,28 +306,6 @@ export default function PostDetailFade({ post }: { post: Post }) {
                       <span className="text-sm sm:text-base">공유</span>
                     </Button>
                   </div>
-                  {/* Comments Section */}
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-semibold text-foreground mb-6 sm:mb-8">댓글</h3>
-                    {/* Add Comment */}
-                    <Card className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-lg mb-6 sm:mb-8">
-                      <CardContent className="p-4 sm:p-6 lg:p-8">
-                        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                          <div className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm sm:text-base">
-                            U
-                          </div>
-                          <div className="flex-1 space-y-4">
-                            <Textarea placeholder="댓글을 작성해보세요..." className="min-h-[100px] sm:min-h-[120px] resize-none border-border/50 bg-background/50 focus:bg-background transition-colors duration-200" />
-                            <div className="flex justify-end">
-                              <Button className="bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200 w-full sm:w-auto">
-                                댓글 작성
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
                 </CardContent>
               </Card>
             </div>
