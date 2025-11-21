@@ -20,6 +20,7 @@ interface Post {
   thumbnail?: string;
   logoImageName?: string;
   categories?: string[];
+  viewCount?: number;
 }
 
 function SkeletonBox({ className = "" }: { className?: string }) {
@@ -29,11 +30,27 @@ function SkeletonBox({ className = "" }: { className?: string }) {
 export default function PostDetailFade({ post }: { post: Post }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [displayViewCount, setDisplayViewCount] = useState<number | null>(null);
 
   useEffect(() => {
     if (post) {
       const t = setTimeout(() => setIsLoaded(true), 200);
       return () => clearTimeout(t);
+    }
+  }, [post]);
+
+  // 상세 페이지에서 보여줄 조회수(UX용): 0 또는 미집계면 최소 1회로 보정
+  useEffect(() => {
+    if (!post) {
+      setDisplayViewCount(null);
+      return;
+    }
+
+    if (typeof post.viewCount === "number" && post.viewCount > 0) {
+      setDisplayViewCount(post.viewCount);
+    } else {
+      // 조회수 정보가 없거나 0이면, 사용자가 들어온 시점부터는 최소 1회로 보여줌
+      setDisplayViewCount(1);
     }
   }, [post]);
 
@@ -210,12 +227,33 @@ export default function PostDetailFade({ post }: { post: Post }) {
                           </div>
                         </div>
                         
-                        {/* Reading Time Estimate */}
-                        <div className="flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full self-start sm:self-auto">
-                          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span>약 {Math.ceil(post.content.length / 500)}분</span>
+                        <div className="flex items-center gap-2 self-start sm:self-auto">
+                          <div className="flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+                            <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>약 {Math.ceil(post.content.length / 500)}분</span>
+                          </div>
+
+                          {displayViewCount !== null && displayViewCount > 0 && (
+                            <div className="flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+                              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                />
+                              </svg>
+                              <span>{displayViewCount.toLocaleString()}회</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
