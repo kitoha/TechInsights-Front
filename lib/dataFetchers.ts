@@ -138,10 +138,9 @@ export async function fetchCompanies(): Promise<Company[]> {
   }
 }
 
-// AI 추천 게시물 데이터 페칭
 export async function fetchRecommendedPosts(): Promise<RecommendedPost[]> {
   try {
-    const url = `/api/v1/recommendations`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/recommendations`;
     const res = await apiGet<{title: string; logoImageName: string}[]>(url);
     
     const colorSets = [

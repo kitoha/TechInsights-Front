@@ -13,7 +13,9 @@ const nextConfig: NextConfig = {
       't1.kakaocdn.net',
       'blog.banksalad.com',
       'oliveyoung.tech',
-      'miro.medium.com'
+      'miro.medium.com',
+      'tech.kakaopay.com',
+      'blog.kakaocdn.net'
     ],
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,

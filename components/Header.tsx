@@ -4,11 +4,17 @@ import Link from "next/link"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
+import { useAuth } from "@/context/AuthContext"
+import { LoginModal } from "@/components/LoginModal"
+import { UserProfileDropdown } from "@/components/UserProfileDropdown"
+import { Button } from "@/components/ui/button"
 
 export function Header() {
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
+  const { isLoggedIn, isLoading } = useAuth()
+
   return (
     <header className="bg-card border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,7 +61,22 @@ export function Header() {
 
           <div className="flex items-center space-x-2 sm:space-x-4 ml-auto">
             <ThemeToggle />
-            
+            {!isLoading && (
+              <>
+                {isLoggedIn ? (
+                  <UserProfileDropdown />
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="hover:bg-muted transition-colors"
+                    onClick={() => setLoginModalOpen(true)}
+                  >
+                    Login
+                  </Button>
+                )}
+              </>
+            )}
             {/* 모바일 햄버거 메뉴 버튼 */}
             <button
               className="md:hidden p-2 rounded-md hover:bg-muted transition-colors"
@@ -119,6 +140,7 @@ export function Header() {
             </div>
           </div>
         )}
+        <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
       </div>
     </header>
   )
