@@ -69,7 +69,6 @@ export function Header() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="hover:bg-muted transition-colors"
                     onClick={() => setLoginModalOpen(true)}
                   >
                     Login
