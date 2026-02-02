@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
 import { api } from "@/lib/api"
+import { isAxiosError } from "axios"
 
 export default function SettingsPage() {
   const { userProfile, refetchUser, isLoggedIn, isLoading } = useAuth()
@@ -34,10 +35,14 @@ export default function SettingsPage() {
       await api.post("/api/v1/users/me/nickname", { nickname })
       await refetchUser()
       setMessage({ type: "success", text: "새로운 닉네임이 잘 반영되었습니다!" })
-    } catch (error: any) {
-      const responseData = error?.response?.data
-      const status = error?.response?.status
-      const serverMessage = responseData?.message
+    } catch (error: unknown) {
+      let serverMessage = ""
+      let status = 0
+
+      if (isAxiosError(error)) {
+        serverMessage = error.response?.data?.message
+        status = error.response?.status || 0
+      }
       
       if (status === 401) {
         setMessage({ type: "error", text: "로그인 세션이 만료되었습니다. 다시 로그인해주세요." })
