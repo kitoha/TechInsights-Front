@@ -27,7 +27,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     companyName: item.companyName || "기타",
     title: item.title,
     description: item.description || item.preview?.replace(/<[^>]+>/g, '') || '',
-    image: item.image || item.thumbnail || "/placeholder.svg?height=120&width=120",
+    image: item.image || item.thumbnail || "/placeholder.svg",
     url: item.url,
     publishedAt: item.publishedAt,
     logoImageName: item.logoImageName,

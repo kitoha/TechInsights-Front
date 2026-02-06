@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { FileText, Eye, Clock } from "lucide-react";
 
 export interface CompanyStats {
   id: string;
@@ -30,15 +31,6 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
       return `${(views / 1000).toFixed(1)}K`;
     }
     return views.toString();
-  };
-
-  const formatUrl = (url: string) => {
-    try {
-      const urlObj = new URL(url);
-      return urlObj.hostname;
-    } catch {
-      return url;
-    }
   };
 
   const handleViewPosts = () => {
@@ -68,7 +60,7 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
   const top3Style = isTop3 && rank && rank >= 1 && rank <= 3 ? rankStyles[rank as keyof typeof rankStyles] : null;
 
   return (
-    <Card className={`p-6 hover:shadow-lg transition-all duration-300 relative overflow-hidden ${
+    <Card className={`p-6 hover:shadow-lg transition-all duration-300 relative overflow-hidden flex flex-col h-full ${
       top3Style 
         ? `${top3Style.gradient} border ${top3Style.borderGradient} ${top3Style.borderGlow} hover:scale-[1.02]` 
         : ""
@@ -95,7 +87,7 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
 
       <div className="space-y-3">
         <div className="flex items-center gap-2">
-          <span className="text-gray-500 dark:text-gray-400">📄</span>
+          <FileText className="w-4 h-4 text-blue-500/80" />
           <span className="text-sm text-gray-600 dark:text-gray-300">게시글 수</span>
           <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             {company.postCount}
@@ -103,7 +95,7 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-gray-500 dark:text-gray-400">📊</span>
+          <Eye className="w-4 h-4 text-emerald-500/80" />
           <span className="text-sm text-gray-600 dark:text-gray-300">총 조회 수</span>
           <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             {formatViews(company.totalViews)}
@@ -111,39 +103,20 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-gray-500 dark:text-gray-400">🕐</span>
+          <Clock className="w-4 h-4 text-amber-500/80" />
           <span className="text-sm text-gray-600 dark:text-gray-300">최근 게시글</span>
           <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             {company.latestPost}
           </span>
         </div>
-
-        <div className="flex items-start gap-2">
-          <span className="text-gray-500 dark:text-gray-400 mt-0.5">🔗</span>
-          <div className="flex-1 min-w-0">
-            <span className="text-sm text-gray-600 dark:text-gray-300">기술 블로그</span>
-            <div className="mt-1">
-              <span className="text-sm text-gray-500 dark:text-gray-400 break-all">
-                {formatUrl(company.blogUrl)}
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <div className="mt-6 flex gap-2">
+      <div className="mt-auto pt-6">
         <Button 
           onClick={handleViewPosts}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
         >
           회사 게시글 보기
-        </Button>
-        <Button 
-          variant="outline"
-          className="flex-1 cursor-not-allowed opacity-50"
-          disabled
-        >
-          기술블로그
         </Button>
       </div>
     </Card>
