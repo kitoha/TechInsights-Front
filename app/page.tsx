@@ -12,7 +12,7 @@ import { Post } from "@/lib/types";
 export default async function HomePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
   const page = Number(params?.page) || 0;
-  const categories = ["All", "FrontEnd", "BackEnd", "AI", "Big Data", "Infra", "Architecture"];
+  const categories = ["FrontEnd", "BackEnd", "AI", "Big Data", "Infra", "Architecture"];
   const selectedCategory = params?.category || "All";
   
   const [postsData, trendingCompanies, companies, recommendedPosts] = await Promise.all([

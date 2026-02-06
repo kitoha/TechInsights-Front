@@ -59,7 +59,7 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
             totalPages={postsData.totalPages}
             page={page}
             selectedCategory="All"
-            categories={["All"]}
+            categories={[]}
             companyId={companyId}
             companyInfo={companyInfo}
           />

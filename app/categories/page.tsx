@@ -25,7 +25,9 @@ export default async function CategoriesPage() {
     }[]>(url);
 
     if (res && typeof res === 'object' && 'data' in res && res.data && Array.isArray(res.data)) {
-      categories = res.data.map((category): CategoryStats => ({
+      categories = res.data
+        .filter(category => category.category.toLowerCase() !== 'all')
+        .map((category): CategoryStats => ({
         id: category.category.toLowerCase(),
         name: category.category,
         postCount: category.postCount,
@@ -43,14 +45,6 @@ export default async function CategoriesPage() {
     
     // Fallback data for development
     categories = [
-      {
-        id: "all",
-        name: "All",
-        postCount: 36,
-        totalViews: 1,
-        latestPost: "2022년 9월",
-        logoImage: "/categories/all.svg"
-      },
       {
         id: "frontend",
         name: "FrontEnd",
