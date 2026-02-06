@@ -2,20 +2,22 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: [
-      'tech.socarcorp.kr', 
-      'hyperconnect.github.io',
-      'd2908q01vomqb2.cloudfront.net',
-      'static.toss.im',
-      'techblog.lycorp.co.jp',
-      'techblog.woowa.in',
-      'thefarmersfront.github.io',
-      't1.kakaocdn.net',
-      'blog.banksalad.com',
-      'oliveyoung.tech',
-      'miro.medium.com',
-      'tech.kakaopay.com',
-      'blog.kakaocdn.net'
+    remotePatterns: [
+      { protocol: 'https', hostname: '**.socarcorp.kr' },
+      { protocol: 'https', hostname: '**.github.io' },
+      { protocol: 'https', hostname: '**.cloudfront.net' },
+      { protocol: 'https', hostname: '**.toss.im' },
+      { protocol: 'https', hostname: '**.lycorp.co.jp' },
+      { protocol: 'https', hostname: '**.woowa.in' },
+      { protocol: 'https', hostname: '**.kakaocdn.net' },
+      { protocol: 'https', hostname: '**.banksalad.com' },
+      { protocol: 'https', hostname: '**.oliveyoung.tech' },
+      { protocol: 'https', hostname: '**.medium.com' },
+      { protocol: 'https', hostname: '**.kakaopay.com' },
+      { protocol: 'https', hostname: '**.naver.com' },
+      { protocol: 'https', hostname: '**.daumcdn.net' },
+      { protocol: 'https', hostname: '**.gmarket.com' },
+      { protocol: 'https', hostname: '**.musinsa.com' },
     ],
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,

@@ -39,7 +39,7 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
     companyName: item.companyName || "기타",
     title: item.title,
     description: item.description || item.preview?.replace(/<[^>]+>/g, '') || '',
-    image: item.image || item.thumbnail || "/placeholder.svg",
+    image: item.image || item.thumbnail,
     url: item.url,
     publishedAt: item.publishedAt,
     logoImageName: item.logoImageName,

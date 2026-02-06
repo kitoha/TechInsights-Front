@@ -224,12 +224,12 @@ const PostCard = memo(function PostCard({ post }: { post: Post }) {
           <div className="w-24 flex-shrink-0">
             <div className="w-24 h-24 rounded-lg overflow-hidden">
               <OptimizedImage
-                src={post.image || "/placeholder.svg"}
+                src={post.image || (post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg")}
                 alt={post.title}
                 width={192}
                 height={192}
                 className="w-full h-full object-cover rounded-lg"
-                fallbackSrc={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
+                fallbackSrc="/placeholder.svg"
               />
             </div>
           </div>

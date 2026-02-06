@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/Header";
 import ReactMarkdown from "react-markdown";
+import { OptimizedImage } from "@/components/OptimizedImage";
 
 interface Post {
   id: string;
@@ -28,7 +29,6 @@ function SkeletonBox({ className = "" }: { className?: string }) {
 
 export default function PostDetailFade({ post }: { post: Post }) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const [displayViewCount, setDisplayViewCount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -260,13 +260,13 @@ export default function PostDetailFade({ post }: { post: Post }) {
                   {/* Hero Image */}
                   <div className="mb-8 sm:mb-12">
                     <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                      <Image
-                        src={imageError ? `/logos/${post.logoImageName || 'placeholder.svg'}` : (post.thumbnail || "/placeholder.svg")}
+                      <OptimizedImage
+                        src={post.thumbnail || (post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg")}
                         alt={post.title}
                         width={800}
                         height={400}
                         className="w-full h-[250px] sm:h-[350px] lg:h-[500px] object-cover transition-transform duration-500 hover:scale-105"
-                        onError={() => setImageError(true)}
+                        fallbackSrc="/placeholder.svg"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                     </div>
