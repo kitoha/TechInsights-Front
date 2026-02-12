@@ -1,25 +1,14 @@
 'use client'
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
-
-interface RecommendedPost {
-  title: string
-  logo: string
-  color: string
-  borderColor: string
-}
-
-interface AIRecommendedPostsProps {
-  posts: RecommendedPost[]
-}
-
+import Link from "next/link"
 import SidebarListCard from "./SidebarListCard"
+import { OptimizedImage } from "./OptimizedImage"
 
 interface RecommendedPost {
+  postId: string
   title: string
-  logo: string
-  color: string
-  borderColor: string
+  logoImageName: string
 }
 
 interface AIRecommendedPostsProps {
@@ -33,12 +22,29 @@ export default function AIRecommendedPosts({ posts }: AIRecommendedPostsProps) {
       iconType="ai"
       items={posts}
       itemRender={(post, index) => (
-        <div key={index} className="flex items-start space-x-2.5 group cursor-pointer">
-          <div className="w-1 h-1 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
-          <p className="text-[13px] font-semibold text-foreground/90 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
-            {post.title}
-          </p>
-        </div>
+        <Link key={index} href={`/post/${post.postId}`} className="group cursor-pointer flex items-start space-x-3 py-1 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 rounded-lg px-1 -mx-1 transition-colors">
+          <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 border border-border/30 overflow-hidden">
+            {post.logoImageName && post.logoImageName.trim() !== '' ? (
+              <OptimizedImage
+                src={`/logos/${post.logoImageName}`}
+                alt={post.title}
+                width={20}
+                height={20}
+                className="object-contain w-5 h-5"
+                fallbackSrc="/placeholder.svg"
+              />
+            ) : (
+              <svg className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L14.85 8.65L22 9.24L16.5 13.97L18.18 21L12 17.27L5.82 21L7.5 13.97L2 9.24L9.15 8.65L12 2Z"/>
+              </svg>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-semibold text-foreground/95 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+              {post.title}
+            </p>
+          </div>
+        </Link>
       )}
     />
   )

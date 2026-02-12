@@ -19,10 +19,9 @@ interface Company {
 }
 
 interface RecommendedPost {
+  postId: string;
   title: string;
-  logo: string;
-  color: string;
-  borderColor: string;
+  logoImageName: string;
 }
 
 interface SidebarProps {

@@ -101,16 +101,18 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
 
         {/* Newsletter Box */}
         <div className="p-4 pt-0">
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-xl p-5 border border-blue-100 dark:border-blue-900/30">
-            <div className="flex items-center space-x-2 mb-2">
-              <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-              <h4 className="text-[12px] font-bold text-foreground">Newsletter</h4>
+          <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/30 dark:via-indigo-950/30 dark:to-purple-950/30 rounded-2xl p-6 border border-blue-200 dark:border-blue-900/40 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center space-x-2 mb-3">
+              <div className="w-8 h-8 bg-blue-600 dark:bg-blue-500 rounded-xl flex items-center justify-center shadow-sm">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              </div>
+              <h4 className="text-[13px] font-bold text-foreground/95">Newsletter</h4>
             </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
-              Get daily tech insights in your inbox.
+            <p className="text-[12px] text-muted-foreground/80 leading-relaxed mb-4">
+              Get daily tech insights delivered to your inbox.
             </p>
-            <Button variant="default" className="w-full h-8 text-[11px] font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
-              Subscribe
+            <Button variant="default" className="w-full h-9 text-[12px] font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all">
+              Subscribe Now
             </Button>
           </div>
         </div>

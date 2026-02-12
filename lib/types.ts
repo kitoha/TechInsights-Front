@@ -25,10 +25,9 @@ export interface TrendingPost {
 }
 
 export interface RecommendedPost {
+  postId: string;
   title: string;
-  logo: string;
-  color: string;
-  borderColor: string;
+  logoImageName: string;
 }
 
 export interface ApiResponse<T> {

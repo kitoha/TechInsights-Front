@@ -187,7 +187,7 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
 
 const PostCard = memo(function PostCard({ post }: { post: Post }) {
   return (
-    <Card className="group bg-white dark:bg-gray-900 border border-border/40 hover:border-blue-200 dark:hover:border-blue-900/50 shadow-sm hover:shadow-lg transition-all duration-300 rounded-2xl overflow-hidden">
+    <Card className="group bg-white dark:bg-gray-900 border border-border/40 hover:border-blue-200 dark:hover:border-blue-900/50 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden">
       <Link href={`/post/${post.id}`}>
         <CardContent className="p-7">
           <div className="flex flex-col space-y-4">
