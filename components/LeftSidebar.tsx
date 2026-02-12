@@ -27,8 +27,10 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
   const topics = [
     { name: "FrontEnd", href: "/?category=FrontEnd" },
     { name: "BackEnd", href: "/?category=BackEnd" },
-    { name: "AI & ML", href: "/?category=AI" },
-    { name: "DevOps", href: "/?category=Infra" },
+    { name: "AI", href: "/?category=AI" },
+    { name: "Big Data", href: "/?category=Big Data" },
+    { name: "Infra", href: "/?category=Infra" },
+    { name: "Architecture", href: "/?category=Architecture" },
   ]
 
   return (
@@ -43,23 +45,23 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
 
       <aside className={`
         fixed left-0 top-0 h-screen bg-background flex flex-col z-50 transition-transform duration-300 ease-in-out
-        w-64 lg:translate-x-0 border-r border-border/40
+        w-60 lg:translate-x-0 border-r border-border/30
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}>
         {/* Logo Section */}
-        <div className="p-8 pb-4">
-          <Link href="/" className="flex items-center space-x-2" onClick={onClose}>
-            <div className="w-8 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center">
-              <span className="text-white dark:text-black text-lg font-bold">T</span>
+        <div className="px-6 py-6 pb-4">
+          <Link href="/" className="flex items-center space-x-2.5" onClick={onClose}>
+            <div className="w-7 h-7 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-sm">
+              <span className="text-white text-sm font-bold">T</span>
             </div>
-            <span className="text-xl font-black tracking-tight text-foreground">TechInsights</span>
+            <span className="text-lg font-bold tracking-tight text-foreground">TechInsights</span>
           </Link>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-8">
+        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-6">
           {/* Menu Section */}
-          <div className="space-y-1">
-            <h3 className="px-4 text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4">Menu</h3>
+          <div className="space-y-0.5">
+            <h3 className="px-3 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider mb-3">Menu</h3>
             {menuItems.map((item) => {
               const isActive = pathname === item.href
               return (
@@ -67,51 +69,47 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
                   key={item.name}
                   href={item.href}
                   onClick={onClose}
-                  className={`flex items-center space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 ${
                     isActive
-                      ? "bg-accent text-accent-foreground font-bold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      ? "bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 font-semibold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/30"
                   }`}
                 >
-                  <item.icon className="w-4 h-4" />
-                  <span className="text-[14px]">{item.name}</span>
+                  <item.icon className="w-[18px] h-[18px]" />
+                  <span className="text-[13px] font-medium">{item.name}</span>
                 </Link>
               )
             })}
           </div>
 
           {/* Topics Section */}
-          <div className="space-y-1">
-            <h3 className="px-4 text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4">Topics</h3>
+          <div className="space-y-0.5">
+            <h3 className="px-3 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider mb-3">Topics</h3>
             {topics.map((topic) => (
               <Link
                 key={topic.name}
                 href={topic.href}
                 onClick={onClose}
-                className="flex items-center space-x-3 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all duration-200"
+                className="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/30 transition-all duration-200"
               >
-                <div className="w-4 h-4 flex items-center justify-center opacity-40">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                  </svg>
-                </div>
-                <span className="text-[14px] font-medium">{topic.name}</span>
+                <span className="text-muted-foreground/50 text-sm font-medium">#</span>
+                <span className="text-[13px] font-medium">{topic.name}</span>
               </Link>
             ))}
           </div>
         </div>
 
         {/* Newsletter Box */}
-        <div className="p-6 pt-0">
-          <div className="bg-accent/30 rounded-2xl p-6 border border-border/50">
-            <div className="flex items-center space-x-2 mb-3">
-              <svg className="w-4 h-4 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-              <h4 className="text-[13px] font-black uppercase tracking-wider">Newsletter</h4>
+        <div className="p-4 pt-0">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-xl p-5 border border-blue-100 dark:border-blue-900/30">
+            <div className="flex items-center space-x-2 mb-2">
+              <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              <h4 className="text-[12px] font-bold text-foreground">Newsletter</h4>
             </div>
-            <p className="text-[12px] text-muted-foreground leading-relaxed mb-4">
-              Daily tech insights delivered to your inbox.
+            <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
+              Get daily tech insights in your inbox.
             </p>
-            <Button variant="outline" className="w-full h-9 text-[12px] font-bold rounded-lg border-border/60 hover:bg-background">
+            <Button variant="default" className="w-full h-8 text-[11px] font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
               Subscribe
             </Button>
           </div>
