@@ -21,14 +21,14 @@ export default function SidebarListCard<T = unknown>({
   iconType = 'default'
 }: SidebarListCardProps<T>) {
   return (
-    <div className="bg-white dark:bg-gray-900 border border-border/40 rounded-2xl overflow-hidden shadow-sm">
-      <div className="px-5 py-4 flex items-center justify-between border-b border-border/30">
+    <div className="bg-white dark:bg-gray-900 border border-border/40 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <div className="px-5 py-4 flex items-center justify-between border-b border-border/30 bg-gray-50/50 dark:bg-gray-800/30">
         <div className="flex items-center gap-2">
-          <h3 className="text-[12px] font-bold uppercase tracking-wider text-foreground">
+          <h3 className="text-[12px] font-bold uppercase tracking-wider text-foreground/95">
             {title}
           </h3>
           {iconType === 'ranking' && (
-            <svg className="w-3.5 h-3.5 text-muted-foreground/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
             </svg>
           )}
@@ -37,14 +37,14 @@ export default function SidebarListCard<T = unknown>({
           )}
         </div>
         {moreLink && (
-          <Link href={moreLink} className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+          <Link href={moreLink} className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
             View All
           </Link>
         )}
       </div>
 
-      <div className="px-5 py-4">
-        <div className="space-y-4">
+      <div className="px-5 py-5">
+        <div className="space-y-3.5">
           {loading ? (
             <div className="py-4 flex justify-center"><div className="w-5 h-5 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" /></div>
           ) : items.length === 0 ? (

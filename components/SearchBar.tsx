@@ -292,7 +292,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
           onKeyDown={handleKeyDown}
           onFocus={() => query.trim() && setIsOpen(true)}
           placeholder="Search for posts, topics, or companies"
-          className="pl-10 pr-10 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 h-12 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-xl shadow-sm hover:shadow-md focus:shadow-lg transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+          className={`pl-10 pr-10 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 hover:shadow-md focus:shadow-lg transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${className}`}
         />
       </div>
 

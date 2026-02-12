@@ -94,7 +94,7 @@ export function Sidebar({ trendingPosts, companies, recommendedPosts }: SidebarP
   }, [refreshTrending]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Trending Now Section */}
       <SidebarListCard
         title="Trending Now"

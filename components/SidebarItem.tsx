@@ -15,11 +15,11 @@ interface SidebarItemProps {
 export const SidebarItem = memo(function SidebarItem({ index, logoImage, title, subtitle, onClick, itemType = 'default', viewCount }: SidebarItemProps) {
   if (itemType === 'ranking') {
     return (
-      <div className="group cursor-pointer flex items-center space-x-3" onClick={onClick}>
-        <span className="text-[16px] font-bold text-muted-foreground/40 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-none min-w-[24px]">
+      <div className="group cursor-pointer flex items-center space-x-3 py-0.5 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 rounded-lg px-1 -mx-1 transition-colors" onClick={onClick}>
+        <span className="text-[16px] font-bold text-muted-foreground/50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-none min-w-[24px]">
           {String(index + 1).padStart(2, '0')}
         </span>
-        <div className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 border border-border/30">
+        <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 border border-border/30">
           <OptimizedImage
             src={logoImage}
             alt="logo"
@@ -29,12 +29,12 @@ export const SidebarItem = memo(function SidebarItem({ index, logoImage, title, 
           />
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="text-[13px] font-semibold leading-tight text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+          <h4 className="text-[13px] font-semibold leading-tight text-foreground/95 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
             {title}
           </h4>
         </div>
         {viewCount !== undefined && (
-          <div className="flex items-center space-x-1 text-muted-foreground/50">
+          <div className="flex items-center space-x-1 text-muted-foreground/60">
             <span className="text-[10px] font-semibold whitespace-nowrap tabular-nums">
               {viewCount.toLocaleString()}
             </span>
@@ -52,8 +52,8 @@ export const SidebarItem = memo(function SidebarItem({ index, logoImage, title, 
   const color = colors[index % colors.length];
 
   return (
-    <div className="group cursor-pointer flex items-center space-x-3" onClick={onClick}>
-      <div className={`w-9 h-9 rounded-lg ${color} flex items-center justify-center flex-shrink-0 border border-border/30`}>
+    <div className="group cursor-pointer flex items-center space-x-3 py-1 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 rounded-lg px-1 -mx-1 transition-colors" onClick={onClick}>
+      <div className={`w-9 h-9 rounded-xl ${color} flex items-center justify-center flex-shrink-0 border border-border/30 group-hover:border-blue-300 dark:group-hover:border-blue-800 transition-colors`}>
         <OptimizedImage
           src={logoImage}
           alt="logo"
@@ -63,10 +63,10 @@ export const SidebarItem = memo(function SidebarItem({ index, logoImage, title, 
         />
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="text-[13px] font-semibold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+        <h4 className="text-[13px] font-semibold text-foreground/95 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
           {title}
         </h4>
-        <p className="text-[10px] text-muted-foreground/70 truncate font-medium">
+        <p className="text-[10px] text-muted-foreground/65 truncate font-medium">
           {subtitle || "Technology & Engineering"}
         </p>
       </div>
