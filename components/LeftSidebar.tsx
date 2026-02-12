@@ -49,16 +49,16 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}>
         {/* Logo Section */}
-        <div className="px-6 py-6 pb-4">
-          <Link href="/" className="flex items-center space-x-2.5" onClick={onClose}>
-            <div className="w-7 h-7 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-sm">
-              <span className="text-white text-sm font-bold">T</span>
+        <div className="h-16 px-6 flex items-center border-b border-border/30">
+          <Link href="/" className="flex items-center space-x-2" onClick={onClose}>
+            <div className="w-7 h-7 bg-foreground rounded-md flex items-center justify-center">
+              <span className="text-background text-sm font-bold">T</span>
             </div>
             <span className="text-lg font-bold tracking-tight text-foreground">TechInsights</span>
           </Link>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-6">
+        <div className="flex-1 overflow-y-auto px-3 py-6 space-y-6">
           {/* Menu Section */}
           <div className="space-y-0.5">
             <h3 className="px-3 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider mb-3">Menu</h3>

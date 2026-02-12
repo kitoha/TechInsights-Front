@@ -38,8 +38,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   return (
     <div className="bg-[#fafbfc] dark:bg-gray-950 min-h-full">
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-8">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-3 py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Main Content */}
           <MainContent
             posts={latestPosts}

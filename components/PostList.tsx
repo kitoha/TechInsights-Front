@@ -139,8 +139,8 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
           )}
         </div>
         {/* Pagination */}
-        <Pagination className="mt-8">
-          <PaginationContent>
+        <Pagination className="mt-10">
+          <PaginationContent className="gap-1.5">
             <PaginationItem>
               <PaginationPrevious className="cursor-pointer" onClick={() => handlePageClick(page - 1)} aria-disabled={page <= 0} />
             </PaginationItem>
