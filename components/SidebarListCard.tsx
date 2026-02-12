@@ -21,32 +21,32 @@ export default function SidebarListCard<T = unknown>({
   iconType = 'default'
 }: SidebarListCardProps<T>) {
   return (
-    <div className="bg-white dark:bg-gray-900 border border-border/40 rounded-3xl overflow-hidden shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)]">
-      <div className="px-6 py-6 flex items-center justify-between">
+    <div className="bg-white dark:bg-gray-900 border border-border/40 rounded-2xl overflow-hidden shadow-sm">
+      <div className="px-5 py-4 flex items-center justify-between border-b border-border/30">
         <div className="flex items-center gap-2">
-          <h3 className="text-[13px] font-black uppercase tracking-[0.15em] text-foreground">
+          <h3 className="text-[12px] font-bold uppercase tracking-wider text-foreground">
             {title}
           </h3>
           {iconType === 'ranking' && (
-            <svg className="w-4 h-4 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-muted-foreground/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
             </svg>
           )}
           {iconType === 'ai' && (
-             <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L14.85 8.65L22 9.24L16.5 13.97L18.18 21L12 17.27L5.82 21L7.5 13.97L2 9.24L9.15 8.65L12 2Z"/></svg>
+             <svg className="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L14.85 8.65L22 9.24L16.5 13.97L18.18 21L12 17.27L5.82 21L7.5 13.97L2 9.24L9.15 8.65L12 2Z"/></svg>
           )}
         </div>
         {moreLink && (
-          <Link href={moreLink} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
+          <Link href={moreLink} className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             View All
           </Link>
         )}
       </div>
-      
-      <div className="px-6 pb-6">
-        <div className="space-y-6">
+
+      <div className="px-5 py-4">
+        <div className="space-y-4">
           {loading ? (
-            <div className="py-4 flex justify-center"><div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>
+            <div className="py-4 flex justify-center"><div className="w-5 h-5 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" /></div>
           ) : items.length === 0 ? (
             <div className="text-center py-4 text-xs text-muted-foreground">{emptyMessage}</div>
           ) : (

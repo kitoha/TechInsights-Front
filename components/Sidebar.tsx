@@ -94,7 +94,7 @@ export function Sidebar({ trendingPosts, companies, recommendedPosts }: SidebarP
   }, [refreshTrending]);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* Trending Now Section */}
       <SidebarListCard
         title="Trending Now"
@@ -106,7 +106,7 @@ export function Sidebar({ trendingPosts, companies, recommendedPosts }: SidebarP
             index={idx}
             logoImage={post.logoImage}
             title={post.title}
-            subtitle="Explore the implementation of modern architectures."
+            viewCount={post.viewCount}
             itemType="ranking"
           />
         )}

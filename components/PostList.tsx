@@ -93,7 +93,7 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
 
       <section className="mb-12">
 
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-5">
 
 
           {posts.length === 0 ? (
@@ -187,74 +187,70 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
 
 const PostCard = memo(function PostCard({ post }: { post: Post }) {
   return (
-    <Card className="group bg-background border-none shadow-none hover:bg-accent/5 transition-all duration-300 rounded-2xl overflow-hidden">
+    <Card className="group bg-white dark:bg-gray-900 border border-border/40 hover:border-border/60 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden">
       <Link href={`/post/${post.id}`}>
-        <CardContent className="p-8">
-          <div className="flex flex-col space-y-4">
+        <CardContent className="p-6">
+          <div className="flex flex-col space-y-3">
             {/* Header: Company & Date */}
-            <div className="flex items-center space-x-3">
-              <div className="w-6 h-6 rounded-full bg-background border border-border flex items-center justify-center overflow-hidden">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-5 h-5 rounded-full bg-background border border-border/50 flex items-center justify-center overflow-hidden">
                 {post.logoImageName ? (
                   <OptimizedImage
                     src={`/logos/${post.logoImageName}`}
                     alt={post.companyName}
-                    width={20}
-                    height={20}
+                    width={18}
+                    height={18}
                     className="object-contain"
                   />
                 ) : (
-                  <div className="w-full h-full bg-primary/10 flex items-center justify-center text-[10px] font-bold">
+                  <div className="w-full h-full bg-primary/10 flex items-center justify-center text-[9px] font-bold">
                     {post.companyName[0]}
                   </div>
                 )}
               </div>
-              <span className="text-[14px] font-bold text-foreground/80">{post.companyName}</span>
-              <span className="text-[14px] text-muted-foreground">•</span>
-              <span className="text-[14px] text-muted-foreground">
-                {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: '2-digit',
-                  year: 'numeric'
-                })}
+              <span className="text-[13px] font-semibold text-foreground/90">{post.companyName}</span>
+              <span className="text-[13px] text-muted-foreground/50">•</span>
+              <span className="text-[13px] text-muted-foreground/70">
+                {(() => {
+                  const date = new Date(post.publishedAt);
+                  const year = date.getFullYear();
+                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                  const day = String(date.getDate()).padStart(2, '0');
+                  return `${year}년 ${month}월 ${day}일`;
+                })()}
               </span>
             </div>
 
             {/* Title: Large & Bold */}
-            <h2 className="text-3xl font-black text-foreground leading-[1.2] tracking-tight group-hover:text-primary transition-colors">
+            <h2 className="text-2xl font-bold text-foreground leading-[1.3] tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
               {post.title}
             </h2>
 
             {/* Description */}
-            <p className="text-[16px] text-muted-foreground leading-relaxed line-clamp-3">
+            <p className="text-[15px] text-muted-foreground/80 leading-relaxed line-clamp-2">
               {post.description}
             </p>
 
             {/* Footer: Tags & Actions */}
-            <div className="flex items-center justify-between pt-4">
+            <div className="flex items-center justify-between pt-3">
               <div className="flex items-center gap-2">
                 {post.categories?.slice(0, 2).map((cat) => (
-                  <span 
-                    key={cat} 
-                    className="px-4 py-1.5 bg-accent/50 text-[11px] font-black rounded-lg text-muted-foreground uppercase tracking-widest border border-border/50"
+                  <span
+                    key={cat}
+                    className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-[10px] font-semibold rounded-md text-muted-foreground uppercase tracking-wide"
                   >
                     {cat}
                   </span>
                 ))}
               </div>
-              
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-1.5 text-muted-foreground">
-                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                   <span className="text-[12px] font-bold">5 min read</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button className="p-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                  </button>
-                  <button className="p-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" /></svg>
-                  </button>
-                </div>
+
+              <div className="flex items-center space-x-2">
+                <button className="p-1.5 text-muted-foreground/60 hover:text-foreground hover:bg-accent/50 rounded-lg transition-colors">
+                  <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                </button>
+                <button className="p-1.5 text-muted-foreground/60 hover:text-foreground hover:bg-accent/50 rounded-lg transition-colors">
+                  <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" /></svg>
+                </button>
               </div>
             </div>
           </div>
