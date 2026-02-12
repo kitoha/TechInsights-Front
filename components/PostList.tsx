@@ -48,11 +48,9 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
   const handlePageClick = useCallback((p: number) => {
     const params = new URLSearchParams(window.location.search);
     if (companyId) {
-      // 회사 페이지에서는 companyId를 URL 파라미터로 유지
       params.set("page", String(p));
       router.push(`/company/${companyId}?${params.toString()}`);
     } else {
-      // 홈페이지에서는 category 파라미터 사용
       params.set("category", selectedCategory);
       params.set("page", String(p));
       router.push(`?${params.toString()}`);
@@ -62,17 +60,17 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
 
   return (
     <>
-      {/* Category Tabs - 회사별 게시글일 때는 숨김 */}
+      {/* Category Tabs */}
       {!companyId && (
-        <div className="flex flex-wrap gap-3 mb-8">
+        <div className="flex flex-wrap gap-2 mb-8 bg-muted/30 p-1.5 rounded-2xl w-fit border border-border/50">
           {categories.map((category) => (
             <button
               key={category}
               className={
-                "px-4 py-2 rounded-full font-medium transition shadow-sm border cursor-pointer " +
+                "px-5 py-2 rounded-xl font-semibold transition-all duration-300 cursor-pointer text-sm " +
                 (selectedCategory === category
-                  ? "bg-blue-600 text-white border-blue-600 shadow-md dark:bg-blue-500 dark:text-white dark:border-blue-400"
-                  : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-blue-900 dark:hover:text-blue-200 dark:hover:border-blue-500")
+                  ? "bg-primary text-primary-foreground shadow-lg scale-105"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground")
               }
               onClick={() => handleTabClick(category)}
             >
@@ -83,7 +81,7 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
       )}
       {/* Latest Posts */}
       <section className="mb-12">
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-6">
           {posts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-gray-500">
               {companyId ? (
@@ -175,68 +173,94 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
 
 const PostCard = memo(function PostCard({ post }: { post: Post }) {
   return (
-  <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-    <CardContent className="px-6 py-0">
+    <Card className="group bg-card hover:bg-accent/5 border-border/50 hover:border-primary/20 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] overflow-hidden rounded-2xl">
       <Link href={`/post/${post.id}`}>
-        <div className="flex items-center justify-between">
-          <div className="flex-1 pr-6 flex flex-col min-h-[150px] justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                {post.logoImageName && (
-                  <OptimizedImage
-                    src={`/logos/${post.logoImageName}`}
-                    alt={post.companyName}
-                    width={24}
-                    height={24}
-                    className="object-contain w-6 h-6 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
-                  />
-                )}
-                <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{post.companyName}</span>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{post.title}</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{post.description}</p>
-            </div>
-            <div className="flex items-center justify-between">
-              <CategoryBadges categories={post.categories || []} />
-              <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap">
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                  <span>
-                    {(() => {
-                      const date = new Date(post.publishedAt);
-                      const year = date.getFullYear();
-                      const month = String(date.getMonth() + 1).padStart(2, '0');
-                      const day = String(date.getDate()).padStart(2, '0');
-                      return `${year}년${month}월${day}일`;
-                    })()}
-                  </span>
-                </div>
-
-                {typeof post.viewCount === "number" && post.viewCount > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Eye className="w-3.5 h-3.5 text-gray-400" />
-                    <span>조회 {post.viewCount.toLocaleString()}회</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="w-24 flex-shrink-0">
-            <div className="w-24 h-24 rounded-lg overflow-hidden">
+        <CardContent className="p-0">
+          <div className="flex flex-col md:flex-row">
+            {/* Image Section - Tablet/Desktop Left, Mobile Top */}
+            <div className="md:w-64 h-48 md:h-auto relative overflow-hidden flex-shrink-0">
               <OptimizedImage
                 src={post.image || (post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg")}
                 alt={post.title}
-                width={192}
-                height={192}
-                className="w-full h-full object-cover rounded-lg"
+                width={400}
+                height={300}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 fallbackSrc="/placeholder.svg"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </div>
+
+            {/* Content Section */}
+            <div className="flex-1 p-6 flex flex-col justify-between space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1 bg-background rounded-lg border border-border group-hover:border-primary/30 transition-colors">
+                      {post.logoImageName && (
+                        <OptimizedImage
+                          src={`/logos/${post.logoImageName}`}
+                          alt={post.companyName}
+                          width={20}
+                          height={20}
+                          className="object-contain w-5 h-5 rounded-md"
+                        />
+                      )}
+                    </div>
+                    <span className="text-sm font-bold text-foreground/80 group-hover:text-primary transition-colors">
+                      {post.companyName}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-[12px] text-muted-foreground font-medium">
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>
+                        {new Date(post.publishedAt).toLocaleDateString('ko-KR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                    {typeof post.viewCount === "number" && post.viewCount > 0 && (
+                      <div className="flex items-center gap-1.5 border-l border-border pl-3">
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>{post.viewCount.toLocaleString()}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2 leading-tight">
+                  {post.title}
+                </h3>
+                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                  {post.description}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <div className="flex flex-wrap gap-2">
+                  {post.categories?.slice(0, 3).map((cat) => (
+                    <span 
+                      key={cat} 
+                      className="px-2.5 py-1 bg-muted text-[11px] font-bold rounded-md text-muted-foreground uppercase tracking-wider border border-border group-hover:border-primary/20 transition-colors"
+                    >
+                      {cat}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center text-primary font-bold text-sm opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-300">
+                  Read More
+                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </CardContent>
       </Link>
-    </CardContent>
-  </Card>
+    </Card>
   );
 });
 
