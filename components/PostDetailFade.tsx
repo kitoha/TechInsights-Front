@@ -154,8 +154,7 @@ export default function PostDetailFade({ post }: { post: Post }) {
       {/* Real Content */}
       <div className={`transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
         {post && (
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <Header />
+          <div className="bg-gray-50 dark:bg-gray-900 min-h-full">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
               {/* Breadcrumb */}
               <nav className="flex items-center space-x-2 sm:space-x-4 text-sm mb-6 sm:mb-8">
