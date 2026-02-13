@@ -17,6 +17,7 @@ interface PostDetailProps {
 interface PostData {
   id: string
   title: string
+  preview?: string
   url: string
   content: string
   publishedAt: string
