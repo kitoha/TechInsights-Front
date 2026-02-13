@@ -15,15 +15,25 @@ export function TopHeader({ onMenuClick }: TopHeaderProps) {
   const pathname = usePathname()
 
   return (
-    <header className="h-20 bg-background sticky top-0 z-40 border-b border-border/30 lg:ml-60">
+    <header className="h-20 bg-background sticky top-0 z-40 border-b border-border/30">
       <div className="h-full flex items-center justify-between px-8">
-        {/* Mobile menu button */}
-        <button
-          onClick={onMenuClick}
-          className="lg:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
+        {/* Left: Logo (desktop) or Mobile menu button */}
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={onMenuClick}
+            className="lg:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          {/* Logo - visible on desktop, hidden on mobile */}
+          <Link href="/" className="hidden lg:flex items-center space-x-2">
+            <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center">
+              <span className="text-background text-base font-bold">T</span>
+            </div>
+            <span className="text-xl font-bold tracking-tight text-foreground">TechInsights</span>
+          </Link>
+        </div>
 
         {/* Center: Search Bar */}
         <div className="flex-1 max-w-2xl mx-4 md:mx-auto">

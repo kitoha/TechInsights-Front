@@ -23,7 +23,7 @@ export default function AIRecommendedPosts({ posts }: AIRecommendedPostsProps) {
       items={posts}
       itemRender={(post, index) => (
         <Link key={index} href={`/post/${post.postId}`} className="group cursor-pointer flex items-center space-x-3 py-1 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 rounded-lg px-1 -mx-1 transition-colors">
-          <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 border border-border/30 overflow-hidden">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
             {post.logoImageName && post.logoImageName.trim() !== '' ? (
               <LogoImage
                 src={`/logos/${post.logoImageName}`}
@@ -31,7 +31,6 @@ export default function AIRecommendedPosts({ posts }: AIRecommendedPostsProps) {
                 width={20}
                 height={20}
                 className="object-contain w-5 h-5"
-                fallbackSrc="/placeholder.svg"
               />
             ) : (
               <svg className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">

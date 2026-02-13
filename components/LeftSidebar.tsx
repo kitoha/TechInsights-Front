@@ -45,13 +45,13 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
 
       <aside className={`
         fixed left-0 top-0 h-screen bg-background flex flex-col z-50 transition-transform duration-300 ease-in-out
-        w-60 lg:translate-x-0 border-r border-border/30
+        w-60 lg:translate-x-0 border-r border-border/30 lg:top-20
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}>
-        {/* Logo Section */}
-        <div className="h-20 px-6 flex items-center border-b border-border/30">
+        {/* Mobile Logo Section - only visible on mobile */}
+        <div className="h-20 px-6 flex items-center lg:hidden border-b border-border/30">
           <Link href="/" className="flex items-center space-x-2" onClick={onClose}>
-            <div className="w-8 h-8 bg-foreground rounded-md flex items-center justify-center">
+            <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center">
               <span className="text-background text-base font-bold">T</span>
             </div>
             <span className="text-xl font-bold tracking-tight text-foreground">TechInsights</span>
