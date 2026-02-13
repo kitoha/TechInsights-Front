@@ -128,7 +128,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
             <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${categoryIcon.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200`}>
               {categoryIcon.icon}
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {category.name}
             </h3>
           </div>

@@ -22,7 +22,7 @@ export default function AIRecommendedPosts({ posts }: AIRecommendedPostsProps) {
       iconType="ai"
       items={posts}
       itemRender={(post, index) => (
-        <Link key={index} href={`/post/${post.postId}`} className="group cursor-pointer flex items-start space-x-3 py-1 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 rounded-lg px-1 -mx-1 transition-colors">
+        <Link key={index} href={`/post/${post.postId}`} className="group cursor-pointer flex items-center space-x-3 py-1 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 rounded-lg px-1 -mx-1 transition-colors">
           <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 border border-border/30 overflow-hidden">
             {post.logoImageName && post.logoImageName.trim() !== '' ? (
               <OptimizedImage
@@ -40,7 +40,7 @@ export default function AIRecommendedPosts({ posts }: AIRecommendedPostsProps) {
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-foreground/95 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+            <p className="text-[13px] font-semibold text-foreground/95 leading-snug line-clamp-2">
               {post.title}
             </p>
           </div>
