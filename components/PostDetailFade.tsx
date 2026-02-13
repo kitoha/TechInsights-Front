@@ -1,12 +1,11 @@
 'use client'
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Header } from "@/components/Header";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { Sidebar } from "@/components/Sidebar";
 
@@ -55,6 +54,34 @@ interface PostDetailFadeProps {
 export default function PostDetailFade({ post, trendingPosts, companies, recommendedPosts }: PostDetailFadeProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [displayViewCount, setDisplayViewCount] = useState<number | null>(null);
+
+  // Split content into summary and main content
+  const splitContent = (content: string) => {
+    const lines = content.split('\n');
+    const summaryLines: string[] = [];
+    const mainLines: string[] = [];
+    let foundFirstHeading = false;
+
+    for (const line of lines) {
+      // Check if line is a heading (starts with #)
+      if (line.trim().startsWith('#') && line.trim().length > 1) {
+        foundFirstHeading = true;
+      }
+
+      if (foundFirstHeading) {
+        mainLines.push(line);
+      } else {
+        summaryLines.push(line);
+      }
+    }
+
+    return {
+      summary: summaryLines.join('\n').trim() || content.substring(0, 500),
+      main: mainLines.join('\n').trim()
+    };
+  };
+
+  const { summary, main } = splitContent(post?.content || '');
 
   useEffect(() => {
     if (post) {
@@ -179,227 +206,200 @@ export default function PostDetailFade({ post, trendingPosts, companies, recomme
       {/* Real Content */}
       <div className={`transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
         {post && (
-          <div className="bg-gray-50 dark:bg-gray-900 min-h-full lg:ml-60">
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
-              <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+          <div className="bg-[#f4f6f8] dark:bg-gray-900 min-h-full">
+            <div className="max-w-[1280px] mx-auto px-4 lg:px-6 py-4 lg:py-8">
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
               {/* Main Content Area */}
-              <div className="xl:col-span-8">
+              <div className="xl:col-span-9">
               {/* Breadcrumb */}
-              <nav className="flex items-center space-x-2 sm:space-x-4 text-sm mb-6 sm:mb-8">
-                <Link 
-                  href="/" 
-                  className="flex items-center space-x-2 px-3 py-2 sm:px-4 rounded-xl bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 hover:from-slate-200 hover:to-slate-300 dark:hover:from-slate-700 dark:hover:to-slate-600 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                  <span className="font-medium hidden sm:inline">홈</span>
+              <nav className="flex items-center space-x-2 text-[11px] text-gray-500 dark:text-gray-400 mb-2">
+                <Link href="/" className="hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
+                  Home
                 </Link>
-                
-                {/* Custom Separator */}
-                <div className="flex items-center">
-                  <div className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-gradient-to-r from-slate-300 to-slate-400 dark:from-slate-600 dark:to-slate-500 flex items-center justify-center">
-                    <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-xl border border-slate-200 dark:border-slate-600 shadow-sm">
-                  <div className="flex items-center space-x-1 sm:space-x-2">
-                    <div className="w-2 h-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full animate-pulse"></div>
-                    <span className="text-slate-600 dark:text-slate-400 text-xs font-medium">현재 페이지</span>
-                  </div>
-                  <span className="text-slate-800 dark:text-slate-200 font-semibold text-xs sm:text-sm max-w-32 sm:max-w-md truncate">{post.title}</span>
-                </div>
+                <span>›</span>
+                <span className="text-gray-700 dark:text-gray-300">Blog</span>
               </nav>
+
               {/* Back Button */}
-              <button 
-                onClick={() => window.history.back()} 
-                className="inline-flex items-center space-x-2 sm:space-x-3 px-3 py-2 sm:px-4 sm:py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 mb-6 sm:mb-8 group transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+              <button
+                onClick={() => window.history.back()}
+                className="inline-flex items-center space-x-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4 transition-colors"
               >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                <span className="font-medium text-sm sm:text-base">목록으로 돌아가기</span>
+                <span>Back to list</span>
               </button>
-              {/* Article Header */}
-              <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-3xl transition-all duration-300">
-                <CardContent className="p-4 sm:p-6 lg:p-10">
-                  {/* Article Header with Enhanced Design */}
-                  <div className="mb-8 sm:mb-12 relative">
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 rounded-2xl -m-2 sm:-m-4"></div>
-                    <div className="relative z-10 p-4 sm:p-6 lg:p-8">
-                      {/* Title with Enhanced Typography */}
-                      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black mb-6 sm:mb-8 leading-[1.1] tracking-tight">
-                        <span className="bg-gradient-to-r from-slate-800 via-slate-600 to-slate-800 dark:from-slate-200 dark:via-slate-400 dark:to-slate-200 bg-clip-text text-transparent">
-                          {post.title}
-                        </span>
-                      </h1>
-                      
-                      {/* Meta Information with Enhanced Design */}
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-                        <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-6 lg:space-x-8">
-                          <div className="flex items-center space-x-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 px-3 py-2 sm:px-4 rounded-full">
-                            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
-                            <span className="font-semibold text-foreground text-sm sm:text-base">{post.companyName}</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-muted-foreground">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span className="font-medium text-sm sm:text-base">{new Date(post.publishedAt).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 self-start sm:self-auto">
-                          <div className="flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
-                            <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>약 {Math.ceil(post.content.length / 500)}분</span>
-                          </div>
 
-                          {displayViewCount !== null && displayViewCount > 0 && (
-                            <div className="flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
-                              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                />
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                />
-                              </svg>
-                              <span>{displayViewCount.toLocaleString()}회</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Hero Image Section - Square with Logo */}
-                  <div className="mb-8 sm:mb-12">
-                    <div className="relative w-full aspect-square overflow-hidden rounded-2xl shadow-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-                      {post.thumbnail ? (
-                        <>
-                          <OptimizedImage
-                            src={post.thumbnail}
-                            alt={post.title}
-                            width={800}
-                            height={800}
-                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                            fallbackSrc="/placeholder.svg"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-                        </>
-                      ) : (
-                        <div className="flex items-center justify-center w-full h-full">
-                          <div className="relative w-1/2 h-1/2 max-w-[300px] max-h-[300px]">
+              {/* Article Card */}
+              <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <CardContent className="p-0">
+                  {/* Article Header Section */}
+                  <div className="px-5 sm:px-7 lg:px-10 pt-7 pb-5">
+                    {/* Article Title */}
+                    <h1 className="text-[34px] sm:text-[40px] lg:text-[44px] font-bold text-gray-900 dark:text-gray-100 mb-4 leading-[1.15] tracking-tight">
+                      {post.title}
+                    </h1>
+
+                    {/* Meta Information */}
+                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[12px]">
+                      <div className="flex items-center space-x-2.5">
+                        {post.logoImageName && (
+                          <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                             <OptimizedImage
-                              src={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
+                              src={`/logos/${post.logoImageName}`}
                               alt={post.companyName}
-                              width={400}
-                              height={400}
-                              className="w-full h-full object-contain transition-transform duration-500 hover:scale-110"
+                              width={24}
+                              height={24}
+                              className="w-full h-full object-contain"
                               fallbackSrc="/placeholder.svg"
                             />
                           </div>
-                        </div>
+                        )}
+                        <span className="font-semibold text-gray-900 dark:text-gray-100">{post.companyName} Engineering</span>
+                      </div>
+                      <span className="text-gray-300 dark:text-gray-600">•</span>
+                      <time className="text-gray-600 dark:text-gray-400">
+                        {new Date(post.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                      </time>
+                      <span className="text-gray-300 dark:text-gray-600">•</span>
+                      <span className="text-gray-600 dark:text-gray-400">{Math.ceil(post.content.length / 500)} min read</span>
+                      {displayViewCount !== null && displayViewCount > 0 && (
+                        <>
+                          <span className="text-gray-300 dark:text-gray-600">•</span>
+                          <div className="flex items-center space-x-1.5 text-gray-600 dark:text-gray-400">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span>{displayViewCount.toLocaleString()}</span>
+                          </div>
+                        </>
                       )}
+                    </div>
+                  </div>
 
-                      {/* Company Logo Badge - Bottom Left */}
-                      {post.logoImageName && (
-                        <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 bg-white dark:bg-gray-800 rounded-xl p-2 sm:p-3 shadow-lg border border-gray-200 dark:border-gray-700">
+                  {/* Hero Image Section */}
+                  <div className="px-5 sm:px-7 lg:px-10">
+                    <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-gradient-to-br from-[#2665ff] via-[#2452db] to-[#1b3dbe]">
+                      {post.thumbnail ? (
+                        <OptimizedImage
+                          src={post.thumbnail}
+                          alt={post.title}
+                          width={1200}
+                          height={750}
+                          className="w-full h-full object-cover"
+                          fallbackSrc="/placeholder.svg"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-full p-16">
                           <OptimizedImage
-                            src={`/logos/${post.logoImageName}`}
+                            src={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
                             alt={post.companyName}
-                            width={40}
-                            height={40}
-                            className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+                            width={400}
+                            height={400}
+                            className="w-full h-full max-w-sm object-contain opacity-85 drop-shadow-2xl"
                             fallbackSrc="/placeholder.svg"
                           />
                         </div>
                       )}
                     </div>
                   </div>
-                  {/* Article Content with Enhanced Design */}
-                  <div className="relative mb-12 sm:mb-16">
-                    {/* Content Background */}
-                    <div className="absolute inset-0 bg-white dark:bg-gray-800 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700 -m-3 sm:-m-6"></div>
-                    <div className="relative z-10 p-4 sm:p-6 lg:p-8">
-                      {/* AI Summary Header */}
-                      <div className="flex items-center justify-between mb-6 sm:mb-8">
-                        <div className="flex items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 sm:px-6 sm:py-3 rounded-full shadow-lg">
-                          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+
+                  {/* Content Section */}
+                  <div className="px-5 sm:px-7 lg:px-10 py-7">
+                    {/* AI Summary Header */}
+                    <div className="mb-8">
+                      <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-3 py-2">
+                        <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 3.5L2 7.5l8 4 8-4-8-4z"/>
+                            <path d="M2 12.5l8 4 8-4"/>
+                            <path d="M2 10l8 4 8-4"/>
                           </svg>
-                          <span className="text-white font-bold text-sm sm:text-lg">AI 요약</span>
+                        </div>
+                        <h2 className="text-[13px] font-semibold text-gray-900 dark:text-gray-100">AI Summary</h2>
+                      </div>
+                    </div>
+
+                    {/* Key Summary */}
+                    {summary && (
+                      <div className="mb-10">
+                        <div className="prose prose-sm max-w-none dark:prose-invert
+                          prose-p:text-gray-600 dark:prose-p:text-gray-300 prose-p:text-[14px] prose-p:leading-6 prose-p:mb-3
+                          prose-ul:my-3 prose-ul:list-disc prose-ul:pl-5 prose-ul:space-y-1.5
+                          prose-li:text-gray-600 dark:prose-li:text-gray-300 prose-li:text-[14px] prose-li:leading-6
+                          prose-strong:text-gray-900 dark:prose-strong:text-gray-100
+                          prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeRaw]}
+                          >
+                            {summary}
+                          </ReactMarkdown>
                         </div>
                       </div>
-                      
-                      {/* Enhanced Markdown Content */}
-                      <div className="markdown-body prose prose-sm sm:prose-base lg:prose-xl max-w-none dark:prose-invert 
-                        prose-headings:text-foreground prose-headings:font-bold prose-headings:tracking-tight
-                        prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:text-sm sm:prose-p:text-base lg:prose-p:text-lg
-                        prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
-                        prose-strong:text-foreground prose-strong:font-bold
-                        prose-code:text-foreground prose-code:bg-muted/50 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-xs sm:prose-code:text-sm prose-code:font-mono
-                        prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border/50 prose-pre:rounded-xl prose-pre:p-3 sm:prose-pre:p-6
-                        prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50/50 dark:prose-blockquote:bg-blue-950/20 prose-blockquote:pl-4 sm:prose-blockquote:pl-6 prose-blockquote:py-3 sm:prose-blockquote:py-4 prose-blockquote:rounded-r-xl
-                        prose-ul:space-y-1 sm:prose-ul:space-y-2 prose-ol:space-y-1 sm:prose-ol:space-y-2
-                        prose-li:text-foreground/90 prose-li:leading-relaxed
-                        prose-img:rounded-xl prose-img:shadow-lg
-                        prose-table:border-collapse prose-table:border prose-table:border-border prose-table:rounded-lg prose-table:text-xs sm:prose-table:text-sm
-                        prose-th:bg-muted/50 prose-th:font-semibold prose-th:border prose-th:border-border prose-th:p-2 sm:prose-th:p-3
-                        prose-td:border prose-td:border-border prose-td:p-2 sm:prose-td:p-3">
-                        <ReactMarkdown>{post.content}</ReactMarkdown>
+                    )}
+
+                    {/* Main Article Content */}
+                    {main && (
+                      <div className="border-t border-gray-100 dark:border-gray-700 pt-8">
+                        <div className="prose prose-base max-w-none dark:prose-invert
+                          prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-headings:font-bold prose-headings:tracking-tight
+                          prose-h1:text-3xl prose-h1:mb-4 prose-h1:mt-10 prose-h1:first:mt-0
+                          prose-h2:text-[32px] prose-h2:mb-4 prose-h2:mt-10 prose-h2:first:mt-0
+                          prose-h3:text-2xl prose-h3:mb-3 prose-h3:mt-8
+                          prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:text-[15px] prose-p:leading-7 prose-p:mb-5
+                          prose-ul:my-4 prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-2
+                          prose-ol:my-4 prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-2
+                          prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:text-[15px] prose-li:leading-7
+                          prose-blockquote:border-l-2 prose-blockquote:border-blue-400 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-500 dark:prose-blockquote:text-gray-400
+                          prose-code:text-sm prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeRaw]}
+                          >
+                            {main}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {/* Bottom Actions */}
+                  <div className="px-5 sm:px-7 lg:px-10 pb-7">
+                    <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                      {/* Tags */}
+                      {post.categories && post.categories.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {post.categories.map((category, index) => (
+                            <Badge
+                              key={index}
+                              variant="secondary"
+                              className="px-2.5 py-1 text-[11px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-md"
+                            >
+                              #{category}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Social Actions */}
+                      <div className="flex items-center gap-2">
+                        <button className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                          </svg>
+                          <span>Like</span>
+                        </button>
+
+                        <button className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                          </svg>
+                          <span>Share</span>
+                        </button>
                       </div>
                     </div>
-                  </div>
-                  {/* View Original Button */}
-                  <div className="mb-8 sm:mb-12">
-                    <Button variant="outline" asChild className="group border-2 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-all duration-200 w-full sm:w-auto">
-                      <a href={post.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center space-x-2">
-                        <span>원문 보기</span>
-                        <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </a>
-                    </Button>
-                  </div>
-                  {/* Tags */}
-                  <div className="mb-8 sm:mb-12">
-                    <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-4 sm:mb-6">태그</h3>
-                    <div className="flex flex-wrap gap-2 sm:gap-3">
-                      <Badge variant="secondary" className="px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors duration-200">
-                        {post.companyName}
-                      </Badge>
-                      <Badge variant="secondary" className="px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors duration-200">
-                        기술
-                      </Badge>
-                    </div>
-                  </div>
-                  {/* Like and Share */}
-                  <div className="flex items-center justify-center sm:justify-start space-x-6 sm:space-x-8 mb-8 sm:mb-12 pb-6 sm:pb-8 border-b border-border/50">
-                    <Button variant="ghost" className="flex items-center space-x-2 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all duration-200">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                      <span className="text-sm sm:text-base">좋아요</span>
-                    </Button>
-                    <Button variant="ghost" className="flex items-center space-x-2 text-muted-foreground hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-all duration-200">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                      </svg>
-                      <span className="text-sm sm:text-base">공유</span>
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -407,8 +407,8 @@ export default function PostDetailFade({ post, trendingPosts, companies, recomme
               {/* End Main Content Area */}
 
               {/* Right Sidebar - 기존 Sidebar 재사용 */}
-              <div className="xl:col-span-4">
-                <div className="sticky top-24">
+              <div className="xl:col-span-3">
+                <div className="sticky top-20">
                   <Sidebar
                     trendingPosts={trendingPosts}
                     companies={companies}

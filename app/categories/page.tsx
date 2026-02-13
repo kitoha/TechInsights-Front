@@ -1,5 +1,4 @@
 import { isAxiosError } from "axios";
-import { Header } from "@/components/Header";
 import { CategoryCard, CategoryStats } from "@/components/CategoryCard";
 import { apiGet } from "@/lib/api";
 import { redirect } from "next/navigation";

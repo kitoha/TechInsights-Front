@@ -15,7 +15,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       />
       <div className="flex-1 flex flex-col">
         <TopHeader onMenuClick={() => setIsSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto lg:ml-60">
+        <main className="flex-1 overflow-y-auto lg:ml-56">
           {children}
         </main>
       </div>

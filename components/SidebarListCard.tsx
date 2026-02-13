@@ -1,4 +1,3 @@
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
 interface SidebarListCardProps<T = unknown> {
@@ -8,7 +7,7 @@ interface SidebarListCardProps<T = unknown> {
   moreLink?: string;
   loading?: boolean;
   emptyMessage?: string;
-  iconType?: 'ranking' | 'company' | 'default';
+  iconType?: 'ranking' | 'company' | 'ai' | 'default';
 }
 
 export default function SidebarListCard<T = unknown>({ 
