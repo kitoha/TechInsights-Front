@@ -15,12 +15,12 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
   const pathname = usePathname()
 
   const menuItems = [
-    { name: "Feed", href: "/", icon: Home },
-    { name: "Trending", href: "/trending", icon: (props: any) => (
-      <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+    { name: "Home", href: "/", icon: Home },
+    { name: "Categories", href: "/categories", icon: (props: any) => (
+      <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
     )},
-    { name: "Saved", href: "/saved", icon: (props: any) => (
-      <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+    { name: "Companies", href: "/companies", icon: (props: any) => (
+      <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
     )},
   ]
 
@@ -72,7 +72,7 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
                   className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
                     isActive
                       ? "bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 font-semibold shadow-sm"
-                      : "text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/20"
+                      : "text-muted-foreground hover:bg-blue-50/50 dark:hover:bg-blue-950/20"
                   }`}
                 >
                   <item.icon className="w-[18px] h-[18px]" />
@@ -90,7 +90,7 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
                 key={topic.name}
                 href={topic.href}
                 onClick={onClose}
-                className="flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-all duration-200"
+                className="flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-all duration-200"
               >
                 <span className="text-muted-foreground/50 text-sm font-medium">#</span>
                 <span className="text-[13px] font-medium">{topic.name}</span>

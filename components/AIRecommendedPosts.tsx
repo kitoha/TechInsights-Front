@@ -3,7 +3,7 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
 import Link from "next/link"
 import SidebarListCard from "./SidebarListCard"
-import { OptimizedImage } from "./OptimizedImage"
+import { LogoImage } from "./LogoImage"
 
 interface RecommendedPost {
   postId: string
@@ -25,7 +25,7 @@ export default function AIRecommendedPosts({ posts }: AIRecommendedPostsProps) {
         <Link key={index} href={`/post/${post.postId}`} className="group cursor-pointer flex items-center space-x-3 py-1 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 rounded-lg px-1 -mx-1 transition-colors">
           <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 border border-border/30 overflow-hidden">
             {post.logoImageName && post.logoImageName.trim() !== '' ? (
-              <OptimizedImage
+              <LogoImage
                 src={`/logos/${post.logoImageName}`}
                 alt={post.title}
                 width={20}

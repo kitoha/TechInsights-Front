@@ -1,6 +1,6 @@
 "use client";
 import { memo } from "react";
-import { OptimizedImage } from "./OptimizedImage";
+import { LogoImage } from "./LogoImage";
 
 interface SidebarItemProps {
   index: number;
@@ -20,7 +20,7 @@ export const SidebarItem = memo(function SidebarItem({ index, logoImage, title, 
           {String(index + 1).padStart(2, '0')}
         </span>
         <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 border border-border/30">
-          <OptimizedImage
+          <LogoImage
             src={logoImage}
             alt="logo"
             width={18}
@@ -54,7 +54,7 @@ export const SidebarItem = memo(function SidebarItem({ index, logoImage, title, 
   return (
     <div className="group cursor-pointer flex items-center space-x-3 py-1 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 rounded-lg px-1 -mx-1 transition-colors" onClick={onClick}>
       <div className={`w-9 h-9 rounded-xl ${color} flex items-center justify-center flex-shrink-0 border border-border/30`}>
-        <OptimizedImage
+        <LogoImage
           src={logoImage}
           alt="logo"
           width={20}
