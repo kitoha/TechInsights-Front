@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/Header";
 import ReactMarkdown from "react-markdown";
 import { OptimizedImage } from "@/components/OptimizedImage";
+import { Sidebar } from "@/components/Sidebar";
 
 interface Post {
   id: string;
@@ -23,11 +24,35 @@ interface Post {
   viewCount?: number;
 }
 
+interface TrendingPost {
+  logoImage: string;
+  title: string;
+  viewCount: number;
+}
+
+interface Company {
+  name: string;
+  logoImage: string;
+}
+
+interface RecommendedPost {
+  postId: string;
+  title: string;
+  logoImageName: string;
+}
+
 function SkeletonBox({ className = "" }: { className?: string }) {
   return <div className={`animate-pulse bg-gray-200 dark:bg-gray-700 rounded ${className}`} />;
 }
 
-export default function PostDetailFade({ post }: { post: Post }) {
+interface PostDetailFadeProps {
+  post: Post;
+  trendingPosts: TrendingPost[];
+  companies: Company[];
+  recommendedPosts: RecommendedPost[];
+}
+
+export default function PostDetailFade({ post, trendingPosts, companies, recommendedPosts }: PostDetailFadeProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [displayViewCount, setDisplayViewCount] = useState<number | null>(null);
 
@@ -154,8 +179,11 @@ export default function PostDetailFade({ post }: { post: Post }) {
       {/* Real Content */}
       <div className={`transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
         {post && (
-          <div className="bg-gray-50 dark:bg-gray-900 min-h-full">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+          <div className="bg-gray-50 dark:bg-gray-900 min-h-full lg:ml-60">
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+              {/* Main Content Area */}
+              <div className="xl:col-span-8">
               {/* Breadcrumb */}
               <nav className="flex items-center space-x-2 sm:space-x-4 text-sm mb-6 sm:mb-8">
                 <Link 
@@ -256,18 +284,49 @@ export default function PostDetailFade({ post }: { post: Post }) {
                       </div>
                     </div>
                   </div>
-                  {/* Hero Image */}
+                  {/* Hero Image Section - Square with Logo */}
                   <div className="mb-8 sm:mb-12">
-                    <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                      <OptimizedImage
-                        src={post.thumbnail || (post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg")}
-                        alt={post.title}
-                        width={800}
-                        height={400}
-                        className="w-full h-[250px] sm:h-[350px] lg:h-[500px] object-cover transition-transform duration-500 hover:scale-105"
-                        fallbackSrc="/placeholder.svg"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    <div className="relative w-full aspect-square overflow-hidden rounded-2xl shadow-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+                      {post.thumbnail ? (
+                        <>
+                          <OptimizedImage
+                            src={post.thumbnail}
+                            alt={post.title}
+                            width={800}
+                            height={800}
+                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                            fallbackSrc="/placeholder.svg"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                        </>
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-full">
+                          <div className="relative w-1/2 h-1/2 max-w-[300px] max-h-[300px]">
+                            <OptimizedImage
+                              src={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
+                              alt={post.companyName}
+                              width={400}
+                              height={400}
+                              className="w-full h-full object-contain transition-transform duration-500 hover:scale-110"
+                              fallbackSrc="/placeholder.svg"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Company Logo Badge - Bottom Left */}
+                      {post.logoImageName && (
+                        <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 bg-white dark:bg-gray-800 rounded-xl p-2 sm:p-3 shadow-lg border border-gray-200 dark:border-gray-700">
+                          <OptimizedImage
+                            src={`/logos/${post.logoImageName}`}
+                            alt={post.companyName}
+                            width={40}
+                            height={40}
+                            className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+                            fallbackSrc="/placeholder.svg"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                   {/* Article Content with Enhanced Design */}
@@ -344,6 +403,22 @@ export default function PostDetailFade({ post }: { post: Post }) {
                   </div>
                 </CardContent>
               </Card>
+              </div>
+              {/* End Main Content Area */}
+
+              {/* Right Sidebar - 기존 Sidebar 재사용 */}
+              <div className="xl:col-span-4">
+                <div className="sticky top-24">
+                  <Sidebar
+                    trendingPosts={trendingPosts}
+                    companies={companies}
+                    recommendedPosts={recommendedPosts}
+                  />
+                </div>
+              </div>
+              {/* End Right Sidebar */}
+
+            </div>
             </div>
           </div>
         )}
