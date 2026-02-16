@@ -40,17 +40,17 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
       )}
 
       <aside className={`
-        fixed left-0 top-0 h-screen bg-background flex flex-col z-50 transition-transform duration-300 ease-in-out
-        w-56 lg:translate-x-0 border-r border-border/40 lg:top-16
+        fixed left-0 top-0 h-screen bg-gray-50 dark:bg-gray-950 flex flex-col z-50 transition-transform duration-300 ease-in-out
+        w-56 lg:translate-x-0 border-r border-gray-300 dark:border-gray-700 lg:top-14 shadow-lg lg:shadow-none
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}>
         {/* Mobile Logo Section - only visible on mobile */}
-        <div className="h-16 px-5 flex items-center lg:hidden border-b border-border/40">
+        <div className="h-14 px-5 flex items-center lg:hidden border-b border-gray-300 dark:border-gray-700">
           <Link href="/" className="flex items-center space-x-2" onClick={onClose}>
-            <div className="w-7 h-7 bg-foreground rounded-md flex items-center justify-center">
-              <span className="text-background text-sm font-bold">T</span>
+            <div className="w-6 h-6 bg-foreground rounded-md flex items-center justify-center">
+              <span className="text-background text-xs font-bold">T</span>
             </div>
-            <span className="text-base font-semibold tracking-tight text-foreground">TechInsights</span>
+            <span className="text-sm font-semibold tracking-tight text-foreground">TechInsights</span>
           </Link>
         </div>
 
@@ -67,8 +67,8 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
                   onClick={onClose}
                   className={`flex items-center space-x-2.5 px-3 py-2 rounded-md transition-colors ${
                     isActive
-                      ? "bg-blue-50 text-blue-600 font-medium"
-                      : "text-muted-foreground hover:bg-muted/70"
+                      ? "bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 font-medium"
+                      : "text-muted-foreground hover:bg-white dark:hover:bg-gray-900"
                   }`}
                 >
                   <item.icon className="w-4 h-4" />
@@ -86,7 +86,7 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
                 key={topic.name}
                 href={topic.href}
                 onClick={onClose}
-                className="flex items-center space-x-2.5 px-3 py-2 rounded-md text-muted-foreground hover:bg-muted/70 transition-colors"
+                className="flex items-center space-x-2.5 px-3 py-2 rounded-md text-muted-foreground hover:bg-white dark:hover:bg-gray-900 transition-colors"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-current/60" />
                 <span className="text-[12px]">{topic.name}</span>

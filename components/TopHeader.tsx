@@ -12,7 +12,7 @@ interface TopHeaderProps {
 
 export function TopHeader({ onMenuClick }: TopHeaderProps) {
   return (
-    <header className="h-16 bg-background/95 backdrop-blur sticky top-0 z-40 border-b border-border/50">
+    <header className="h-14 bg-white dark:bg-gray-900 sticky top-0 z-40 border-b border-gray-300 dark:border-gray-700">
       <div className="h-full flex items-center justify-between px-4 lg:px-6">
         <div className="flex items-center space-x-3">
           <button
@@ -24,23 +24,23 @@ export function TopHeader({ onMenuClick }: TopHeaderProps) {
           </button>
 
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-7 h-7 bg-foreground rounded-md flex items-center justify-center">
-              <span className="text-background text-sm font-bold">T</span>
+            <div className="w-6 h-6 bg-foreground rounded-md flex items-center justify-center">
+              <span className="text-background text-xs font-bold">T</span>
             </div>
-            <span className="text-base font-semibold tracking-tight text-foreground">TechInsights</span>
+            <span className="text-sm font-semibold tracking-tight text-foreground">TechInsights</span>
           </Link>
         </div>
 
         <div className="hidden md:block flex-1 max-w-xl mx-6">
-          <SearchBar className="w-full h-9 bg-muted/60 rounded-lg" />
+          <SearchBar className="w-full h-8 bg-muted/60 rounded-lg" />
         </div>
 
         <div className="flex items-center space-x-2">
           <ThemeToggle />
-          <button className="hidden sm:inline-flex px-2 py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <button className="hidden sm:inline-flex px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
             Sign In
           </button>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3.5 h-8 rounded-md text-xs shadow-none">
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 h-7 rounded-md text-xs shadow-none">
             Subscribe
           </Button>
         </div>

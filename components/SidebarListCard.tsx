@@ -20,8 +20,8 @@ export default function SidebarListCard<T = unknown>({
   iconType = 'default'
 }: SidebarListCardProps<T>) {
   return (
-    <div className="bg-white dark:bg-gray-900 border border-border/40 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="px-5 py-4 flex items-center justify-between border-b border-border/30 bg-gray-50/50 dark:bg-gray-800/30">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200/60 dark:border-gray-700/60 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
+      <div className="px-5 py-4 flex items-center justify-between border-b border-gray-200/40 dark:border-gray-700/40 bg-gray-50 dark:bg-gray-700/50">
         <div className="flex items-center gap-2">
           <h3 className="text-[12px] font-bold uppercase tracking-wider text-foreground/95">
             {title}

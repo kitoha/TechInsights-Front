@@ -190,7 +190,7 @@ const PostCard = memo(function PostCard({ post }: { post: Post }) {
   const thumbnail = post.thumbnail || post.image;
 
   return (
-    <Card className="group bg-white dark:bg-gray-900 border border-border/40 hover:border-blue-200 dark:hover:border-blue-900/50 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden">
+    <Card className="group bg-white dark:bg-gray-800 border border-gray-200/60 dark:border-gray-700/60 hover:border-blue-300 dark:hover:border-blue-700 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 rounded-2xl overflow-hidden">
       <Link href={`/post/${post.id}`}>
         <CardContent className="p-0">
           <div className="flex flex-col md:flex-row gap-5">
