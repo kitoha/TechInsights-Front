@@ -143,8 +143,8 @@ export default function PostDetailFade({ post, trendingPosts, companies, recomme
       <div className={`absolute inset-0 z-10 transition-opacity duration-500 ${isLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div className="bg-[#f4f6f8] dark:bg-gray-900 min-h-screen">
           <div className="max-w-[1600px] mx-auto px-4 lg:px-8 py-4 lg:py-8">
-            <div className="grid grid-cols-1 xl:grid-cols-[1fr_minmax(0,800px)_1fr_minmax(0,320px)_1fr] xl:gap-8">
-              <div className="xl:col-start-2 xl:col-span-1">
+            <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] xl:gap-6">
+              <div className="xl:col-span-1">
                 <SkeletonBox className="w-16 h-6 mb-3 rounded-md" />
                 <div className="flex items-center space-x-2 mb-2">
                   <SkeletonBox className="w-12 h-3" />
@@ -176,7 +176,7 @@ export default function PostDetailFade({ post, trendingPosts, companies, recomme
                   </CardContent>
                 </Card>
               </div>
-              <div className="xl:col-start-4 xl:col-span-1 space-y-4">
+              <div className="xl:col-span-1 space-y-4">
                 <SkeletonBox className="w-full h-48 rounded-xl" />
                 <SkeletonBox className="w-full h-36 rounded-xl" />
                 <SkeletonBox className="w-full h-32 rounded-xl" />
@@ -190,45 +190,62 @@ export default function PostDetailFade({ post, trendingPosts, companies, recomme
         {post && (
           <div className="bg-[#f4f6f8] dark:bg-gray-900 min-h-full">
             <div className="max-w-[1600px] mx-auto px-4 lg:px-8 py-4 lg:py-8">
-              <div className="grid grid-cols-1 xl:grid-cols-[1fr_minmax(0,800px)_1fr_minmax(0,320px)_1fr] xl:gap-8">
+              <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] xl:gap-6">
               {/* Main Content Area */}
-              <div className="xl:col-start-2 xl:col-span-1">
-              {/* Category Tab */}
-              {post.categories && post.categories.length > 0 && (
-                <div className="flex items-center gap-1 mb-3">
-                  {post.categories.map((category, idx) => (
+              <div className="xl:col-span-1">
+              {/* Header Navigation Area */}
+              <div className="mb-6 space-y-4">
+                {/* Top Row: Breadcrumb & Back Button */}
+                <div className="flex items-center justify-between">
+                  {/* Breadcrumb */}
+                  <nav className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
                     <Link
-                      key={idx}
-                      href={`/?category=${category}`}
-                      className="px-3 py-1.5 text-[11px] font-semibold rounded-md bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 transition-colors hover:bg-blue-100 dark:hover:bg-blue-900/50"
+                      href="/"
+                      className="group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all cursor-pointer"
                     >
-                      {category}
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      <span>Home</span>
                     </Link>
-                  ))}
+                    <svg className="w-4 h-4 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span className="px-2.5 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      {post.categories && post.categories.length > 0 ? post.categories[0] : 'Blog'}
+                    </span>
+                  </nav>
+
+                  {/* Back Button */}
+                  <button
+                    onClick={() => window.history.back()}
+                    className="group inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md transition-all duration-200 cursor-pointer"
+                  >
+                    <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Back to list</span>
+                  </button>
                 </div>
-              )}
 
-              {/* Breadcrumb */}
-              <nav className="flex items-center space-x-2 text-[11px] text-gray-500 dark:text-gray-400 mb-2">
-                <Link href="/" className="hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
-                  Home
-                </Link>
-                <span>›</span>
-                <span className="text-gray-700 dark:text-gray-300">
-                  {post.categories && post.categories.length > 0 ? post.categories[0] : 'Blog'}
-                </span>
-              </nav>
-
-              {/* Back Button */}
-              <button
-                onClick={() => window.history.back()}
-                className="inline-flex items-center space-x-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-5 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                <span>Back to list</span>
-              </button>
+                {/* Category Tags */}
+                {post.categories && post.categories.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {post.categories.map((category, idx) => (
+                      <Link
+                        key={idx}
+                        href={`/?category=${category}`}
+                        className="group inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-full bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-500/10 dark:to-blue-600/10 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-500/20 dark:hover:to-blue-600/20 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-sm hover:scale-105 transition-all duration-200 cursor-pointer"
+                      >
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                        </svg>
+                        {category}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Article Card */}
               <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -309,16 +326,14 @@ export default function PostDetailFade({ post, trendingPosts, companies, recomme
                   <div className="px-5 sm:px-7 lg:px-10 py-7">
                     {/* AI Summary Header */}
                     <div className="mb-7">
-                      <div className="flex w-full items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-3 py-2.5">
-                        <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 3.5L2 7.5l8 4 8-4-8-4z"/>
-                            <path d="M2 12.5l8 4 8-4"/>
-                            <path d="M2 10l8 4 8-4"/>
-                          </svg>
-                        </div>
-                        <h2 className="text-[13px] font-semibold text-gray-900 dark:text-gray-100">AI Summary</h2>
-                      </div>
+                      <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 dark:bg-blue-900/30 px-5 py-2.5">
+                        <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M10 2L8.5 7.5 3 9l5.5 1.5L10 16l1.5-5.5L17 9l-5.5-1.5L10 2z"/>
+                          <path d="M17.5 13l-.75 2.25L14.5 16l2.25.75.75 2.25.75-2.25L20.5 16l-2.25-.75L17.5 13z"/>
+                          <path d="M6 13l-.5 1.5L4 15l1.5.5L6 17l.5-1.5L8 15l-1.5-.5L6 13z"/>
+                        </svg>
+                        <span className="text-[15px] font-semibold text-blue-600 dark:text-blue-400">AI Summary</span>
+                      </span>
                     </div>
 
                     {/* Key Summary */}
@@ -353,7 +368,16 @@ export default function PostDetailFade({ post, trendingPosts, companies, recomme
                           prose-ol:my-4 prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-2
                           prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:text-[15px] prose-li:leading-7
                           prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/20 prose-blockquote:rounded-lg prose-blockquote:px-5 prose-blockquote:py-4 prose-blockquote:italic prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-300 prose-blockquote:not-italic
-                          prose-code:text-sm prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded">
+                          prose-code:text-sm prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-blue-600 dark:prose-code:text-blue-400 prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+                          prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:text-gray-100 prose-pre:rounded-lg prose-pre:p-4 prose-pre:overflow-x-auto prose-pre:my-6
+                          prose-pre>code:bg-transparent prose-pre>code:p-0 prose-pre>code:text-sm prose-pre>code:text-gray-100
+                          prose-strong:text-gray-900 dark:prose-strong:text-gray-100 prose-strong:font-semibold
+                          prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+                          prose-img:rounded-lg prose-img:my-6
+                          prose-hr:border-gray-200 dark:prose-hr:border-gray-700 prose-hr:my-8
+                          prose-table:border-collapse prose-table:w-full prose-table:my-6
+                          prose-th:border prose-th:border-gray-300 dark:prose-th:border-gray-600 prose-th:bg-gray-100 dark:prose-th:bg-gray-800 prose-th:px-4 prose-th:py-2 prose-th:text-left
+                          prose-td:border prose-td:border-gray-300 dark:prose-td:border-gray-600 prose-td:px-4 prose-td:py-2">
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             rehypePlugins={[rehypeRaw]}
@@ -414,7 +438,7 @@ export default function PostDetailFade({ post, trendingPosts, companies, recomme
               {/* End Main Content Area */}
 
               {/* Right Sidebar - 기존 Sidebar 재사용 */}
-              <div className="xl:col-start-4 xl:col-span-1">
+              <div className="xl:col-span-1">
                 <div className="sticky top-20">
                   <Sidebar
                     trendingPosts={trendingPosts}
