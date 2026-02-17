@@ -16,9 +16,6 @@ interface MainContentProps {
 export function MainContent({ posts, totalPages, page, selectedCategory, categories, companyId, companyInfo }: MainContentProps) {
   return (
     <div className="lg:col-span-3">
-      {/* Search Bar */}
-      <SearchBar className="mb-6" />
-      
       {/* Company Header */}
       {companyId && companyInfo && (
         <div className="mb-6 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">

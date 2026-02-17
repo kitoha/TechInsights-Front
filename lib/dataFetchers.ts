@@ -141,30 +141,16 @@ export async function fetchCompanies(): Promise<Company[]> {
 export async function fetchRecommendedPosts(): Promise<RecommendedPost[]> {
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/recommendations`;
-    const res = await apiGet<{title: string; logoImageName: string}[]>(url);
-    
-    const colorSets = [
-      { color: "bg-gradient-to-br from-blue-50 to-blue-100", borderColor: "border-blue-200" },
-      { color: "bg-gradient-to-br from-yellow-50 to-yellow-100", borderColor: "border-yellow-200" },
-      { color: "bg-gradient-to-br from-green-50 to-green-100", borderColor: "border-green-200" },
-      { color: "bg-gradient-to-br from-gray-50 to-gray-100", borderColor: "border-gray-200" },
-      { color: "bg-gradient-to-br from-emerald-50 to-emerald-100", borderColor: "border-emerald-200" },
-    ];
+    const res = await apiGet<{postId: string; title: string; logoImageName: string}[]>(url);
 
     if (res && typeof res === 'object' && 'data' in res && res.data && Array.isArray(res.data)) {
-      return res.data
-        .filter((item) => item.logoImageName && item.logoImageName.trim() !== '')
-        .map((item, idx: number) => {
-          const colorIdx = idx % colorSets.length;
-          return {
-            title: item.title,
-            logo: `/logos/${item.logoImageName}`,
-            color: colorSets[colorIdx].color,
-            borderColor: colorSets[colorIdx].borderColor,
-          };
-        });
+      return res.data.map((item) => ({
+        postId: item.postId,
+        title: item.title,
+        logoImageName: item.logoImageName,
+      }));
     }
-    
+
     return [];
   } catch {
     return [];

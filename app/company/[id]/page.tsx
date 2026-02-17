@@ -1,4 +1,3 @@
-import { Header } from "@/components/Header";
 import { MainContent } from "@/components/MainContent";
 import { Sidebar } from "@/components/Sidebar";
 import { 
@@ -49,10 +48,9 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-full">
+      <div className="max-w-[1600px] mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Main Content */}
           <MainContent
             posts={latestPosts}

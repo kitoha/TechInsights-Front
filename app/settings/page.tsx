@@ -1,6 +1,5 @@
 "use client"
 
-import { Header } from "@/components/Header"
 import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -59,10 +58,9 @@ export default function SettingsPage() {
   if (isLoading) return null
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      <Header />
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="space-y-8">
+    <div className="bg-background text-foreground transition-colors duration-300 min-h-full">
+      <main className="max-w-[1600px] mx-auto px-6 py-12">
+        <div className="max-w-3xl mx-auto space-y-8">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">설정</h1>
             <p className="text-muted-foreground mt-2">

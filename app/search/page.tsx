@@ -4,7 +4,6 @@ import { apiGet } from "@/lib/api"
 import { isAxiosError } from "axios"
 import { redirect } from "next/navigation"
 import SearchResults from "@/components/SearchResults"
-import { Header } from "@/components/Header"
 
 interface SearchPageProps {
   searchParams: Promise<{
@@ -23,7 +22,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   if (!query.trim()) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
@@ -57,7 +55,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Suspense fallback={<div>검색 중...</div>}>
           <SearchResults 

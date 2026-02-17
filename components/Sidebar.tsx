@@ -19,10 +19,9 @@ interface Company {
 }
 
 interface RecommendedPost {
+  postId: string;
   title: string;
-  logo: string;
-  color: string;
-  borderColor: string;
+  logoImageName: string;
 }
 
 interface SidebarProps {
@@ -94,13 +93,10 @@ export function Sidebar({ trendingPosts, companies, recommendedPosts }: SidebarP
   }, [refreshTrending]);
 
   return (
-    <div className="space-y-6">
-      {/* AI 추천 게시물 */}
-      <AIRecommendedPosts posts={recommendedPosts} />
-      
-      {/* 게시물 조회 수 랭킹 */}
+    <div className="space-y-5">
+      {/* Trending Now Section */}
       <SidebarListCard
-        title="인기 게시물"
+        title="Trending Now"
         items={latestTrending}
         iconType="ranking"
         itemRender={(post: TrendingPost, idx: number) => (
@@ -109,23 +105,27 @@ export function Sidebar({ trendingPosts, companies, recommendedPosts }: SidebarP
             index={idx}
             logoImage={post.logoImage}
             title={post.title}
-            subtitle={post.viewCount.toString()}
+            viewCount={post.viewCount}
             itemType="ranking"
           />
         )}
       />
+
+      {/* AI Picks Section */}
+      <AIRecommendedPosts posts={recommendedPosts} />
       
-      {/* Featured Companies */}
+      {/* Tech Companies Section */}
       <SidebarListCard
-        title="기술 블로그 기업"
-        items={companies}
-        iconType="company"
+        title="Tech Companies"
+        moreLink="/companies"
+        items={companies.slice(0, 5)}
         itemRender={(company: Company, idx: number) => (
           <SidebarItem
             key={idx}
             index={idx}
             logoImage={company.logoImage}
             title={company.name}
+            subtitle="Technology & Engineering"
             itemType="company"
           />
         )}

@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**.musinsa.com' },
     ],
     formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 86400,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
