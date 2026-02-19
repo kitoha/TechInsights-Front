@@ -25,9 +25,6 @@ export const api = axios.create({
   baseURL: getApiBaseUrl(),
   timeout: 10000,
   withCredentials: true,
-  headers: {
-    'Connection': 'keep-alive',
-  },
 });
 
 let onUnauthorized: (() => void) | null = null;
