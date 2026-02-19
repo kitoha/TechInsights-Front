@@ -200,9 +200,8 @@ const PostCard = memo(function PostCard({ post }: { post: Post }) {
                 <OptimizedImage
                   src={thumbnail}
                   alt={post.title}
-                  width={224}
-                  height={176}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                   fallbackSrc="/placeholder.svg"
                 />
                 {/* Overlay gradient for better text readability */}

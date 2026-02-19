@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -36,12 +37,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading: true,
   });
 
+  // 로그인 확인이 완료됐는지 추적 - 비로그인 확정 후 탭 전환 시 불필요한 재호출 차단
+  const authCheckedRef = useRef(false);
+  const isLoggedInRef = useRef(false);
+
   const clearAndRedirect = useCallback(() => {
     setState({
       isLoggedIn: false,
       userProfile: null,
       isLoading: false,
     });
+    isLoggedInRef.current = false;
     if (typeof window !== "undefined") {
       window.location.href = "/";
     }
@@ -67,10 +73,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   }, []);
 
+  // 외부에서 명시적으로 호출하는 refetch - 로그인 후 상태 갱신 목적
   const refetchUser = useCallback(async () => {
     try {
-      const res = await api.get<unknown>(USERS_ME);
-      const profile = parseUserProfile(res);
+      const res = await api.get<unknown>(USERS_ME, {
+        validateStatus: (s) => s < 500,
+      });
+      const profile = res.status === 200 ? parseUserProfile(res) : null;
+      isLoggedInRef.current = !!profile;
       setState((prev) => ({
         ...prev,
         isLoggedIn: !!profile,
@@ -78,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading: false,
       }));
     } catch {
+      isLoggedInRef.current = false;
       setState((prev) => ({
         ...prev,
         isLoggedIn: false,
@@ -92,15 +103,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => setUnauthorizedHandler(null);
   }, [clearAndRedirect]);
 
-  // 쿠키가 있으면 새로고침해도 Me API 200 → 로그인 UI 유지. 401/403 → 로그아웃 UI.
+  // 앱 마운트 시 1회만 호출 - 쿠키 기반 세션 확인
+  // validateStatus로 401을 정상 응답으로 처리 → 브라우저 콘솔 네트워크 에러 제거
   useEffect(() => {
     let cancelled = false;
-    let retryTimer: ReturnType<typeof setTimeout> | null = null;
-    const runMe = async (retry = false) => {
+    const runMe = async () => {
       try {
-        const res = await api.get<unknown>(USERS_ME);
+        const res = await api.get<unknown>(USERS_ME, {
+          validateStatus: (s) => s < 500,
+        });
         if (cancelled) return;
-        const profile = parseUserProfile(res);
+        const profile = res.status === 200 ? parseUserProfile(res) : null;
+        isLoggedInRef.current = !!profile;
+        authCheckedRef.current = true;
         setState({
           isLoggedIn: !!profile,
           userProfile: profile,
@@ -108,13 +123,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       } catch {
         if (cancelled) return;
-        // users/me 401 → user null로 업데이트, 리다이렉트 없이 앱 구동 계속 (인터셉터에서 users/me 401 예외 처리)
-        if (!retry) {
-          retryTimer = setTimeout(() => {
-            runMe(true);
-          }, 800);
-          return;
-        }
+        isLoggedInRef.current = false;
+        authCheckedRef.current = true;
         setState({
           isLoggedIn: false,
           userProfile: null,
@@ -123,22 +133,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
     runMe();
-    return () => {
-      cancelled = true;
-      if (retryTimer) clearTimeout(retryTimer);
-    };
+    return () => { cancelled = true; };
   }, [parseUserProfile]);
 
-  // OAuth 리다이렉트 복귀·탭 전환 시 로그인 상태 재동기화
+  // OAuth 리다이렉트 복귀 시 로그인 상태 재동기화
+  // - visibilitychange만 사용 (focus와 중복 발화 방지)
+  // - 로그인 상태인 경우에만 재검증, 비로그인 확정 시 불필요한 호출 차단
   useEffect(() => {
     const onVisible = () => {
+      if (document.visibilityState !== "visible") return;
+      if (!authCheckedRef.current) return;
+      // 비로그인 상태가 확정된 경우에는 재호출 안 함
+      // (OAuth 리다이렉트 후 돌아왔을 때는 페이지 자체가 reload되므로 커버됨)
+      if (!isLoggedInRef.current) return;
       refetchUser();
     };
     document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("focus", onVisible);
     return () => {
       document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("focus", onVisible);
     };
   }, [refetchUser]);
 
@@ -146,11 +158,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = getLoginRedirectUrl();
   }, []);
 
-  // 가이드: 1) POST /api/v1/auth/logout (withCredentials) 2) 전역 유저 상태 null 3) 메인/로그인 페이지 이동
   const logout = useCallback(async () => {
     try {
-      await api.post(LOGOUT_ENDPOINT); // withCredentials: true (api 기본값)
+      await api.post(LOGOUT_ENDPOINT);
     } finally {
+      isLoggedInRef.current = false;
       setState({
         isLoggedIn: false,
         userProfile: null,
