@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { apiGet } from "@/lib/api";
-import PostDetailFade from "@/components/PostDetailFade";
+import { apiGet } from "@/lib/shared/api";
+import PostDetailFade from "@/components/post/PostDetailFade";
 import {
   fetchTrendingCompanies,
-  fetchCompanies,
-  fetchRecommendedPosts
-} from "@/lib/dataFetchers";
+  fetchCompanies
+} from "@/lib/companies";
+import { fetchRecommendedPosts } from "@/lib/posts";
 
 interface PostDetailProps {
   params: Promise<{

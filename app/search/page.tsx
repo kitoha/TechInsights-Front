@@ -1,9 +1,9 @@
 import { Suspense } from "react"
-import { SearchResponse, SortBy } from "@/lib/searchTypes"
-import { apiGet } from "@/lib/api"
+import { SearchResponse, SortBy } from "@/lib/search/types"
+import { apiGet } from "@/lib/shared/api"
 import { isAxiosError } from "axios"
 import { redirect } from "next/navigation"
-import SearchResults from "@/components/SearchResults"
+import SearchResults from "@/components/search/SearchResults"
 
 interface SearchPageProps {
   searchParams: Promise<{

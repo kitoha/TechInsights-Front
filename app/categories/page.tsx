@@ -1,6 +1,6 @@
 import { isAxiosError } from "axios";
-import { CategoryCard, CategoryStats } from "@/components/CategoryCard";
-import { apiGet } from "@/lib/api";
+import { CategoryCard, CategoryStats } from "@/components/category/CategoryCard";
+import { apiGet } from "@/lib/shared/api";
 import { redirect } from "next/navigation";
 
 export interface ApiResponse<T> {

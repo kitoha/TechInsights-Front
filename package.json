@@ -6,7 +6,7 @@
     "dev": "NODE_OPTIONS='--no-deprecation' next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
