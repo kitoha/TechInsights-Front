@@ -1,6 +1,6 @@
 import { isAxiosError } from "axios";
-import { CompanyCard, CompanyStats } from "@/components/CompanyCard";
-import { apiGet } from "@/lib/api";
+import { CompanyCard, CompanyStats } from "@/components/company/CompanyCard";
+import { apiGet } from "@/lib/shared/api";
 import { redirect } from "next/navigation";
 
 export interface ApiResponse<T> {

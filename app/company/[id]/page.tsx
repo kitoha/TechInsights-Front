@@ -1,13 +1,11 @@
-import { MainContent } from "@/components/MainContent";
-import { Sidebar } from "@/components/Sidebar";
+import { MainContent } from "@/components/post/MainContent";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { 
   fetchPostsByCompany,
-  fetchCompanyInfo,
-  fetchTrendingCompanies, 
-  fetchCompanies, 
   fetchRecommendedPosts
-} from "@/lib/dataFetchers";
-import { Post } from "@/lib/types";
+} from "@/lib/posts";
+import { fetchCompanyInfo, fetchTrendingCompanies, fetchCompanies } from "@/lib/companies";
+import { Post } from "@/lib/posts";
 import { notFound } from "next/navigation";
 
 interface CompanyPageProps {

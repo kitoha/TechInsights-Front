@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
-import { api } from "@/lib/api"
+import { api } from "@/lib/shared/api"
 import { isAxiosError } from "axios"
 
 export default function SettingsPage() {

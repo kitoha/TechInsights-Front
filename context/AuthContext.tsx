@@ -10,8 +10,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { api, setUnauthorizedHandler } from "@/lib/api";
-import { getLoginRedirectUrl, type UserProfile } from "@/lib/auth";
+import { api, setUnauthorizedHandler } from "@/lib/shared/api";
+import { getLoginRedirectUrl, type UserProfile } from "@/lib/shared/auth";
 
 const USERS_ME = "/api/v1/users/me";
 const LOGOUT_ENDPOINT = "/api/v1/auth/logout";

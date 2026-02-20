@@ -1,12 +1,8 @@
-import { MainContent } from "@/components/MainContent";
-import { Sidebar } from "@/components/Sidebar";
-import { 
-  fetchPosts, 
-  fetchTrendingCompanies, 
-  fetchCompanies, 
-  fetchRecommendedPosts
-} from "@/lib/dataFetchers";
-import { Post } from "@/lib/types";
+import { MainContent } from "@/components/post/MainContent";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { fetchPosts, fetchRecommendedPosts } from "@/lib/posts";
+import { fetchTrendingCompanies, fetchCompanies } from "@/lib/companies";
+import { Post } from "@/lib/posts";
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
