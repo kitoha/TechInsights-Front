@@ -131,31 +131,30 @@ export default function SearchResults({
     )
   }
 
-  const activeData = mode === "semantic" ? semanticData : keywordData
-  if (!activeData) {
-    return (
-      <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
-        <p className="mt-4 text-gray-600 dark:text-gray-400">검색 중...</p>
-      </div>
-    )
-  }
-
   if (mode === "semantic") {
-    const topSimilarity = semanticData?.results[0]?.similarityScore ?? 0
+    if (!semanticData) {
+      return (
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">검색 중...</p>
+        </div>
+      )
+    }
+
+    const topSimilarity = semanticData.results[0]?.similarityScore ?? 0
 
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-2">
           <Button
-            variant={mode === "semantic" ? "default" : "outline"}
+            variant="default"
             size="sm"
             onClick={() => handleModeChange("semantic")}
           >
             AI 검색
           </Button>
           <Button
-            variant={mode === "keyword" ? "default" : "outline"}
+            variant="outline"
             size="sm"
             onClick={() => handleModeChange("keyword")}
           >
@@ -280,20 +279,29 @@ export default function SearchResults({
     )
   }
 
+  if (!keywordData) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
+        <p className="mt-4 text-gray-600 dark:text-gray-400">검색 중...</p>
+      </div>
+    )
+  }
+
   const { posts, totalCount, totalPages, hasNext } = keywordData
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
         <Button
-          variant={mode === "semantic" ? "default" : "outline"}
+          variant="outline"
           size="sm"
           onClick={() => handleModeChange("semantic")}
         >
           AI 검색
         </Button>
         <Button
-          variant={mode === "keyword" ? "default" : "outline"}
+          variant="default"
           size="sm"
           onClick={() => handleModeChange("keyword")}
         >
