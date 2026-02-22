@@ -136,7 +136,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
         setError(null)
 
         const response = await apiGet<InstantSearchResponse>(
-          `/api/v1/search/instant?query=${encodeURIComponent(query)}`,
+          `/api/v1/search/instant?query=${encodeURIComponent(trimmedQuery)}`,
           { signal: abortController.signal }
         )
 
@@ -396,7 +396,9 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
                   <div className="px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 border-b border-gray-200 dark:border-gray-600">
                     📝 게시물
                   </div>
-                  {keywordResults.posts.slice(0, 5).map((post, index) => renderPostItem(post, (keywordResults.companies?.length || 0) + index))}
+                  {keywordResults.posts.slice(0, 5).map((post, index) =>
+                    renderPostItem(post, Math.min(keywordResults.companies?.length || 0, 5) + index)
+                  )}
                 </div>
               )}
             </div>

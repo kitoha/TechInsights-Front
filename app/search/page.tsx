@@ -18,9 +18,14 @@ interface SearchPageProps {
 
 const DEFAULT_SIZE = 10
 const MAX_QUERY_LENGTH = 500
+const VALID_SORT_BY: SortBy[] = ["RELEVANCE", "LATEST", "POPULAR"]
 
 function resolveSearchMode(mode?: string): SearchMode {
   return mode === "keyword" ? "keyword" : "semantic"
+}
+
+function resolveSortBy(sortBy?: string): SortBy {
+  return sortBy && VALID_SORT_BY.includes(sortBy as SortBy) ? (sortBy as SortBy) : "RELEVANCE"
 }
 
 function getValidationError(mode: SearchMode, query: string, size: number): string | null {
@@ -46,7 +51,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const query = params?.query || ""
   const mode = resolveSearchMode(params?.mode)
   const page = Number(params?.page) || 0
-  const sortBy = (params?.sortBy as SortBy) || "RELEVANCE"
+  const sortBy = resolveSortBy(params?.sortBy)
   const size = params?.size === undefined ? DEFAULT_SIZE : Number(params.size)
   const companyId = params?.companyId
 
