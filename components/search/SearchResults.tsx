@@ -6,6 +6,7 @@ import { SearchMode, SearchResponse, SemanticSearchResponse, SortBy } from "@/li
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import SearchModeToggle from "@/components/search/SearchModeToggle"
 import { ChevronLeft, ChevronRight, Calendar, Eye } from "lucide-react"
 import Image from "next/image"
 
@@ -38,6 +39,15 @@ function getSimilarityMeta(score: number) {
     label: "약한 연관",
     className: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
   }
+}
+
+function sanitizeHighlightedHtml(text: string) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/&lt;mark&gt;/gi, "<mark>")
+    .replace(/&lt;\/mark&gt;/gi, "</mark>")
 }
 
 export default function SearchResults({
@@ -116,7 +126,7 @@ export default function SearchResults({
   const renderHighlightedText = (text: string) => {
     return (
       <span
-        dangerouslySetInnerHTML={{ __html: text }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHighlightedHtml(text) }}
         className="[&_mark]:bg-gradient-to-r [&_mark]:from-blue-400 [&_mark]:to-purple-500 [&_mark]:text-white [&_mark]:px-1.5 [&_mark]:py-0.5 [&_mark]:rounded-md [&_mark]:font-medium [&_mark]:shadow-sm"
       />
     )
@@ -145,22 +155,7 @@ export default function SearchResults({
 
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() => handleModeChange("semantic")}
-          >
-            AI 검색
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleModeChange("keyword")}
-          >
-            일반 검색
-          </Button>
-        </div>
+        <SearchModeToggle currentMode={mode} onChange={handleModeChange} />
 
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/50 dark:bg-blue-950/30">
           <div className="flex items-center gap-2">
@@ -292,22 +287,7 @@ export default function SearchResults({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleModeChange("semantic")}
-        >
-          AI 검색
-        </Button>
-        <Button
-          variant="default"
-          size="sm"
-          onClick={() => handleModeChange("keyword")}
-        >
-          일반 검색
-        </Button>
-      </div>
+      <SearchModeToggle currentMode={mode} onChange={handleModeChange} />
 
       <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-900">
         <div className="flex items-center gap-2">
