@@ -1,28 +1,39 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { Search, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { apiGet } from "@/lib/shared/api"
-import { SemanticSearchResponse } from "@/lib/search/types"
+import { InstantSearchCompany, InstantSearchPost, InstantSearchResponse, SearchMode, SemanticSearchResponse } from "@/lib/search/types"
 import { isAxiosError } from "axios"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 
 interface SearchBarProps {
   className?: string;
 }
 
-interface CacheEntry {
+interface SemanticCacheEntry {
   data: SemanticSearchResponse
   timestamp: number
 }
 
-const searchCache = new Map<string, CacheEntry>()
+interface KeywordCacheEntry {
+  data: InstantSearchResponse
+  timestamp: number
+}
+
+const semanticCache = new Map<string, SemanticCacheEntry>()
+const keywordCache = new Map<string, KeywordCacheEntry>()
 const CACHE_DURATION = 5 * 60 * 1000
 const DROPDOWN_SIZE = 5
 const MAX_QUERY_LENGTH = 500
+
+function resolveSearchMode(mode?: string | null): SearchMode {
+  return mode === "keyword" ? "keyword" : "semantic"
+}
 
 function getSimilarityLabel(score: number) {
   if (score >= 0.9) return "매우 유사"
@@ -32,15 +43,31 @@ function getSimilarityLabel(score: number) {
 
 export default function SearchBar({ className = "" }: SearchBarProps) {
   const [query, setQuery] = useState("")
+  const [mode, setMode] = useState<SearchMode>("semantic")
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [results, setResults] = useState<SemanticSearchResponse | null>(null)
+  const [semanticResults, setSemanticResults] = useState<SemanticSearchResponse | null>(null)
+  const [keywordResults, setKeywordResults] = useState<InstantSearchResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [selectedIndex, setSelectedIndex] = useState(-1)
 
   const searchRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    setMode(resolveSearchMode(searchParams.get("mode")))
+  }, [searchParams])
+
+  const activeItemsCount = useMemo(() => {
+    if (mode === "semantic") {
+      return semanticResults?.results.length || 0
+    }
+    const companiesCount = Math.min(keywordResults?.companies?.length || 0, 5)
+    const postsCount = Math.min(keywordResults?.posts?.length || 0, 5)
+    return companiesCount + postsCount
+  }, [mode, semanticResults, keywordResults])
 
   useEffect(() => {
     const isProd = process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
@@ -74,14 +101,16 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     const trimmedQuery = query.trim()
 
     if (!trimmedQuery) {
-      setResults(null)
+      setSemanticResults(null)
+      setKeywordResults(null)
       setIsOpen(false)
       setError(null)
       return
     }
 
     if (trimmedQuery.length > MAX_QUERY_LENGTH) {
-      setResults(null)
+      setSemanticResults(null)
+      setKeywordResults(null)
       setError(`질문은 ${MAX_QUERY_LENGTH}자 이내로 입력해주세요.`)
       setIsOpen(true)
       setIsLoading(false)
@@ -94,15 +123,28 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
 
     const timeoutId = setTimeout(async () => {
       const normalizedQuery = trimmedQuery.toLowerCase()
-      const cached = searchCache.get(normalizedQuery)
       const now = Date.now()
 
-      if (cached && now - cached.timestamp < CACHE_DURATION) {
-        setResults(cached.data)
-        setIsOpen(true)
-        setSelectedIndex(-1)
-        setIsLoading(false)
-        return
+      if (mode === "semantic") {
+        const cached = semanticCache.get(normalizedQuery)
+        if (cached && now - cached.timestamp < CACHE_DURATION) {
+          setSemanticResults(cached.data)
+          setKeywordResults(null)
+          setIsOpen(true)
+          setSelectedIndex(-1)
+          setIsLoading(false)
+          return
+        }
+      } else {
+        const cached = keywordCache.get(normalizedQuery)
+        if (cached && now - cached.timestamp < CACHE_DURATION) {
+          setKeywordResults(cached.data)
+          setSemanticResults(null)
+          setIsOpen(true)
+          setSelectedIndex(-1)
+          setIsLoading(false)
+          return
+        }
       }
 
       const abortController = new AbortController()
@@ -112,27 +154,31 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
         setIsLoading(true)
         setError(null)
 
-        const response = await apiGet<SemanticSearchResponse>(
-          `/api/v1/search/semantic?query=${encodeURIComponent(query)}&size=${DROPDOWN_SIZE}`,
-          { signal: abortController.signal }
-        )
+        if (mode === "semantic") {
+          const response = await apiGet<SemanticSearchResponse>(
+            `/api/v1/search/semantic?query=${encodeURIComponent(query)}&size=${DROPDOWN_SIZE}`,
+            { signal: abortController.signal }
+          )
 
-        if (!abortController.signal.aborted) {
-          setResults(response.data)
-          setIsOpen(true)
-          setSelectedIndex(-1)
+          if (!abortController.signal.aborted) {
+            setSemanticResults(response.data)
+            setKeywordResults(null)
+            setIsOpen(true)
+            setSelectedIndex(-1)
+            semanticCache.set(normalizedQuery, { data: response.data, timestamp: now })
+          }
+        } else {
+          const response = await apiGet<InstantSearchResponse>(
+            `/api/v1/search/instant?query=${encodeURIComponent(query)}`,
+            { signal: abortController.signal }
+          )
 
-          searchCache.set(normalizedQuery, {
-            data: response.data,
-            timestamp: now,
-          })
-
-          if (searchCache.size > 100) {
-            const entries = Array.from(searchCache.entries())
-            entries.sort((a, b) => b[1].timestamp - a[1].timestamp)
-            const toKeep = entries.slice(0, 50)
-            searchCache.clear()
-            toKeep.forEach(([key, value]) => searchCache.set(key, value))
+          if (!abortController.signal.aborted) {
+            setKeywordResults(response.data)
+            setSemanticResults(null)
+            setIsOpen(true)
+            setSelectedIndex(-1)
+            keywordCache.set(normalizedQuery, { data: response.data, timestamp: now })
           }
         }
       } catch (err: unknown) {
@@ -142,11 +188,15 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
         if (!abortController.signal.aborted) {
           const status = isAxiosError(err) ? err.response?.status : undefined
           if (status === 400) {
-            setError("요청 조건이 올바르지 않습니다. 질문(1~500자)을 확인해주세요.")
+            setError(mode === "semantic"
+              ? "요청 조건이 올바르지 않습니다. 질문(1~500자)을 확인해주세요."
+              : "검색어 조건이 올바르지 않습니다."
+            )
           } else {
             setError("검색 중 오류가 발생했습니다.")
           }
-          setResults(null)
+          setSemanticResults(null)
+          setKeywordResults(null)
           setIsOpen(true)
         }
       } finally {
@@ -162,7 +212,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
         abortControllerRef.current.abort()
       }
     }
-  }, [query])
+  }, [query, mode])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -176,13 +226,41 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  const pushSearchPage = () => {
+    const trimmed = query.trim()
+    if (!trimmed) return
+
+    const params = new URLSearchParams()
+    params.set("query", trimmed)
+    params.set("mode", mode)
+
+    if (mode === "keyword") {
+      params.set("page", "0")
+      params.set("sortBy", "RELEVANCE")
+    }
+
+    router.push(`/search?${params.toString()}`)
+  }
+
   const handleItemClick = (index: number) => {
-    if (!results) return
+    if (mode === "semantic") {
+      const selected = semanticResults?.results[index]
+      if (!selected) return
+      router.push(`/post/${selected.post.id}`)
+    } else {
+      if (!keywordResults) return
+      const maxCompanies = Math.min(keywordResults.companies?.length || 0, 5)
+      const companies = keywordResults.companies?.slice(0, 5) || []
+      const posts = keywordResults.posts?.slice(0, 5) || []
 
-    const selected = results.results[index]
-    if (!selected) return
+      if (index < maxCompanies) {
+        router.push(`/company/${companies[index].id}`)
+      } else {
+        const postIndex = index - maxCompanies
+        router.push(`/post/${posts[postIndex].id}`)
+      }
+    }
 
-    router.push(`/post/${selected.post.id}`)
     setIsOpen(false)
     setQuery("")
   }
@@ -194,9 +272,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
       return
     }
 
-    const totalItems = results?.results.length || 0
-
-    if (!isOpen || totalItems === 0) {
+    if (!isOpen || activeItemsCount === 0) {
       if (e.key === "Enter" && query.trim()) {
         e.preventDefault()
         if (query.trim().length > MAX_QUERY_LENGTH) {
@@ -204,7 +280,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
           setIsOpen(true)
           return
         }
-        router.push(`/search?query=${encodeURIComponent(query)}`)
+        pushSearchPage()
         setIsOpen(false)
       }
       return
@@ -213,26 +289,98 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault()
-        setSelectedIndex((prev) => (prev + 1) % totalItems)
+        setSelectedIndex((prev) => (prev + 1) % activeItemsCount)
         break
       case "ArrowUp":
         e.preventDefault()
-        setSelectedIndex((prev) => (prev <= 0 ? totalItems - 1 : prev - 1))
+        setSelectedIndex((prev) => (prev <= 0 ? activeItemsCount - 1 : prev - 1))
         break
       case "Enter":
         e.preventDefault()
         if (selectedIndex >= 0) {
           handleItemClick(selectedIndex)
         } else {
-          router.push(`/search?query=${encodeURIComponent(query)}`)
+          pushSearchPage()
           setIsOpen(false)
         }
         break
     }
   }
 
+  const renderHighlightedText = (text: string) => {
+    return (
+      <span
+        dangerouslySetInnerHTML={{ __html: text }}
+        className="[&_mark]:bg-gradient-to-r [&_mark]:from-blue-400 [&_mark]:to-purple-500 [&_mark]:text-white [&_mark]:px-1.5 [&_mark]:py-0.5 [&_mark]:rounded-md [&_mark]:font-medium [&_mark]:shadow-sm"
+      />
+    )
+  }
+
+  const renderCompanyItem = (company: InstantSearchCompany, index: number) => (
+    <div
+      key={`company-${company.id}`}
+      className={`flex items-center gap-3 p-4 cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-200 ${
+        selectedIndex === index ? "bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700" : ""
+      }`}
+      onClick={() => handleItemClick(index)}
+    >
+      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm">
+        <Image src={`/logos/${company.logoImageName}`} alt={company.name} width={40} height={40} className="object-cover w-full h-full rounded-xl" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{renderHighlightedText(company.highlightedName)}</div>
+        <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full inline-block">
+          {company.matchedPostCount}개 게시물
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderPostItem = (post: InstantSearchPost, index: number) => (
+    <div
+      key={`post-${post.id}`}
+      className={`flex items-center gap-3 p-4 cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-200 ${
+        selectedIndex === index ? "bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700" : ""
+      }`}
+      onClick={() => handleItemClick(index)}
+    >
+      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm">
+        <Image src={`/logos/${post.companyLogo}`} alt={post.companyName} width={40} height={40} className="object-cover w-full h-full rounded-xl" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">{renderHighlightedText(post.highlightedTitle)}</div>
+        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+          <span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full">{post.companyName}</span>
+          <span>•</span>
+          <span>{new Date(post.publishedAt).toLocaleDateString("ko-KR")}</span>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div ref={searchRef} className={`relative ${className}`}>
+      <div className="mb-2 flex gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant={mode === "semantic" ? "default" : "outline"}
+          className="h-7 px-3 text-xs"
+          onClick={() => setMode("semantic")}
+        >
+          AI 검색
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={mode === "keyword" ? "default" : "outline"}
+          className="h-7 px-3 text-xs"
+          onClick={() => setMode("keyword")}
+        >
+          일반 검색
+        </Button>
+      </div>
+
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
         {isLoading && (
@@ -243,7 +391,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => query.trim() && setIsOpen(true)}
-          placeholder="AI 검색: 궁금한 내용을 질문해보세요"
+          placeholder={mode === "semantic" ? "AI 검색: 궁금한 내용을 질문해보세요" : "일반 검색: 키워드를 입력해보세요"}
           className={`pl-10 pr-10 border-gray-200 text-gray-900 placeholder-gray-500 transition-all duration-200 hover:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg dark:border-gray-700 dark:text-white dark:placeholder-gray-400 ${className}`}
         />
       </div>
@@ -254,12 +402,12 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
             <div className="p-4 text-sm text-red-600 dark:text-red-400">{error}</div>
           ) : !query.trim() ? (
             <div className="p-4 text-sm text-gray-500 dark:text-gray-400">질문을 입력하세요</div>
-          ) : results && results.results.length > 0 ? (
+          ) : mode === "semantic" && semanticResults && semanticResults.results.length > 0 ? (
             <div>
               <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-3 text-xs font-bold text-gray-600 dark:border-gray-600 dark:from-gray-800 dark:to-gray-700 dark:text-gray-300">
                 AI 검색 미리보기
               </div>
-              {results.results.map((item, index) => (
+              {semanticResults.results.map((item, index) => (
                 <div
                   key={item.post.id}
                   className={`flex cursor-pointer items-center gap-3 p-4 transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700 ${
@@ -268,18 +416,10 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
                   onClick={() => handleItemClick(index)}
                 >
                   <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 shadow-sm dark:from-gray-800 dark:to-gray-700">
-                    <Image
-                      src={`/logos/${item.post.companyLogo}`}
-                      alt={item.post.companyName}
-                      width={40}
-                      height={40}
-                      className="h-full w-full rounded-xl object-cover"
-                    />
+                    <Image src={`/logos/${item.post.companyLogo}`} alt={item.post.companyName} width={40} height={40} className="h-full w-full rounded-xl object-cover" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="mb-1 line-clamp-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                      {item.post.title}
-                    </div>
+                    <div className="mb-1 line-clamp-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{item.post.title}</div>
                     <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                       <span className="rounded-full bg-gray-100 px-2 py-1 dark:bg-gray-800">{item.post.companyName}</span>
                       <Badge variant="outline" className="text-[10px]">
@@ -289,6 +429,26 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
                   </div>
                 </div>
               ))}
+            </div>
+          ) : mode === "keyword" && keywordResults && (keywordResults.companies?.length > 0 || keywordResults.posts?.length > 0) ? (
+            <div>
+              {keywordResults.companies && keywordResults.companies.length > 0 && (
+                <div>
+                  <div className="px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 border-b border-gray-200 dark:border-gray-600">
+                    🏢 회사
+                  </div>
+                  {keywordResults.companies.slice(0, 5).map((company, index) => renderCompanyItem(company, index))}
+                </div>
+              )}
+
+              {keywordResults.posts && keywordResults.posts.length > 0 && (
+                <div>
+                  <div className="px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 border-b border-gray-200 dark:border-gray-600">
+                    📝 게시물
+                  </div>
+                  {keywordResults.posts.slice(0, 5).map((post, index) => renderPostItem(post, (keywordResults.companies?.length || 0) + index))}
+                </div>
+              )}
             </div>
           ) : (
             <div className="p-4 text-sm text-gray-500 dark:text-gray-400">검색 결과가 없습니다</div>
