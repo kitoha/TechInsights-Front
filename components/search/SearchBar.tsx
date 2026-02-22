@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { apiGet } from "@/lib/shared/api"
 import { SemanticSearchResponse } from "@/lib/search/types"
+import { isAxiosError } from "axios"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 
@@ -21,6 +22,7 @@ interface CacheEntry {
 const searchCache = new Map<string, CacheEntry>()
 const CACHE_DURATION = 5 * 60 * 1000
 const DROPDOWN_SIZE = 5
+const MAX_QUERY_LENGTH = 500
 
 function getSimilarityLabel(score: number) {
   if (score >= 0.9) return "매우 유사"
@@ -69,9 +71,20 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   }, [])
 
   useEffect(() => {
-    if (!query.trim()) {
+    const trimmedQuery = query.trim()
+
+    if (!trimmedQuery) {
       setResults(null)
       setIsOpen(false)
+      setError(null)
+      return
+    }
+
+    if (trimmedQuery.length > MAX_QUERY_LENGTH) {
+      setResults(null)
+      setError(`질문은 ${MAX_QUERY_LENGTH}자 이내로 입력해주세요.`)
+      setIsOpen(true)
+      setIsLoading(false)
       return
     }
 
@@ -80,8 +93,8 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     }
 
     const timeoutId = setTimeout(async () => {
-      const trimmedQuery = query.trim().toLowerCase()
-      const cached = searchCache.get(trimmedQuery)
+      const normalizedQuery = trimmedQuery.toLowerCase()
+      const cached = searchCache.get(normalizedQuery)
       const now = Date.now()
 
       if (cached && now - cached.timestamp < CACHE_DURATION) {
@@ -109,7 +122,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
           setIsOpen(true)
           setSelectedIndex(-1)
 
-          searchCache.set(trimmedQuery, {
+          searchCache.set(normalizedQuery, {
             data: response.data,
             timestamp: now,
           })
@@ -127,9 +140,14 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
           return
         }
         if (!abortController.signal.aborted) {
-          setError("검색 중 오류가 발생했습니다.")
+          const status = isAxiosError(err) ? err.response?.status : undefined
+          if (status === 400) {
+            setError("요청 조건이 올바르지 않습니다. 질문(1~500자)을 확인해주세요.")
+          } else {
+            setError("검색 중 오류가 발생했습니다.")
+          }
           setResults(null)
-          setIsOpen(false)
+          setIsOpen(true)
         }
       } finally {
         if (!abortController.signal.aborted) {
@@ -181,6 +199,11 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     if (!isOpen || totalItems === 0) {
       if (e.key === "Enter" && query.trim()) {
         e.preventDefault()
+        if (query.trim().length > MAX_QUERY_LENGTH) {
+          setError(`질문은 ${MAX_QUERY_LENGTH}자 이내로 입력해주세요.`)
+          setIsOpen(true)
+          return
+        }
         router.push(`/search?query=${encodeURIComponent(query)}`)
         setIsOpen(false)
       }
