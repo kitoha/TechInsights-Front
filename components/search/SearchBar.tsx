@@ -1,11 +1,10 @@
 "use client"
 
 import { useState, useEffect, useMemo, useRef } from "react"
-import { Search, Loader2 } from "lucide-react"
+import { Search, Loader2, Sparkles } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { apiGet } from "@/lib/shared/api"
-import { InstantSearchCompany, InstantSearchPost, InstantSearchResponse, SearchMode, SemanticSearchResponse } from "@/lib/search/types"
+import { InstantSearchCompany, InstantSearchPost, InstantSearchResponse, SearchMode } from "@/lib/search/types"
 import { isAxiosError } from "axios"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
@@ -14,30 +13,17 @@ interface SearchBarProps {
   className?: string;
 }
 
-interface SemanticCacheEntry {
-  data: SemanticSearchResponse
-  timestamp: number
-}
-
 interface KeywordCacheEntry {
   data: InstantSearchResponse
   timestamp: number
 }
 
-const semanticCache = new Map<string, SemanticCacheEntry>()
 const keywordCache = new Map<string, KeywordCacheEntry>()
 const CACHE_DURATION = 5 * 60 * 1000
-const DROPDOWN_SIZE = 5
 const MAX_QUERY_LENGTH = 500
 
 function resolveSearchMode(mode?: string | null): SearchMode {
   return mode === "keyword" ? "keyword" : "semantic"
-}
-
-function getSimilarityLabel(score: number) {
-  if (score >= 0.9) return "매우 유사"
-  if (score >= 0.7) return "관련 있음"
-  return "약한 연관"
 }
 
 export default function SearchBar({ className = "" }: SearchBarProps) {
@@ -45,7 +31,6 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   const [mode, setMode] = useState<SearchMode>("semantic")
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [semanticResults, setSemanticResults] = useState<SemanticSearchResponse | null>(null)
   const [keywordResults, setKeywordResults] = useState<InstantSearchResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [selectedIndex, setSelectedIndex] = useState(-1)
@@ -60,13 +45,11 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   }, [searchParams])
 
   const activeItemsCount = useMemo(() => {
-    if (mode === "semantic") {
-      return semanticResults?.results.length || 0
-    }
+    if (mode === "semantic") return 0
     const companiesCount = Math.min(keywordResults?.companies?.length || 0, 5)
     const postsCount = Math.min(keywordResults?.posts?.length || 0, 5)
     return companiesCount + postsCount
-  }, [mode, semanticResults, keywordResults])
+  }, [mode, keywordResults])
 
   useEffect(() => {
     const isProd = process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
@@ -100,19 +83,31 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     const trimmedQuery = query.trim()
 
     if (!trimmedQuery) {
-      setSemanticResults(null)
       setKeywordResults(null)
       setIsOpen(false)
       setError(null)
+      setIsLoading(false)
       return
     }
 
     if (trimmedQuery.length > MAX_QUERY_LENGTH) {
-      setSemanticResults(null)
       setKeywordResults(null)
       setError(`질문은 ${MAX_QUERY_LENGTH}자 이내로 입력해주세요.`)
       setIsOpen(true)
       setIsLoading(false)
+      return
+    }
+
+    // AI 검색은 입력 완료 후 Enter 시점에만 실행한다.
+    if (mode === "semantic") {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      setKeywordResults(null)
+      setError(null)
+      setSelectedIndex(-1)
+      setIsLoading(false)
+      setIsOpen(true)
       return
     }
 
@@ -124,26 +119,13 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
       const normalizedQuery = trimmedQuery.toLowerCase()
       const now = Date.now()
 
-      if (mode === "semantic") {
-        const cached = semanticCache.get(normalizedQuery)
-        if (cached && now - cached.timestamp < CACHE_DURATION) {
-          setSemanticResults(cached.data)
-          setKeywordResults(null)
-          setIsOpen(true)
-          setSelectedIndex(-1)
-          setIsLoading(false)
-          return
-        }
-      } else {
-        const cached = keywordCache.get(normalizedQuery)
-        if (cached && now - cached.timestamp < CACHE_DURATION) {
-          setKeywordResults(cached.data)
-          setSemanticResults(null)
-          setIsOpen(true)
-          setSelectedIndex(-1)
-          setIsLoading(false)
-          return
-        }
+      const cached = keywordCache.get(normalizedQuery)
+      if (cached && now - cached.timestamp < CACHE_DURATION) {
+        setKeywordResults(cached.data)
+        setIsOpen(true)
+        setSelectedIndex(-1)
+        setIsLoading(false)
+        return
       }
 
       const abortController = new AbortController()
@@ -153,32 +135,16 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
         setIsLoading(true)
         setError(null)
 
-        if (mode === "semantic") {
-          const response = await apiGet<SemanticSearchResponse>(
-            `/api/v1/search/semantic?query=${encodeURIComponent(query)}&size=${DROPDOWN_SIZE}`,
-            { signal: abortController.signal }
-          )
+        const response = await apiGet<InstantSearchResponse>(
+          `/api/v1/search/instant?query=${encodeURIComponent(query)}`,
+          { signal: abortController.signal }
+        )
 
-          if (!abortController.signal.aborted) {
-            setSemanticResults(response.data)
-            setKeywordResults(null)
-            setIsOpen(true)
-            setSelectedIndex(-1)
-            semanticCache.set(normalizedQuery, { data: response.data, timestamp: now })
-          }
-        } else {
-          const response = await apiGet<InstantSearchResponse>(
-            `/api/v1/search/instant?query=${encodeURIComponent(query)}`,
-            { signal: abortController.signal }
-          )
-
-          if (!abortController.signal.aborted) {
-            setKeywordResults(response.data)
-            setSemanticResults(null)
-            setIsOpen(true)
-            setSelectedIndex(-1)
-            keywordCache.set(normalizedQuery, { data: response.data, timestamp: now })
-          }
+        if (!abortController.signal.aborted) {
+          setKeywordResults(response.data)
+          setIsOpen(true)
+          setSelectedIndex(-1)
+          keywordCache.set(normalizedQuery, { data: response.data, timestamp: now })
         }
       } catch (err: unknown) {
         if (err instanceof Error && err.name === "AbortError") {
@@ -187,14 +153,10 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
         if (!abortController.signal.aborted) {
           const status = isAxiosError(err) ? err.response?.status : undefined
           if (status === 400) {
-            setError(mode === "semantic"
-              ? "요청 조건이 올바르지 않습니다. 질문(1~500자)을 확인해주세요."
-              : "검색어 조건이 올바르지 않습니다."
-            )
+            setError("검색어 조건이 올바르지 않습니다.")
           } else {
             setError("검색 중 오류가 발생했습니다.")
           }
-          setSemanticResults(null)
           setKeywordResults(null)
           setIsOpen(true)
         }
@@ -242,22 +204,16 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   }
 
   const handleItemClick = (index: number) => {
-    if (mode === "semantic") {
-      const selected = semanticResults?.results[index]
-      if (!selected) return
-      router.push(`/post/${selected.post.id}`)
-    } else {
-      if (!keywordResults) return
-      const maxCompanies = Math.min(keywordResults.companies?.length || 0, 5)
-      const companies = keywordResults.companies?.slice(0, 5) || []
-      const posts = keywordResults.posts?.slice(0, 5) || []
+    if (!keywordResults) return
+    const maxCompanies = Math.min(keywordResults.companies?.length || 0, 5)
+    const companies = keywordResults.companies?.slice(0, 5) || []
+    const posts = keywordResults.posts?.slice(0, 5) || []
 
-      if (index < maxCompanies) {
-        router.push(`/company/${companies[index].id}`)
-      } else {
-        const postIndex = index - maxCompanies
-        router.push(`/post/${posts[postIndex].id}`)
-      }
+    if (index < maxCompanies) {
+      router.push(`/company/${companies[index].id}`)
+    } else {
+      const postIndex = index - maxCompanies
+      router.push(`/post/${posts[postIndex].id}`)
     }
 
     setIsOpen(false)
@@ -360,38 +316,43 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   return (
     <div ref={searchRef} className={`relative ${className}`}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-400" />
         {isLoading && (
-          <Loader2 className="absolute right-32 top-1/2 h-5 w-5 -translate-y-1/2 transform animate-spin text-gray-400" />
+          <Loader2 className="absolute right-28 top-1/2 h-4 w-4 -translate-y-1/2 transform animate-spin text-slate-400" />
         )}
         <div className="absolute right-2 top-1/2 z-10 -translate-y-1/2">
           <div
-            className="relative flex h-8 w-28 items-center overflow-hidden rounded-full border border-slate-200/90 bg-white/90 p-0.5 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/85"
+            className="relative flex h-7 w-[106px] items-center overflow-hidden rounded-full border border-slate-200/90 bg-slate-100/90 p-0.5 shadow-sm dark:border-slate-700 dark:bg-slate-800/80"
             role="group"
             aria-label="검색 모드 전환"
           >
             <span
-              className={`absolute left-0.5 top-0.5 h-7 w-[54px] rounded-full bg-gradient-to-r from-slate-900 to-slate-700 shadow-sm transition-transform duration-200 ease-out dark:from-slate-100 dark:to-slate-200 ${
-                mode === "keyword" ? "translate-x-[54px]" : "translate-x-0"
+              className={`pointer-events-none absolute top-0.5 h-6 w-[50px] rounded-full bg-gradient-to-r from-blue-600 to-blue-500 shadow-sm transition-transform duration-200 ease-out dark:from-blue-500 dark:to-blue-400 ${
+                mode === "semantic" ? "translate-x-0.5" : "translate-x-[54px]"
               }`}
             />
             <button
               type="button"
               aria-pressed={mode === "semantic"}
-              className={`relative z-10 flex h-7 flex-1 items-center justify-center rounded-full px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
-                mode === "semantic" ? "text-white dark:text-slate-900" : "text-slate-600 dark:text-slate-300"
+              className={`relative z-10 flex h-6 w-[52px] items-center justify-center rounded-full px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
+                mode === "semantic" ? "text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
               }`}
-              onClick={() => setMode("semantic")}
+              onClick={() => setMode((prev) => (prev === "semantic" ? "keyword" : "semantic"))}
             >
+              <Sparkles
+                className={`mr-1 h-3 w-3 transition-opacity duration-150 ${
+                  mode === "semantic" ? "opacity-100" : "opacity-70"
+                }`}
+              />
               AI
             </button>
             <button
               type="button"
               aria-pressed={mode === "keyword"}
-              className={`relative z-10 flex h-7 flex-1 items-center justify-center rounded-full px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
-                mode === "keyword" ? "text-white dark:text-slate-900" : "text-slate-600 dark:text-slate-300"
+              className={`relative z-10 flex h-6 w-[52px] items-center justify-center rounded-full px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
+                mode === "keyword" ? "text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
               }`}
-              onClick={() => setMode("keyword")}
+              onClick={() => setMode((prev) => (prev === "keyword" ? "semantic" : "keyword"))}
             >
               일반
             </button>
@@ -403,7 +364,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
           onKeyDown={handleKeyDown}
           onFocus={() => query.trim() && setIsOpen(true)}
           placeholder={mode === "semantic" ? "AI 검색: 궁금한 내용을 질문해보세요" : "일반 검색: 키워드를 입력해보세요"}
-          className={`pl-10 pr-32 border-gray-200 text-gray-900 placeholder-gray-500 transition-all duration-200 hover:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg dark:border-gray-700 dark:text-white dark:placeholder-gray-400 ${className}`}
+          className={`h-10 rounded-full border-slate-200 bg-slate-50/80 pl-10 pr-28 text-sm text-slate-700 placeholder:text-slate-500 transition-all duration-200 hover:bg-slate-50 focus:border-slate-300 focus:ring-2 focus:ring-blue-500/15 focus:shadow-sm dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 ${className}`}
         />
       </div>
 
@@ -413,33 +374,11 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
             <div className="p-4 text-sm text-red-600 dark:text-red-400">{error}</div>
           ) : !query.trim() ? (
             <div className="p-4 text-sm text-gray-500 dark:text-gray-400">질문을 입력하세요</div>
-          ) : mode === "semantic" && semanticResults && semanticResults.results.length > 0 ? (
-            <div>
-              <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-3 text-xs font-bold text-gray-600 dark:border-gray-600 dark:from-gray-800 dark:to-gray-700 dark:text-gray-300">
-                AI 검색 미리보기
+          ) : mode === "semantic" ? (
+            <div className="p-4">
+              <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900 dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-200">
+                AI 검색은 입력 완료 후 <span className="font-semibold">Enter</span>를 누르면 실행됩니다.
               </div>
-              {semanticResults.results.map((item, index) => (
-                <div
-                  key={item.post.id}
-                  className={`flex cursor-pointer items-center gap-3 p-4 transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700 ${
-                    selectedIndex === index ? "bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700" : ""
-                  }`}
-                  onClick={() => handleItemClick(index)}
-                >
-                  <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 shadow-sm dark:from-gray-800 dark:to-gray-700">
-                    <Image src={`/logos/${item.post.companyLogo}`} alt={item.post.companyName} width={40} height={40} className="h-full w-full rounded-xl object-cover" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-1 line-clamp-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{item.post.title}</div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                      <span className="rounded-full bg-gray-100 px-2 py-1 dark:bg-gray-800">{item.post.companyName}</span>
-                      <Badge variant="outline" className="text-[10px]">
-                        {item.similarityScore.toFixed(3)} · {getSimilarityLabel(item.similarityScore)}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           ) : mode === "keyword" && keywordResults && (keywordResults.companies?.length > 0 || keywordResults.posts?.length > 0) ? (
             <div>
