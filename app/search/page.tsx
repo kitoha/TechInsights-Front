@@ -13,10 +13,31 @@ interface SearchPageProps {
   }>;
 }
 
+const DEFAULT_SIZE = 10;
+const MAX_QUERY_LENGTH = 500;
+
+function getValidationError(query: string, size: number): string | null {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return "질문을 입력해주세요.";
+  }
+
+  if (trimmedQuery.length > MAX_QUERY_LENGTH) {
+    return `질문은 ${MAX_QUERY_LENGTH}자 이내로 입력해주세요.`;
+  }
+
+  if (!Number.isInteger(size) || size < 1 || size > 20) {
+    return "결과 개수(size)는 1~20 범위에서 요청해주세요.";
+  }
+
+  return null;
+}
+
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const query = params?.query || "";
-  const size = Number(params?.size) || 10;
+  const size = params?.size === undefined ? DEFAULT_SIZE : Number(params.size);
   const companyId = params?.companyId;
 
   if (!query.trim()) {
@@ -46,21 +67,30 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   let searchData: SemanticSearchResponse | null = null;
   let error: string | null = null;
+  const validationError = getValidationError(query, size);
 
-  try {
-    const companyIdParam = companyId ? `&companyId=${encodeURIComponent(companyId)}` : "";
-    const response = await apiGet<SemanticSearchResponse>(
-      `/api/v1/search/semantic?query=${encodeURIComponent(query)}&size=${size}${companyIdParam}`
-    )
-    searchData = response.data;
-  } catch (err) {
-    const status: number | undefined = isAxiosError(err) ? err.response?.status : undefined;
-    if (status === 503) {
-      redirect('/maintenance.html');
+  if (validationError) {
+    error = validationError;
+  } else {
+    try {
+      const companyIdParam = companyId ? `&companyId=${encodeURIComponent(companyId)}` : "";
+      const response = await apiGet<SemanticSearchResponse>(
+        `/api/v1/search/semantic?query=${encodeURIComponent(query)}&size=${size}${companyIdParam}`
+      );
+      searchData = response.data;
+    } catch (err) {
+      const status: number | undefined = isAxiosError(err) ? err.response?.status : undefined;
+      if (status === 503) {
+        redirect('/maintenance.html');
+      }
+      if (status === 400) {
+        error = "요청 조건이 올바르지 않습니다. 질문(1~500자)과 size(1~20)를 확인해주세요.";
+      } else {
+        error = "검색 중 오류가 발생했습니다.";
+      }
+      console.error('Search error:', err);
     }
-    error = "검색 중 오류가 발생했습니다.";
-    console.error('Search error:', err);
-  }
+  } 
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
