@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { SearchResponse, SortBy } from "@/lib/search/types"
+import { SemanticSearchResponse } from "@/lib/search/types"
 import { apiGet } from "@/lib/shared/api"
 import { isAxiosError } from "axios"
 import { redirect } from "next/navigation"
@@ -8,16 +8,16 @@ import SearchResults from "@/components/search/SearchResults"
 interface SearchPageProps {
   searchParams: Promise<{
     query?: string;
-    page?: string;
-    sortBy?: string;
+    size?: string;
+    companyId?: string;
   }>;
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const query = params?.query || "";
-  const page = Number(params?.page) || 0;
-  const sortBy = (params?.sortBy as SortBy) || "RELEVANCE";
+  const size = Number(params?.size) || 10;
+  const companyId = params?.companyId;
 
   if (!query.trim()) {
     return (
@@ -44,13 +44,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     );
   }
 
-  let searchData: SearchResponse | null = null;
+  let searchData: SemanticSearchResponse | null = null;
   let error: string | null = null;
 
   try {
-    const response = await apiGet<SearchResponse>(
-      `/api/v1/search?query=${encodeURIComponent(query)}&page=${page}&size=20&sortBy=${sortBy}`
-    );
+    const companyIdParam = companyId ? `&companyId=${encodeURIComponent(companyId)}` : "";
+    const response = await apiGet<SemanticSearchResponse>(
+      `/api/v1/search/semantic?query=${encodeURIComponent(query)}&size=${size}${companyIdParam}`
+    )
     searchData = response.data;
   } catch (err) {
     const status: number | undefined = isAxiosError(err) ? err.response?.status : undefined;
@@ -69,8 +70,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             query={query}
             searchData={searchData}
             error={error}
-            currentPage={page}
-            sortBy={sortBy}
           />
         </Suspense>
       </div>
