@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo, useRef } from "react"
 import { Search, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { apiGet } from "@/lib/shared/api"
 import { InstantSearchCompany, InstantSearchPost, InstantSearchResponse, SearchMode, SemanticSearchResponse } from "@/lib/search/types"
 import { isAxiosError } from "axios"
@@ -360,39 +359,51 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
 
   return (
     <div ref={searchRef} className={`relative ${className}`}>
-      <div className="mb-2 flex gap-2">
-        <Button
-          type="button"
-          size="sm"
-          variant={mode === "semantic" ? "default" : "outline"}
-          className="h-7 px-3 text-xs"
-          onClick={() => setMode("semantic")}
-        >
-          AI 검색
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant={mode === "keyword" ? "default" : "outline"}
-          className="h-7 px-3 text-xs"
-          onClick={() => setMode("keyword")}
-        >
-          일반 검색
-        </Button>
-      </div>
-
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
         {isLoading && (
-          <Loader2 className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 transform animate-spin text-gray-400" />
+          <Loader2 className="absolute right-32 top-1/2 h-5 w-5 -translate-y-1/2 transform animate-spin text-gray-400" />
         )}
+        <div className="absolute right-2 top-1/2 z-10 -translate-y-1/2">
+          <div
+            className="relative flex h-8 w-28 items-center overflow-hidden rounded-full border border-slate-200/90 bg-white/90 p-0.5 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/85"
+            role="group"
+            aria-label="검색 모드 전환"
+          >
+            <span
+              className={`absolute left-0.5 top-0.5 h-7 w-[54px] rounded-full bg-gradient-to-r from-slate-900 to-slate-700 shadow-sm transition-transform duration-200 ease-out dark:from-slate-100 dark:to-slate-200 ${
+                mode === "keyword" ? "translate-x-[54px]" : "translate-x-0"
+              }`}
+            />
+            <button
+              type="button"
+              aria-pressed={mode === "semantic"}
+              className={`relative z-10 flex h-7 flex-1 items-center justify-center rounded-full px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
+                mode === "semantic" ? "text-white dark:text-slate-900" : "text-slate-600 dark:text-slate-300"
+              }`}
+              onClick={() => setMode("semantic")}
+            >
+              AI
+            </button>
+            <button
+              type="button"
+              aria-pressed={mode === "keyword"}
+              className={`relative z-10 flex h-7 flex-1 items-center justify-center rounded-full px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
+                mode === "keyword" ? "text-white dark:text-slate-900" : "text-slate-600 dark:text-slate-300"
+              }`}
+              onClick={() => setMode("keyword")}
+            >
+              일반
+            </button>
+          </div>
+        </div>
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => query.trim() && setIsOpen(true)}
           placeholder={mode === "semantic" ? "AI 검색: 궁금한 내용을 질문해보세요" : "일반 검색: 키워드를 입력해보세요"}
-          className={`pl-10 pr-10 border-gray-200 text-gray-900 placeholder-gray-500 transition-all duration-200 hover:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg dark:border-gray-700 dark:text-white dark:placeholder-gray-400 ${className}`}
+          className={`pl-10 pr-32 border-gray-200 text-gray-900 placeholder-gray-500 transition-all duration-200 hover:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg dark:border-gray-700 dark:text-white dark:placeholder-gray-400 ${className}`}
         />
       </div>
 
