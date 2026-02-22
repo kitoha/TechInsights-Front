@@ -51,6 +51,7 @@ export interface SearchResponse {
 }
 
 export type SortBy = 'RELEVANCE' | 'LATEST' | 'POPULAR';
+export type SearchMode = "keyword" | "semantic";
 
 export interface SemanticSearchPost {
   id: string;
