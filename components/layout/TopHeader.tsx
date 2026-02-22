@@ -32,7 +32,7 @@ export function TopHeader({ onMenuClick }: TopHeaderProps) {
         </div>
 
         <div className="hidden md:block flex-1 max-w-xl mx-6">
-          <SearchBar className="w-full h-8 bg-muted/60 rounded-lg" />
+          <SearchBar className="w-full" />
         </div>
 
         <div className="flex items-center space-x-2">
