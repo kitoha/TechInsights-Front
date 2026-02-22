@@ -291,7 +291,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onFocus={() => query.trim() && setIsOpen(true)}
-          placeholder="Search for posts, topics, or companies"
+          placeholder="AI 검색: 궁금한 내용을 질문해보세요"
           className={`pl-10 pr-10 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 hover:shadow-md focus:shadow-lg transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${className}`}
         />
       </div>

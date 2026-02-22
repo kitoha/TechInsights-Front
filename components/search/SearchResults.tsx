@@ -92,6 +92,18 @@ export default function SearchResults({
 
   return (
     <div className="space-y-6">
+      <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/50 dark:bg-blue-950/30">
+        <div className="flex items-center gap-2">
+          <Badge className="bg-blue-600 text-white hover:bg-blue-600">AI 검색</Badge>
+          <p className="text-sm text-blue-900 dark:text-blue-200">
+            질문과 관련된 게시글을 AI로 찾아 보여줍니다.
+          </p>
+        </div>
+        <p className="mt-1 text-xs text-blue-800 dark:text-blue-300">
+          현재는 답변 생성 없이, 관련 문서 탐색을 제공합니다.
+        </p>
+      </div>
+
       {/* 검색 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
