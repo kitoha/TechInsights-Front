@@ -2,10 +2,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { apiGet } from "@/lib/shared/api";
 import PostDetailFade from "@/components/post/PostDetailFade";
-import {
-  fetchTrendingCompanies,
-  fetchCompanies
-} from "@/lib/companies";
 import { fetchRecommendedPosts } from "@/lib/posts";
 
 interface PostDetailProps {
@@ -41,10 +37,8 @@ async function getPostData(postId: string): Promise<PostData | null> {
 export default async function PostDetailPage({ params }: PostDetailProps) {
   const resolvedParams = await params;
 
-  const [post, trendingCompanies, companies, recommendedPosts] = await Promise.all([
+  const [post, recommendedPosts] = await Promise.all([
     getPostData(resolvedParams.slug),
-    fetchTrendingCompanies(),
-    fetchCompanies(),
     fetchRecommendedPosts()
   ]);
 
@@ -64,8 +58,6 @@ export default async function PostDetailPage({ params }: PostDetailProps) {
   return (
     <PostDetailFade
       post={post}
-      trendingPosts={trendingCompanies}
-      companies={companies}
       recommendedPosts={recommendedPosts}
     />
   );
