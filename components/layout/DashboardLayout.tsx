@@ -22,6 +22,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <TopHeader
           onMenuClick={() => setIsSidebarOpen(true)}
           showMenuButton={!isPostDetail}
+          compact={isPostDetail}
         />
         <main className={`flex-1 overflow-y-auto ${isPostDetail ? "" : "lg:ml-56"}`}>
           {children}

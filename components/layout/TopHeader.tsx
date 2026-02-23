@@ -10,12 +10,13 @@ import { Button } from "@/components/ui/button"
 interface TopHeaderProps {
   onMenuClick?: () => void;
   showMenuButton?: boolean;
+  compact?: boolean;
 }
 
-export function TopHeader({ onMenuClick, showMenuButton = true }: TopHeaderProps) {
+export function TopHeader({ onMenuClick, showMenuButton = true, compact = false }: TopHeaderProps) {
   return (
-    <header className="h-14 bg-white dark:bg-gray-900 sticky top-0 z-40 border-b border-gray-300 dark:border-gray-700">
-      <div className="h-full flex items-center justify-between px-4 lg:px-6">
+    <header className={`${compact ? "h-12" : "h-14"} bg-white dark:bg-gray-900 sticky top-0 z-40 border-b border-gray-300 dark:border-gray-700`}>
+      <div className={`h-full flex items-center justify-between ${compact ? "px-3 lg:px-5" : "px-4 lg:px-6"}`}>
         <div className="flex items-center space-x-3">
           {showMenuButton && (
             <button
@@ -35,18 +36,18 @@ export function TopHeader({ onMenuClick, showMenuButton = true }: TopHeaderProps
           </Link>
         </div>
 
-        <div className="hidden md:block flex-1 max-w-xl mx-6">
-          <Suspense fallback={<div className="h-10 w-full rounded-full border border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-900/80" />}>
+        <div className={`hidden md:block flex-1 ${compact ? "max-w-lg mx-4" : "max-w-xl mx-6"}`}>
+          <Suspense fallback={<div className={`${compact ? "h-9" : "h-10"} w-full rounded-full border border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-900/80`} />}>
             <SearchBar className="w-full" />
           </Suspense>
         </div>
 
         <div className="flex items-center space-x-2">
           <ThemeToggle />
-          <button className="hidden sm:inline-flex px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+          <button className={`hidden sm:inline-flex px-2 py-1 ${compact ? "text-[11px]" : "text-xs"} text-muted-foreground hover:text-foreground transition-colors`}>
             Sign In
           </button>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 h-7 rounded-md text-xs shadow-none">
+          <Button className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold ${compact ? "px-2.5 h-6 text-[11px]" : "px-3 h-7 text-xs"} rounded-md shadow-none`}>
             Subscribe
           </Button>
         </div>

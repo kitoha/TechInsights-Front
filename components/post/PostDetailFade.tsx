@@ -271,7 +271,9 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   {mainContent && (
                     <div className="border-t border-gray-200/90 dark:border-gray-800 pt-7">
                       <div className="prose prose-base max-w-none dark:prose-invert
+                        font-serif
                         prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-headings:font-bold prose-headings:tracking-tight
+                        prose-headings:font-sans
                         prose-h1:text-[30px] prose-h1:mb-3 prose-h1:mt-10 prose-h1:first:mt-0
                         prose-h2:text-[31px] prose-h2:mb-3 prose-h2:mt-10 prose-h2:first:mt-0
                         prose-h3:text-[24px] prose-h3:mb-3 prose-h3:mt-8
@@ -344,7 +346,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                 </div>
               </article>
 
-              <section className="mt-5 rounded-lg border border-gray-200 bg-white p-3.5 dark:border-gray-800 dark:bg-gray-900">
+              <section className="mt-4 rounded-lg border border-gray-200 bg-white p-3.5 dark:border-gray-800 dark:bg-gray-900">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0 flex items-center gap-3">
                     <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center">
@@ -387,14 +389,14 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
               </section>
 
               {recommendedPosts.length > 0 && (
-                <section className="mt-6">
-                  <div className="mb-2.5 flex items-center justify-between">
+                <section className="mt-4.5">
+                  <div className="mb-2 flex items-center justify-between">
                     <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100">You might also like</h3>
                     <Link href="/" className="text-xs font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
                       View all
                     </Link>
                   </div>
-                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {recommendedPosts.slice(0, 2).map((recommended) => (
                       <Link
                         key={recommended.postId}
