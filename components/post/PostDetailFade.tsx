@@ -151,23 +151,21 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
           <div className="min-h-full bg-[#f3f4f6] dark:bg-gray-950">
             <div className="max-w-[660px] mx-auto px-4 py-7 lg:py-10">
               <article>
-                <div className="mb-4 rounded-xl border border-gray-200 bg-white/80 px-2.5 py-2 dark:border-gray-800 dark:bg-gray-900/70">
-                  <div className="flex items-center justify-between">
-                    <button
-                      onClick={() => window.history.back()}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[12px] font-medium text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:border-gray-600 transition-colors"
-                    >
-                      <ArrowLeft className="h-3.5 w-3.5" />
-                      <span>뒤로가기</span>
-                    </button>
-                    <Link
-                      href="/"
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[12px] font-medium text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:border-gray-600 transition-colors"
-                    >
-                      <span>목록으로</span>
-                      <ChevronRight className="h-3.5 w-3.5" />
-                    </Link>
-                  </div>
+                <div className="mb-4 flex items-center justify-between">
+                  <button
+                    onClick={() => window.history.back()}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[12px] font-medium text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:border-gray-600 transition-colors"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    <span>뒤로가기</span>
+                  </button>
+                  <Link
+                    href="/"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[12px] font-medium text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:border-gray-600 transition-colors"
+                  >
+                    <span>목록으로</span>
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
 
                 <div className="pb-6">
