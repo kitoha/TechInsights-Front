@@ -71,13 +71,6 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
   const { summary, main } = splitContent(post?.content || '');
   const summaryText = (post.preview && post.preview.trim()) || summary;
   const mainContent = main || post.content;
-  const sourceHost = post.url ? (() => {
-    try {
-      return new URL(post.url).hostname.replace(/^www\./, '');
-    } catch {
-      return "";
-    }
-  })() : "";
 
   useEffect(() => {
     if (post) {
@@ -237,9 +230,6 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                     </div>
                     {post.url && (
                       <div className="flex items-center gap-2">
-                        {sourceHost && (
-                          <span className="text-[11px] text-gray-500 dark:text-gray-400">{sourceHost}</span>
-                        )}
                         <a
                           href={post.url}
                           target="_blank"
