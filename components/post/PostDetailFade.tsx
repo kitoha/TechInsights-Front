@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { OptimizedImage } from "@/components/common/OptimizedImage";
+import { LogoImage } from "@/components/company/LogoImage";
 import { ArrowLeft, Bookmark, ChevronRight, Heart, Share2, Sparkles } from "lucide-react";
 
 interface Post {
@@ -349,14 +350,13 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
               <section className="mt-4 rounded-lg border border-gray-200 bg-white p-3.5 dark:border-gray-800 dark:bg-gray-900">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0 flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center">
-                      <OptimizedImage
+                    <div className="h-9 w-9 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center">
+                      <LogoImage
                         src={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
                         alt={post.companyName}
-                        width={24}
-                        height={24}
-                        className="w-6 h-6 object-contain"
-                        fallbackSrc="/placeholder.svg"
+                        width={20}
+                        height={20}
+                        className="w-5 h-5 object-contain"
                       />
                     </div>
                     <div className="min-w-0">
@@ -403,14 +403,13 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                         href={`/post/${recommended.postId}`}
                         className="flex items-center gap-2.5 rounded-lg border border-gray-200 bg-white p-2.5 hover:border-gray-300 transition-all dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
                       >
-                        <div className="h-9 w-9 rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center">
-                          <OptimizedImage
+                        <div className="h-9 w-9 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center">
+                          <LogoImage
                             src={recommended.logoImageName ? `/logos/${recommended.logoImageName}` : "/placeholder.svg"}
                             alt={recommended.title}
-                            width={24}
-                            height={24}
-                            className="h-6 w-6 object-contain"
-                            fallbackSrc="/placeholder.svg"
+                            width={20}
+                            height={20}
+                            className="h-5 w-5 object-contain"
                           />
                         </div>
                         <p className="line-clamp-2 text-[13px] font-medium leading-5 text-gray-800 dark:text-gray-100">
