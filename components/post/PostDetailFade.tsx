@@ -186,7 +186,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                       {new Date(post.publishedAt).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })}
                     </time>
                   </div>
-                  <h1 className="mx-auto max-w-[680px] text-center text-[32px] sm:text-[40px] lg:text-[46px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.14] tracking-tight">
+                  <h1 className="mx-auto max-w-[680px] text-center text-[30px] sm:text-[36px] lg:text-[42px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.14] tracking-tight">
                     {post.title}
                   </h1>
                   <div className="mt-4 flex items-center justify-center gap-2 text-[12px] text-gray-500 dark:text-gray-400">
@@ -255,11 +255,11 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   </div>
 
                   {summaryText && (
-                    <div className="mb-10 rounded-2xl border border-blue-100 bg-gradient-to-b from-blue-50/90 to-white px-5 py-5 dark:border-blue-900/50 dark:from-blue-950/30 dark:to-gray-900">
+                    <div className="mb-10 rounded-2xl border border-gray-200 bg-gray-50/80 px-5 py-5 dark:border-gray-800 dark:bg-gray-900/50">
                       <div className="prose prose-sm max-w-none dark:prose-invert
-                        prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:text-[15px] prose-p:leading-7 prose-p:mb-2.5
+                        prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:text-[14px] prose-p:leading-6 prose-p:mb-2.5
                         prose-ul:my-3 prose-ul:list-disc prose-ul:pl-5 prose-ul:space-y-1.5
-                        prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:text-[15px] prose-li:leading-7 prose-li:marker:text-blue-500
+                        prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:text-[14px] prose-li:leading-6 prose-li:marker:text-blue-500
                         prose-strong:text-gray-900 dark:prose-strong:text-gray-100">
                         <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                           {summaryText}
@@ -272,10 +272,10 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                     <div className="border-t border-gray-200/90 dark:border-gray-800 pt-9">
                       <div className="prose prose-base max-w-none dark:prose-invert
                         prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-headings:font-bold prose-headings:tracking-tight
-                        prose-h1:text-[34px] prose-h1:mb-4 prose-h1:mt-12 prose-h1:first:mt-0
-                        prose-h2:text-[40px] prose-h2:mb-4 prose-h2:mt-12 prose-h2:first:mt-0
-                        prose-h3:text-[30px] prose-h3:mb-3 prose-h3:mt-9
-                        prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-p:text-[17px] prose-p:leading-[1.9] prose-p:mb-6
+                        prose-h1:text-[32px] prose-h1:mb-4 prose-h1:mt-12 prose-h1:first:mt-0
+                        prose-h2:text-[34px] prose-h2:mb-4 prose-h2:mt-12 prose-h2:first:mt-0
+                        prose-h3:text-[26px] prose-h3:mb-3 prose-h3:mt-9
+                        prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-p:text-[16px] prose-p:leading-8 prose-p:mb-6
                         prose-ul:my-5 prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-2
                         prose-ol:my-5 prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-2
                         prose-li:text-gray-800 dark:prose-li:text-gray-200 prose-li:text-[16px] prose-li:leading-8
