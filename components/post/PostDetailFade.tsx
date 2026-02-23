@@ -70,6 +70,13 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
   const { summary, main } = splitContent(post?.content || '');
   const summaryText = (post.preview && post.preview.trim()) || summary;
   const mainContent = main || post.content;
+  const sourceHost = post.url ? (() => {
+    try {
+      return new URL(post.url).hostname.replace(/^www\./, '');
+    } catch {
+      return "";
+    }
+  })() : "";
 
   useEffect(() => {
     if (post) {
@@ -223,17 +230,22 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">핵심요약</h2>
                     {post.url && (
-                      <a
-                        href={post.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-                      >
-                        <span>원문 보기</span>
-                        <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </a>
+                      <div className="flex items-center gap-2">
+                        {sourceHost && (
+                          <span className="text-[11px] text-gray-500 dark:text-gray-400">{sourceHost}</span>
+                        )}
+                        <a
+                          href={post.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                        >
+                          <span>원문 보기</span>
+                          <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      </div>
                     )}
                   </div>
 
@@ -282,13 +294,18 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   {post.categories && post.categories.length > 0 && (
                     <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-wrap gap-2">
                       {post.categories.map((category, index) => (
-                        <Badge
+                        <Link
                           key={index}
-                          variant="secondary"
-                          className="px-2.5 py-1 text-[11px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-md"
+                          href={`/?category=${category}`}
+                          className="inline-flex"
                         >
-                          #{category}
-                        </Badge>
+                          <Badge
+                            variant="secondary"
+                            className="px-2.5 py-1 text-[11px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                          >
+                            #{category}
+                          </Badge>
+                        </Link>
                       ))}
                     </div>
                   )}
@@ -298,7 +315,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
               {recommendedPosts.length > 0 && (
                 <section className="mt-8">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">You might also like</h3>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">이런 글도 함께 읽어보세요</h3>
                     <Link href="/" className="text-xs font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
                       View all
                     </Link>
