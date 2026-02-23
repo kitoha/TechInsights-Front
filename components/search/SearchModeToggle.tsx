@@ -10,7 +10,7 @@ interface SearchModeToggleProps {
 
 export default function SearchModeToggle({ currentMode, onChange }: SearchModeToggleProps) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2" role="group" aria-label="검색 모드 토글">
       <Button
         variant={currentMode === "semantic" ? "default" : "outline"}
         size="sm"

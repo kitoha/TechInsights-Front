@@ -49,13 +49,14 @@ function getValidationError(mode: SearchMode, query: string, size: number): stri
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams
   const query = params?.query || ""
+  const trimmedQuery = query.trim()
   const mode = resolveSearchMode(params?.mode)
   const page = Number(params?.page) || 0
   const sortBy = resolveSortBy(params?.sortBy)
   const size = params?.size === undefined ? DEFAULT_SIZE : Number(params.size)
   const companyId = params?.companyId
 
-  if (!query.trim()) {
+  if (!trimmedQuery) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -84,7 +85,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   let keywordData: SearchResponse | null = null
   let error: string | null = null
 
-  const validationError = getValidationError(mode, query, size)
+  const validationError = getValidationError(mode, trimmedQuery, size)
   if (validationError) {
     error = validationError
   } else {
@@ -92,12 +93,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       if (mode === "semantic") {
         const companyIdParam = companyId ? `&companyId=${encodeURIComponent(companyId)}` : ""
         const response = await apiGet<SemanticSearchResponse>(
-          `/api/v1/search/semantic?query=${encodeURIComponent(query)}&size=${size}${companyIdParam}`
+          `/api/v1/search/semantic?query=${encodeURIComponent(trimmedQuery)}&size=${size}${companyIdParam}`
         )
         semanticData = response.data
       } else {
         const response = await apiGet<SearchResponse>(
-          `/api/v1/search?query=${encodeURIComponent(query)}&page=${page}&size=20&sortBy=${sortBy}`
+          `/api/v1/search?query=${encodeURIComponent(trimmedQuery)}&page=${page}&size=20&sortBy=${sortBy}`
         )
         keywordData = response.data
       }
@@ -122,7 +123,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Suspense fallback={<div>검색 중...</div>}>
           <SearchResults
-            query={query}
+            query={trimmedQuery}
             mode={mode}
             semanticData={semanticData}
             keywordData={keywordData}
