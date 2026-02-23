@@ -255,7 +255,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   </div>
 
                   {summaryText && (
-                    <div className="mb-10 rounded-2xl border border-gray-200 bg-gray-50/80 px-5 py-5 dark:border-gray-800 dark:bg-gray-900/50">
+                    <div className="mb-10 rounded-2xl border border-blue-200/70 bg-gradient-to-br from-blue-50 via-white to-cyan-50 px-5 py-5 shadow-[0_10px_30px_rgba(59,130,246,0.08)] dark:border-blue-800/60 dark:bg-gradient-to-br dark:from-blue-950/35 dark:via-slate-900 dark:to-slate-900 dark:shadow-[0_10px_30px_rgba(37,99,235,0.12)]">
                       <div className="prose prose-sm max-w-none dark:prose-invert
                         prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:text-[14px] prose-p:leading-6 prose-p:mb-2.5
                         prose-ul:my-3 prose-ul:list-disc prose-ul:pl-5 prose-ul:space-y-1.5
