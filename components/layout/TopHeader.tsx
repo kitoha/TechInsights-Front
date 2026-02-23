@@ -9,20 +9,23 @@ import { Button } from "@/components/ui/button"
 
 interface TopHeaderProps {
   onMenuClick?: () => void;
+  showMenuButton?: boolean;
 }
 
-export function TopHeader({ onMenuClick }: TopHeaderProps) {
+export function TopHeader({ onMenuClick, showMenuButton = true }: TopHeaderProps) {
   return (
     <header className="h-14 bg-white dark:bg-gray-900 sticky top-0 z-40 border-b border-gray-300 dark:border-gray-700">
       <div className="h-full flex items-center justify-between px-4 lg:px-6">
         <div className="flex items-center space-x-3">
-          <button
-            onClick={onMenuClick}
-            className="lg:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            aria-label="Open menu"
-          >
-            <Menu className="w-4 h-4" />
-          </button>
+          {showMenuButton && (
+            <button
+              onClick={onMenuClick}
+              className="lg:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              aria-label="Open menu"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+          )}
 
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-6 h-6 bg-foreground rounded-md flex items-center justify-center">
