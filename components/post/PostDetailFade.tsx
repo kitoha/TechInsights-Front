@@ -77,6 +77,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
       return "";
     }
   })() : "";
+  const readMinutes = Math.max(1, Math.ceil(post.content.length / 500));
 
   useEffect(() => {
     if (post) {
@@ -157,7 +158,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
       <div className={`transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
         {post && (
           <div className="bg-[#f6f7f9] dark:bg-gray-950 min-h-full">
-            <div className="max-w-[760px] mx-auto px-4 py-8 lg:py-12">
+            <div className="max-w-[740px] mx-auto px-4 py-8 lg:py-12">
               <article>
                 <div className="pb-6">
                   <div className="flex items-center justify-center gap-2 text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-3">
@@ -174,6 +175,12 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   <h1 className="text-center text-[30px] sm:text-[38px] lg:text-[44px] font-bold text-gray-900 dark:text-gray-100 leading-[1.12] tracking-tight">
                     {post.title}
                   </h1>
+                  <div className="mt-4 flex items-center justify-center gap-2 text-[12px] text-gray-500 dark:text-gray-400">
+                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-amber-100 text-amber-600 text-[10px] font-bold">
+                      A
+                    </span>
+                    <span>{post.companyName} Engineering Team</span>
+                  </div>
                 </div>
 
                 <div>
@@ -204,9 +211,9 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
 
                 <div className="py-7 lg:py-8">
                   <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                    <div className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-900">
-                      <span className="inline-block w-5 h-5 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 text-[12px] leading-5 text-center">AI</span>
-                      <h2 className="text-[13px] font-semibold text-gray-900 dark:text-gray-100">핵심요약</h2>
+                    <div className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-gray-900 dark:text-gray-100">
+                      <span className="text-blue-600 dark:text-blue-400">✦</span>
+                      <h2>핵심요약</h2>
                     </div>
                     {post.url && (
                       <div className="flex items-center gap-2">
@@ -232,8 +239,9 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                     <div className="mb-9 rounded-xl border border-gray-200 bg-white px-4 py-4 dark:border-gray-800 dark:bg-gray-900/40">
                       <div className="prose prose-sm max-w-none dark:prose-invert
                         prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:text-[14px] prose-p:leading-6 prose-p:mb-2.5
-                        prose-ul:my-3 prose-ul:list-disc prose-ul:pl-5 prose-ul:space-y-1.5
-                        prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:text-[14px] prose-li:leading-6
+                        prose-ul:my-3 prose-ul:list-none prose-ul:pl-0 prose-ul:space-y-2
+                        prose-li:relative prose-li:pl-5 prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:text-[14px] prose-li:leading-6
+                        prose-li:before:content-['✓'] prose-li:before:absolute prose-li:before:left-0 prose-li:before:top-0 prose-li:before:text-green-500 prose-li:before:font-semibold
                         prose-strong:text-gray-900 dark:prose-strong:text-gray-100">
                         <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                           {summaryText}
@@ -293,7 +301,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                       <div className="flex items-center gap-2.5">
                         <span>{post.companyName}</span>
                         <span>·</span>
-                        <span>{Math.max(1, Math.ceil(post.content.length / 500))}분 읽기</span>
+                        <span>{readMinutes}분 읽기</span>
                         {displayViewCount !== null && (
                           <>
                             <span>·</span>
@@ -301,13 +309,15 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                           </>
                         )}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button className="inline-flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
-                          <span>좋아요</span>
+                      <div className="flex items-center gap-3">
+                        <button className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors" aria-label="좋아요">
+                          ♡
                         </button>
-                        <span>·</span>
-                        <button className="inline-flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
-                          <span>공유</span>
+                        <button className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors" aria-label="공유">
+                          ↗
+                        </button>
+                        <button className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors" aria-label="북마크">
+                          ▢
                         </button>
                       </div>
                     </div>
@@ -315,12 +325,40 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                 </div>
               </article>
 
+              <section className="mt-6 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center">
+                      <OptimizedImage
+                        src={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
+                        alt={post.companyName}
+                        width={24}
+                        height={24}
+                        className="w-6 h-6 object-contain"
+                        fallbackSrc="/placeholder.svg"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        {post.companyName} Engineering Team
+                      </p>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+                        기술 인사이트를 전달하는 공식 채널
+                      </p>
+                    </div>
+                  </div>
+                  <button className="shrink-0 rounded-full border border-gray-300 px-3 py-1 text-[11px] font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800">
+                    Follow
+                  </button>
+                </div>
+              </section>
+
               {recommendedPosts.length > 0 && (
                 <section className="mt-8">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">이런 글도 함께 읽어보세요</h3>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">You might also like</h3>
                     <Link href="/" className="text-xs font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
-                      전체 보기
+                      View all
                     </Link>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
