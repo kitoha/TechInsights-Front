@@ -21,6 +21,7 @@ interface Post {
   logoImageName?: string;
   categories?: string[];
   viewCount?: number;
+  blogUrl?: string;
 }
 
 interface RecommendedPost {
@@ -368,9 +369,23 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                       </p>
                     </div>
                   </div>
-                  <button className="shrink-0 rounded-full border border-gray-300 px-3 py-1 text-[11px] font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800">
-                    Follow
-                  </button>
+                  {post.blogUrl ? (
+                    <a
+                      href={post.blogUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 rounded-full border border-gray-300 px-3 py-1 text-[11px] font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      기술블로그로 가기
+                    </a>
+                  ) : (
+                    <button
+                      disabled
+                      className="shrink-0 rounded-full border border-gray-200 px-3 py-1 text-[11px] font-medium text-gray-400 cursor-not-allowed dark:border-gray-800 dark:text-gray-500"
+                    >
+                      기술블로그 링크 예정
+                    </button>
+                  )}
                 </div>
               </section>
 
