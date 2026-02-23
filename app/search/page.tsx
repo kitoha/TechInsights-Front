@@ -114,7 +114,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       } else {
         error = "검색 중 오류가 발생했습니다."
       }
-      console.error("Search error:", err)
+      if (isAxiosError(err)) {
+        console.error("Search error", {
+          status: err.response?.status,
+          message: err.message,
+        })
+      } else {
+        console.error("Search error", {
+          message: err instanceof Error ? err.message : "Unknown error",
+        })
+      }
     }
   }
 
