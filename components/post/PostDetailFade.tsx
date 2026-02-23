@@ -160,10 +160,10 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
             <div className="max-w-4xl mx-auto px-4 py-8 lg:py-12">
               <article className="rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
                 <div className="px-5 sm:px-8 lg:px-12 pt-8 lg:pt-10 pb-6">
-                  <h1 className="text-[30px] sm:text-[38px] lg:text-[44px] font-bold text-gray-900 dark:text-gray-100 leading-[1.12] tracking-tight">
+                  <h1 className="text-[28px] sm:text-[38px] lg:text-[44px] font-bold text-gray-900 dark:text-gray-100 leading-[1.15] tracking-tight">
                     {post.title}
                   </h1>
-                  <div className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-2 text-[13px] text-gray-600 dark:text-gray-400">
+                  <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2 text-[13px] text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-2.5">
                       {post.logoImageName && (
                         <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
@@ -179,15 +179,15 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                       )}
                       <span className="font-semibold text-gray-900 dark:text-gray-100">{post.companyName}</span>
                     </div>
-                    <span>•</span>
+                    <span className="text-gray-300 dark:text-gray-700">•</span>
                     <time>
                       {new Date(post.publishedAt).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </time>
-                    <span>•</span>
-                    <span>{Math.max(1, Math.ceil(post.content.length / 500))} min read</span>
+                    <span className="text-gray-300 dark:text-gray-700">•</span>
+                    <span>{Math.max(1, Math.ceil(post.content.length / 500))}분 읽기</span>
                     {displayViewCount !== null && displayViewCount > 0 && (
                       <>
-                        <span>•</span>
+                        <span className="text-gray-300 dark:text-gray-700">•</span>
                         <div className="inline-flex items-center gap-1">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -317,7 +317,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">이런 글도 함께 읽어보세요</h3>
                     <Link href="/" className="text-xs font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
-                      View all
+                      전체 보기
                     </Link>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
