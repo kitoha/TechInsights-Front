@@ -268,16 +268,16 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   {mainContent && (
                     <div className="border-t border-gray-200/90 dark:border-gray-800 pt-7">
                       <div className="prose prose-base max-w-none dark:prose-invert
-                        font-serif
+                        font-sans
                         prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-headings:font-bold prose-headings:tracking-tight
                         prose-headings:font-sans
                         prose-h1:text-[30px] prose-h1:mb-3 prose-h1:mt-10 prose-h1:first:mt-0
                         prose-h2:text-[31px] prose-h2:mb-3 prose-h2:mt-10 prose-h2:first:mt-0
                         prose-h3:text-[24px] prose-h3:mb-3 prose-h3:mt-8
-                        prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-p:text-[15px] prose-p:leading-7 prose-p:mb-5
+                        prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-p:text-[16px] prose-p:leading-8 prose-p:tracking-[0.005em] prose-p:mb-5
                         prose-ul:my-4 prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-1.5
                         prose-ol:my-4 prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-1.5
-                        prose-li:text-gray-800 dark:prose-li:text-gray-200 prose-li:text-[15px] prose-li:leading-7
+                        prose-li:text-gray-800 dark:prose-li:text-gray-200 prose-li:text-[16px] prose-li:leading-8
                         prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-950/30 prose-blockquote:rounded-r-lg prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300 prose-blockquote:not-italic
                         prose-code:text-sm prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-blue-600 dark:prose-code:text-blue-400 prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
                         prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:text-gray-100 prose-pre:rounded-lg prose-pre:p-4 prose-pre:overflow-x-auto prose-pre:my-6
