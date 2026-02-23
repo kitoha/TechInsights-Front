@@ -160,6 +160,26 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
           <div className="bg-[#f6f7f9] dark:bg-gray-950 min-h-full">
             <div className="max-w-[740px] mx-auto px-4 py-8 lg:py-12">
               <article>
+                <div className="mb-4 flex items-center justify-between">
+                  <button
+                    onClick={() => window.history.back()}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-[12px] font-medium text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:border-gray-700 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span>뒤로가기</span>
+                  </button>
+                  <Link
+                    href="/"
+                    className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[12px] font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  >
+                    <span>목록으로</span>
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
                 <div className="pb-6">
                   <div className="flex items-center justify-center gap-2 text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-3">
                     {post.categories && post.categories.length > 0 && (
