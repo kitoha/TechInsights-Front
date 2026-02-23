@@ -70,7 +70,6 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
   const { summary, main } = splitContent(post?.content || '');
   const summaryText = (post.preview && post.preview.trim()) || summary;
   const mainContent = main || post.content;
-  const readMinutes = Math.max(1, Math.ceil(post.content.length / 500));
   const sourceHost = post.url ? (() => {
     try {
       return new URL(post.url).hostname.replace(/^www\./, '');
@@ -317,13 +316,11 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                       </div>
                     )}
                     <div className="flex items-center justify-between text-[12px] text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center gap-2.5">
-                        <span>{post.companyName}</span>
-                        <span>·</span>
-                        <span>{readMinutes}분 읽기</span>
-                        {displayViewCount !== null && (
-                          <>
-                            <span>·</span>
+                    <div className="flex items-center gap-2.5">
+                      <span>{post.companyName}</span>
+                      {displayViewCount !== null && (
+                        <>
+                          <span>·</span>
                             <span>조회 {displayViewCount.toLocaleString()}</span>
                           </>
                         )}
