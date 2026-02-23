@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw";
 import { OptimizedImage } from "@/components/common/OptimizedImage";
 import { LogoImage } from "@/components/company/LogoImage";
 import { ArrowLeft, Bookmark, ChevronRight, Heart, Share2, Sparkles } from "lucide-react";
@@ -258,7 +257,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                         prose-ul:my-3 prose-ul:list-disc prose-ul:pl-5 prose-ul:space-y-1.5
                         prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:text-[13px] prose-li:leading-6 prose-li:marker:text-blue-500
                         prose-strong:text-gray-900 dark:prose-strong:text-gray-100">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {summaryText}
                         </ReactMarkdown>
                       </div>
@@ -288,7 +287,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                         prose-table:block prose-table:overflow-x-auto prose-table:my-6
                         prose-th:border prose-th:border-gray-300 dark:prose-th:border-gray-600 prose-th:bg-gray-100 dark:prose-th:bg-gray-800 prose-th:px-4 prose-th:py-2 prose-th:text-left
                         prose-td:border prose-td:border-gray-300 dark:prose-td:border-gray-600 prose-td:px-4 prose-td:py-2">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {mainContent}
                         </ReactMarkdown>
                       </div>
