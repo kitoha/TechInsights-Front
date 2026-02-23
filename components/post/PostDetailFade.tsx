@@ -151,31 +151,40 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
           <div className="min-h-full bg-[#f3f4f6] dark:bg-gray-950">
             <div className="max-w-[660px] mx-auto px-4 py-7 lg:py-10">
               <article>
-                <div className="mb-3 flex items-center justify-between">
-                  <button
-                    onClick={() => window.history.back()}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200/90 bg-white/90 px-3 py-1.5 text-[12px] font-medium text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:border-gray-600 transition-colors"
-                  >
-                    <ArrowLeft className="h-3.5 w-3.5" />
-                    <span>뒤로가기</span>
-                  </button>
-                  <Link
-                    href="/"
-                    className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-[12px] font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-                  >
-                    <span>목록으로</span>
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Link>
+                <div className="mb-4 rounded-xl border border-gray-200 bg-white/80 px-2.5 py-2 dark:border-gray-800 dark:bg-gray-900/70">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => window.history.back()}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[12px] font-medium text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:border-gray-600 transition-colors"
+                    >
+                      <ArrowLeft className="h-3.5 w-3.5" />
+                      <span>뒤로가기</span>
+                    </button>
+                    <Link
+                      href="/"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[12px] font-medium text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:border-gray-600 transition-colors"
+                    >
+                      <span>목록으로</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
                 </div>
 
                 <div className="pb-6">
-                  <div className="mb-2.5 flex items-center justify-center gap-2 text-[10px] font-medium text-gray-500 dark:text-gray-400">
-                    {post.categories && post.categories.length > 0 && (
-                      <Link href={`/?category=${post.categories[0]}`} className="text-blue-600 dark:text-blue-400 hover:underline underline-offset-4">
+                  <div className="mb-3 flex items-center justify-center gap-2 text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                    {post.categories && post.categories.length > 0 ? (
+                      <Link
+                        href={`/?category=${post.categories[0]}`}
+                        className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-semibold text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300"
+                      >
                         {post.categories[0]}
                       </Link>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-100 px-2.5 py-0.5 text-[10px] font-semibold text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        Blog
+                      </span>
                     )}
-                    <span>•</span>
+                    <span className="text-gray-300 dark:text-gray-600">•</span>
                     <time>
                       {new Date(post.publishedAt).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })}
                     </time>
@@ -183,18 +192,17 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   <h1 className="mx-auto max-w-[620px] text-center text-[28px] sm:text-[33px] lg:text-[38px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.16] tracking-tight">
                     {post.title}
                   </h1>
-                  <div className="mt-3.5 flex items-center justify-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
-                    <div className="h-5 w-5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center">
-                      <OptimizedImage
+                  <div className="mt-4 flex items-center justify-center gap-2 text-[12px] text-gray-600 dark:text-gray-300">
+                    <div className="h-6 w-6 rounded-full bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-700 overflow-hidden flex items-center justify-center">
+                      <LogoImage
                         src={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
                         alt={post.companyName}
-                        width={16}
-                        height={16}
-                        className="h-4 w-4 object-contain"
-                        fallbackSrc="/placeholder.svg"
+                        width={14}
+                        height={14}
+                        className="h-3.5 w-3.5 object-contain"
                       />
                     </div>
-                    <span className="font-medium">{post.companyName} Engineering Team</span>
+                    <span className="font-medium tracking-tight">{post.companyName} Engineering Team</span>
                   </div>
                 </div>
 
