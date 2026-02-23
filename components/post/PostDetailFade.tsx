@@ -154,10 +154,10 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
 
       <div className={`transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
         {post && (
-          <div className="min-h-full bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f6f7f9_42%,_#f1f3f6_100%)] dark:bg-[radial-gradient(circle_at_top,_#111827_0%,_#0b1020_42%,_#090d18_100%)]">
-            <div className="max-w-[740px] mx-auto px-4 py-8 lg:py-12">
+          <div className="min-h-full bg-[#f3f4f6] dark:bg-gray-950">
+            <div className="max-w-[660px] mx-auto px-4 py-7 lg:py-10">
               <article>
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-3 flex items-center justify-between">
                   <button
                     onClick={() => window.history.back()}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200/90 bg-white/90 px-3 py-1.5 text-[12px] font-medium text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:border-gray-600 transition-colors"
@@ -174,8 +174,8 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   </Link>
                 </div>
 
-                <div className="pb-8">
-                  <div className="mb-3 flex items-center justify-center gap-2 text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                <div className="pb-6">
+                  <div className="mb-2.5 flex items-center justify-center gap-2 text-[10px] font-medium text-gray-500 dark:text-gray-400">
                     {post.categories && post.categories.length > 0 && (
                       <Link href={`/?category=${post.categories[0]}`} className="text-blue-600 dark:text-blue-400 hover:underline underline-offset-4">
                         {post.categories[0]}
@@ -186,10 +186,10 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                       {new Date(post.publishedAt).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })}
                     </time>
                   </div>
-                  <h1 className="mx-auto max-w-[680px] text-center text-[30px] sm:text-[36px] lg:text-[42px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.14] tracking-tight">
+                  <h1 className="mx-auto max-w-[620px] text-center text-[28px] sm:text-[33px] lg:text-[38px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.16] tracking-tight">
                     {post.title}
                   </h1>
-                  <div className="mt-4 flex items-center justify-center gap-2 text-[12px] text-gray-500 dark:text-gray-400">
+                  <div className="mt-3.5 flex items-center justify-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
                     <div className="h-5 w-5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center">
                       <OptimizedImage
                         src={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
@@ -204,7 +204,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   </div>
                 </div>
 
-                <div className={`relative w-full aspect-[16/9] overflow-hidden rounded-2xl border border-gray-200/80 shadow-[0_12px_32px_rgba(15,23,42,0.08)] dark:border-gray-700/80 dark:shadow-none ${post.thumbnail ? '' : 'bg-gradient-to-br from-[#2665ff] via-[#2452db] to-[#1b3dbe]'}`}>
+                <div className={`relative w-full aspect-[16/9] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 ${post.thumbnail ? '' : 'bg-gradient-to-br from-[#2665ff] via-[#2452db] to-[#1b3dbe]'}`}>
                   {post.thumbnail ? (
                     <OptimizedImage
                       src={post.thumbnail}
@@ -228,8 +228,8 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   )}
                 </div>
 
-                <div className="py-8 lg:py-10">
-                  <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <div className="py-6 lg:py-7">
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                     <div className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-gray-900 dark:text-gray-100">
                       <Sparkles className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                       <h2>핵심요약</h2>
@@ -255,11 +255,11 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   </div>
 
                   {summaryText && (
-                    <div className="mb-10 rounded-2xl border border-blue-200/70 bg-gradient-to-br from-blue-50 via-white to-cyan-50 px-5 py-5 shadow-[0_10px_30px_rgba(59,130,246,0.08)] dark:border-blue-800/60 dark:bg-gradient-to-br dark:from-blue-950/35 dark:via-slate-900 dark:to-slate-900 dark:shadow-[0_10px_30px_rgba(37,99,235,0.12)]">
+                    <div className="mb-8 rounded-lg border border-blue-200/70 bg-gradient-to-br from-blue-50 via-white to-cyan-50 px-4 py-4 dark:border-blue-800/60 dark:bg-gradient-to-br dark:from-blue-950/35 dark:via-slate-900 dark:to-slate-900">
                       <div className="prose prose-sm max-w-none dark:prose-invert
-                        prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:text-[14px] prose-p:leading-6 prose-p:mb-2.5
+                        prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:text-[13px] prose-p:leading-6 prose-p:mb-2.5
                         prose-ul:my-3 prose-ul:list-disc prose-ul:pl-5 prose-ul:space-y-1.5
-                        prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:text-[14px] prose-li:leading-6 prose-li:marker:text-blue-500
+                        prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:text-[13px] prose-li:leading-6 prose-li:marker:text-blue-500
                         prose-strong:text-gray-900 dark:prose-strong:text-gray-100">
                         <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                           {summaryText}
@@ -269,23 +269,23 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   )}
 
                   {mainContent && (
-                    <div className="border-t border-gray-200/90 dark:border-gray-800 pt-9">
+                    <div className="border-t border-gray-200/90 dark:border-gray-800 pt-7">
                       <div className="prose prose-base max-w-none dark:prose-invert
                         prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-headings:font-bold prose-headings:tracking-tight
-                        prose-h1:text-[32px] prose-h1:mb-4 prose-h1:mt-12 prose-h1:first:mt-0
-                        prose-h2:text-[34px] prose-h2:mb-4 prose-h2:mt-12 prose-h2:first:mt-0
-                        prose-h3:text-[26px] prose-h3:mb-3 prose-h3:mt-9
-                        prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-p:text-[16px] prose-p:leading-8 prose-p:mb-6
-                        prose-ul:my-5 prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-2
-                        prose-ol:my-5 prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-2
-                        prose-li:text-gray-800 dark:prose-li:text-gray-200 prose-li:text-[16px] prose-li:leading-8
+                        prose-h1:text-[30px] prose-h1:mb-3 prose-h1:mt-10 prose-h1:first:mt-0
+                        prose-h2:text-[31px] prose-h2:mb-3 prose-h2:mt-10 prose-h2:first:mt-0
+                        prose-h3:text-[24px] prose-h3:mb-3 prose-h3:mt-8
+                        prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-p:text-[15px] prose-p:leading-7 prose-p:mb-5
+                        prose-ul:my-4 prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-1.5
+                        prose-ol:my-4 prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-1.5
+                        prose-li:text-gray-800 dark:prose-li:text-gray-200 prose-li:text-[15px] prose-li:leading-7
                         prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-950/30 prose-blockquote:rounded-r-lg prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300 prose-blockquote:not-italic
                         prose-code:text-sm prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-blue-600 dark:prose-code:text-blue-400 prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
-                        prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:text-gray-100 prose-pre:rounded-xl prose-pre:p-5 prose-pre:overflow-x-auto prose-pre:my-7
+                        prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:text-gray-100 prose-pre:rounded-lg prose-pre:p-4 prose-pre:overflow-x-auto prose-pre:my-6
                         prose-pre>code:bg-transparent prose-pre>code:p-0 prose-pre>code:text-sm prose-pre>code:text-gray-100
                         prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
-                        prose-img:rounded-xl prose-img:my-7
-                        prose-hr:border-gray-200 dark:prose-hr:border-gray-700 prose-hr:my-10
+                        prose-img:rounded-lg prose-img:my-6
+                        prose-hr:border-gray-200 dark:prose-hr:border-gray-700 prose-hr:my-8
                         prose-table:block prose-table:overflow-x-auto prose-table:my-6
                         prose-th:border prose-th:border-gray-300 dark:prose-th:border-gray-600 prose-th:bg-gray-100 dark:prose-th:bg-gray-800 prose-th:px-4 prose-th:py-2 prose-th:text-left
                         prose-td:border prose-td:border-gray-300 dark:prose-td:border-gray-600 prose-td:px-4 prose-td:py-2">
@@ -296,7 +296,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                     </div>
                   )}
 
-                  <div className="mt-12 border-t border-gray-200 pt-6 dark:border-gray-800">
+                  <div className="mt-10 border-t border-gray-200 pt-5 dark:border-gray-800">
                     {post.categories && post.categories.length > 0 && (
                       <div className="mb-4 flex flex-wrap gap-2">
                         {post.categories.map((category, index) => (
@@ -315,7 +315,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                         ))}
                       </div>
                     )}
-                    <div className="flex items-center justify-between text-[12px] text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
                     <div className="flex items-center gap-2.5">
                       <span>{post.companyName}</span>
                       {displayViewCount !== null && (
@@ -325,18 +325,18 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                           </>
                         )}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white/90 px-2 py-1 transition-colors hover:border-gray-300 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:hover:text-gray-200" aria-label="좋아요">
+                      <div className="flex items-center gap-1.5">
+                        <button className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 transition-colors hover:border-gray-300 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:hover:text-gray-200" aria-label="좋아요">
                           <Heart className="h-3.5 w-3.5" />
-                          <span className="text-[11px]">좋아요</span>
+                          <span className="text-[10px]">좋아요</span>
                         </button>
-                        <button className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white/90 px-2 py-1 transition-colors hover:border-gray-300 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:hover:text-gray-200" aria-label="공유">
+                        <button className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 transition-colors hover:border-gray-300 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:hover:text-gray-200" aria-label="공유">
                           <Share2 className="h-3.5 w-3.5" />
-                          <span className="text-[11px]">공유</span>
+                          <span className="text-[10px]">공유</span>
                         </button>
-                        <button className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white/90 px-2 py-1 transition-colors hover:border-gray-300 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:hover:text-gray-200" aria-label="북마크">
+                        <button className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 transition-colors hover:border-gray-300 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:hover:text-gray-200" aria-label="북마크">
                           <Bookmark className="h-3.5 w-3.5" />
-                          <span className="text-[11px]">저장</span>
+                          <span className="text-[10px]">저장</span>
                         </button>
                       </div>
                     </div>
@@ -344,7 +344,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                 </div>
               </article>
 
-              <section className="mt-6 rounded-2xl border border-gray-200/90 bg-white/95 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
+              <section className="mt-5 rounded-lg border border-gray-200 bg-white p-3.5 dark:border-gray-800 dark:bg-gray-900">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0 flex items-center gap-3">
                     <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center">
@@ -358,7 +358,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                       />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-[13px] font-semibold text-gray-900 dark:text-gray-100">
+                      <p className="truncate text-[12px] font-semibold text-gray-900 dark:text-gray-100">
                         {post.companyName} Engineering Team
                       </p>
                       <p className="truncate text-[11px] text-gray-500 dark:text-gray-400">
@@ -371,14 +371,14 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                       href={post.blogUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="shrink-0 rounded-full border border-gray-300 px-3 py-1 text-[11px] font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 transition-colors"
+                      className="shrink-0 rounded-full border border-gray-300 px-3 py-1 text-[10px] font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 transition-colors"
                     >
                       기술블로그로 가기
                     </a>
                   ) : (
                     <button
                       disabled
-                      className="shrink-0 rounded-full border border-gray-200 px-3 py-1 text-[11px] font-medium text-gray-400 cursor-not-allowed dark:border-gray-800 dark:text-gray-500"
+                      className="shrink-0 rounded-full border border-gray-200 px-3 py-1 text-[10px] font-medium text-gray-400 cursor-not-allowed dark:border-gray-800 dark:text-gray-500"
                     >
                       기술블로그 링크 예정
                     </button>
@@ -387,9 +387,9 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
               </section>
 
               {recommendedPosts.length > 0 && (
-                <section className="mt-8">
-                  <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">You might also like</h3>
+                <section className="mt-6">
+                  <div className="mb-2.5 flex items-center justify-between">
+                    <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100">You might also like</h3>
                     <Link href="/" className="text-xs font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
                       View all
                     </Link>
@@ -399,7 +399,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                       <Link
                         key={recommended.postId}
                         href={`/post/${recommended.postId}`}
-                        className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white/95 p-2.5 hover:border-gray-300 hover:shadow-sm transition-all dark:border-gray-800 dark:bg-gray-900/80 dark:hover:border-gray-700"
+                        className="flex items-center gap-2.5 rounded-lg border border-gray-200 bg-white p-2.5 hover:border-gray-300 transition-all dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
                       >
                         <div className="h-9 w-9 rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center">
                           <OptimizedImage
