@@ -1,57 +1,74 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { Search, Loader2 } from "lucide-react"
+import { useState, useEffect, useMemo, useRef } from "react"
+import { Search, Loader2, Sparkles } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { apiGet } from "@/lib/shared/api"
-import { InstantSearchResponse, InstantSearchCompany, InstantSearchPost } from "@/lib/search/types"
-import { useRouter } from "next/navigation"
+import { InstantSearchCompany, InstantSearchPost, InstantSearchResponse, SearchMode } from "@/lib/search/types"
+import { isAxiosError } from "axios"
+import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 
 interface SearchBarProps {
   className?: string;
 }
 
-// 검색 결과 캐시 (메모리 기반)
-interface CacheEntry {
+interface KeywordCacheEntry {
   data: InstantSearchResponse
   timestamp: number
 }
 
-const searchCache = new Map<string, CacheEntry>()
-const CACHE_DURATION = 5 * 60 * 1000 // 5분
+const keywordCache = new Map<string, KeywordCacheEntry>()
+const CACHE_DURATION = 5 * 60 * 1000
+const MAX_QUERY_LENGTH = 500
+
+function resolveSearchMode(mode?: string | null): SearchMode {
+  return mode === "keyword" ? "keyword" : "semantic"
+}
 
 export default function SearchBar({ className = "" }: SearchBarProps) {
   const [query, setQuery] = useState("")
+  const [mode, setMode] = useState<SearchMode>("semantic")
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [results, setResults] = useState<InstantSearchResponse | null>(null)
+  const [keywordResults, setKeywordResults] = useState<InstantSearchResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [selectedIndex, setSelectedIndex] = useState(-1)
-  
+
   const searchRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
-    const isProd = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    const apiBaseUrl = isProd 
-      ? 'https://api.techinsights.shop' 
-      : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
-    
-    const preconnect = document.createElement('link')
-    preconnect.rel = 'preconnect'
+    setMode(resolveSearchMode(searchParams.get("mode")))
+  }, [searchParams])
+
+  const activeItemsCount = useMemo(() => {
+    if (mode === "semantic") return 0
+    const companiesCount = Math.min(keywordResults?.companies?.length || 0, 5)
+    const postsCount = Math.min(keywordResults?.posts?.length || 0, 5)
+    return companiesCount + postsCount
+  }, [mode, keywordResults])
+
+  useEffect(() => {
+    const isProd = process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+    const apiBaseUrl = isProd
+      ? "https://api.techinsights.shop"
+      : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+
+    const preconnect = document.createElement("link")
+    preconnect.rel = "preconnect"
     preconnect.href = apiBaseUrl
-    preconnect.crossOrigin = 'anonymous'
-    
-    const dnsPrefetch = document.createElement('link')
-    dnsPrefetch.rel = 'dns-prefetch'
+    preconnect.crossOrigin = "anonymous"
+
+    const dnsPrefetch = document.createElement("link")
+    dnsPrefetch.rel = "dns-prefetch"
     dnsPrefetch.href = apiBaseUrl
-    
+
     document.head.appendChild(preconnect)
     document.head.appendChild(dnsPrefetch)
-    
+
     return () => {
       if (document.head.contains(preconnect)) {
         document.head.removeChild(preconnect)
@@ -62,27 +79,49 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     }
   }, [])
 
-  // Debounce 검색 with 캐싱
   useEffect(() => {
-    if (!query.trim()) {
-      setResults(null)
+    const trimmedQuery = query.trim()
+
+    if (!trimmedQuery) {
+      setKeywordResults(null)
       setIsOpen(false)
+      setError(null)
+      setIsLoading(false)
       return
     }
 
-    // 이전 요청 취소
+    if (trimmedQuery.length > MAX_QUERY_LENGTH) {
+      setKeywordResults(null)
+      setError(`질문은 ${MAX_QUERY_LENGTH}자 이내로 입력해주세요.`)
+      setIsOpen(true)
+      setIsLoading(false)
+      return
+    }
+
+    // AI 검색은 입력 완료 후 Enter 시점에만 실행한다.
+    if (mode === "semantic") {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      setKeywordResults(null)
+      setError(null)
+      setSelectedIndex(-1)
+      setIsLoading(false)
+      setIsOpen(true)
+      return
+    }
+
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
 
     const timeoutId = setTimeout(async () => {
-      const trimmedQuery = query.trim().toLowerCase()
-      
-      const cached = searchCache.get(trimmedQuery)
+      const normalizedQuery = trimmedQuery.toLowerCase()
       const now = Date.now()
-      
-      if (cached && (now - cached.timestamp) < CACHE_DURATION) {
-        setResults(cached.data)
+
+      const cached = keywordCache.get(normalizedQuery)
+      if (cached && now - cached.timestamp < CACHE_DURATION) {
+        setKeywordResults(cached.data)
         setIsOpen(true)
         setSelectedIndex(-1)
         setIsLoading(false)
@@ -95,38 +134,31 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
       try {
         setIsLoading(true)
         setError(null)
-        
+
         const response = await apiGet<InstantSearchResponse>(
-          `/api/v1/search/instant?query=${encodeURIComponent(query)}`,
+          `/api/v1/search/instant?query=${encodeURIComponent(trimmedQuery)}`,
           { signal: abortController.signal }
         )
-        
+
         if (!abortController.signal.aborted) {
-          setResults(response.data)
+          setKeywordResults(response.data)
           setIsOpen(true)
           setSelectedIndex(-1)
-          
-          searchCache.set(trimmedQuery, {
-            data: response.data,
-            timestamp: now
-          })
-          
-          if (searchCache.size > 100) {
-            const entries = Array.from(searchCache.entries())
-            entries.sort((a, b) => b[1].timestamp - a[1].timestamp)
-            const toKeep = entries.slice(0, 50)
-            searchCache.clear()
-            toKeep.forEach(([key, value]) => searchCache.set(key, value))
-          }
+          keywordCache.set(normalizedQuery, { data: response.data, timestamp: now })
         }
       } catch (err: unknown) {
-        if (err instanceof Error && err.name === 'AbortError') {
+        if (err instanceof Error && err.name === "AbortError") {
           return
         }
         if (!abortController.signal.aborted) {
-          setError("검색 중 오류가 발생했습니다.")
-          setResults(null)
-          setIsOpen(false)
+          const status = isAxiosError(err) ? err.response?.status : undefined
+          if (status === 400) {
+            setError("검색어 조건이 올바르지 않습니다.")
+          } else {
+            setError("검색 중 오류가 발생했습니다.")
+          }
+          setKeywordResults(null)
+          setIsOpen(true)
         }
       } finally {
         if (!abortController.signal.aborted) {
@@ -141,9 +173,8 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
         abortControllerRef.current.abort()
       }
     }
-  }, [query])
+  }, [query, mode])
 
-  // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -156,64 +187,84 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen || !results) return
+  const pushSearchPage = () => {
+    const trimmed = query.trim()
+    if (!trimmed) return
 
-    const maxCompanies = Math.min(results.companies?.length || 0, 5)
-    const maxPosts = Math.min(results.posts?.length || 0, 5)
-    const totalItems = maxCompanies + maxPosts
-    
+    const params = new URLSearchParams()
+    params.set("query", trimmed)
+    params.set("mode", mode)
+
+    if (mode === "keyword") {
+      params.set("page", "0")
+      params.set("sortBy", "RELEVANCE")
+    }
+
+    router.push(`/search?${params.toString()}`)
+  }
+
+  const handleItemClick = (index: number) => {
+    if (!keywordResults) return
+    const maxCompanies = Math.min(keywordResults.companies?.length || 0, 5)
+    const companies = keywordResults.companies?.slice(0, 5) || []
+    const posts = keywordResults.posts?.slice(0, 5) || []
+
+    if (index < maxCompanies) {
+      router.push(`/company/${companies[index].id}`)
+    } else {
+      const postIndex = index - maxCompanies
+      router.push(`/post/${posts[postIndex].id}`)
+    }
+
+    setIsOpen(false)
+    setQuery("")
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setIsOpen(false)
+      setSelectedIndex(-1)
+      return
+    }
+
+    if (!isOpen || activeItemsCount === 0) {
+      if (e.key === "Enter" && query.trim()) {
+        e.preventDefault()
+        if (query.trim().length > MAX_QUERY_LENGTH) {
+          setError(`질문은 ${MAX_QUERY_LENGTH}자 이내로 입력해주세요.`)
+          setIsOpen(true)
+          return
+        }
+        pushSearchPage()
+        setIsOpen(false)
+      }
+      return
+    }
+
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault()
-        setSelectedIndex(prev => (prev + 1) % totalItems)
+        setSelectedIndex((prev) => (prev + 1) % activeItemsCount)
         break
       case "ArrowUp":
         e.preventDefault()
-        setSelectedIndex(prev => prev <= 0 ? totalItems - 1 : prev - 1)
+        setSelectedIndex((prev) => (prev <= 0 ? activeItemsCount - 1 : prev - 1))
         break
       case "Enter":
         e.preventDefault()
         if (selectedIndex >= 0) {
           handleItemClick(selectedIndex)
         } else {
-          // 엔터 시 전체 검색 페이지로 이동
-          router.push(`/search?query=${encodeURIComponent(query)}`)
+          pushSearchPage()
           setIsOpen(false)
         }
         break
-      case "Escape":
-        setIsOpen(false)
-        setSelectedIndex(-1)
-        break
     }
-  }
-
-  const handleItemClick = (index: number) => {
-    if (!results) return
-
-    const maxCompanies = Math.min(results.companies?.length || 0, 5)
-    const companies = results.companies?.slice(0, 5) || []
-    const posts = results.posts?.slice(0, 5) || []
-    
-    if (index < maxCompanies) {
-      // 회사 클릭 시 회사 페이지로 이동
-      router.push(`/company/${companies[index].id}`)
-    } else {
-      const postIndex = index - maxCompanies
-      router.push(`/post/${posts[postIndex].id}`)
-    }
-    setIsOpen(false)
-    setQuery("")
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value)
   }
 
   const renderHighlightedText = (text: string) => {
     return (
-      <span 
+      <span
         dangerouslySetInnerHTML={{ __html: text }}
         className="[&_mark]:bg-gradient-to-r [&_mark]:from-blue-400 [&_mark]:to-purple-500 [&_mark]:text-white [&_mark]:px-1.5 [&_mark]:py-0.5 [&_mark]:rounded-md [&_mark]:font-medium [&_mark]:shadow-sm"
       />
@@ -224,23 +275,15 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     <div
       key={`company-${company.id}`}
       className={`flex items-center gap-3 p-4 cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-200 ${
-        selectedIndex === index ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700' : ''
+        selectedIndex === index ? "bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700" : ""
       }`}
       onClick={() => handleItemClick(index)}
     >
       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm">
-        <Image 
-          src={`/logos/${company.logoImageName}`} 
-          alt={company.name} 
-          width={40} 
-          height={40} 
-          className="object-cover w-full h-full rounded-xl" 
-        />
+        <Image src={`/logos/${company.logoImageName}`} alt={company.name} width={40} height={40} className="object-cover w-full h-full rounded-xl" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
-          {renderHighlightedText(company.highlightedName)}
-        </div>
+        <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{renderHighlightedText(company.highlightedName)}</div>
         <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full inline-block">
           {company.matchedPostCount}개 게시물
         </div>
@@ -252,27 +295,19 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
     <div
       key={`post-${post.id}`}
       className={`flex items-center gap-3 p-4 cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700 transition-all duration-200 ${
-        selectedIndex === index ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700' : ''
+        selectedIndex === index ? "bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700" : ""
       }`}
       onClick={() => handleItemClick(index)}
     >
       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm">
-        <Image 
-          src={`/logos/${post.companyLogo}`} 
-          alt={post.companyName} 
-          width={40} 
-          height={40} 
-          className="object-cover w-full h-full rounded-xl" 
-        />
+        <Image src={`/logos/${post.companyLogo}`} alt={post.companyName} width={40} height={40} className="object-cover w-full h-full rounded-xl" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">
-          {renderHighlightedText(post.highlightedTitle)}
-        </div>
+        <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">{renderHighlightedText(post.highlightedTitle)}</div>
         <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
           <span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full">{post.companyName}</span>
           <span>•</span>
-          <span>{new Date(post.publishedAt).toLocaleDateString('ko-KR')}</span>
+          <span>{new Date(post.publishedAt).toLocaleDateString("ko-KR")}</span>
         </div>
       </div>
     </div>
@@ -281,61 +316,95 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   return (
     <div ref={searchRef} className={`relative ${className}`}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-400" />
         {isLoading && (
-          <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 animate-spin" />
+          <Loader2 className="absolute right-28 top-1/2 h-4 w-4 -translate-y-1/2 transform animate-spin text-slate-400" />
         )}
+        <div className="absolute right-2 top-1/2 z-10 -translate-y-1/2">
+          <div
+            className="relative flex h-7 w-[106px] items-center overflow-hidden rounded-full border border-slate-200/90 bg-slate-100/90 p-0.5 shadow-sm dark:border-slate-700 dark:bg-slate-800/80"
+            role="group"
+            aria-label="검색 모드 전환"
+          >
+            <span
+              className={`pointer-events-none absolute top-0.5 h-6 w-[50px] rounded-full bg-gradient-to-r from-blue-600 to-blue-500 shadow-sm transition-transform duration-200 ease-out dark:from-blue-500 dark:to-blue-400 ${
+                mode === "semantic" ? "translate-x-0.5" : "translate-x-[54px]"
+              }`}
+            />
+            <button
+              type="button"
+              aria-pressed={mode === "semantic"}
+              className={`relative z-10 flex h-6 w-[52px] items-center justify-center rounded-full px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
+                mode === "semantic" ? "text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
+              }`}
+              onClick={() => setMode((prev) => (prev === "semantic" ? "keyword" : "semantic"))}
+            >
+              <Sparkles
+                className={`mr-1 h-3 w-3 transition-opacity duration-150 ${
+                  mode === "semantic" ? "opacity-100" : "opacity-70"
+                }`}
+              />
+              AI
+            </button>
+            <button
+              type="button"
+              aria-pressed={mode === "keyword"}
+              className={`relative z-10 flex h-6 w-[52px] items-center justify-center rounded-full px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
+                mode === "keyword" ? "text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
+              }`}
+              onClick={() => setMode((prev) => (prev === "keyword" ? "semantic" : "keyword"))}
+            >
+              일반
+            </button>
+          </div>
+        </div>
         <Input
-          ref={inputRef}
           value={query}
-          onChange={handleInputChange}
+          onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => query.trim() && setIsOpen(true)}
-          placeholder="Search for posts, topics, or companies"
-          className={`pl-10 pr-10 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 hover:shadow-md focus:shadow-lg transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${className}`}
+          placeholder={mode === "semantic" ? "AI 검색: 궁금한 내용을 질문해보세요" : "일반 검색: 키워드를 입력해보세요"}
+          className={`h-10 rounded-full border-slate-200 bg-slate-50/80 pl-10 pr-28 text-sm text-slate-700 placeholder:text-slate-500 transition-all duration-200 hover:bg-slate-50 focus:border-slate-300 focus:ring-2 focus:ring-blue-500/15 focus:shadow-sm dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 ${className}`}
         />
       </div>
 
-      {/* 검색 결과 드롭다운 */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-50 backdrop-blur-sm">
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 rounded-xl border border-gray-200 bg-white shadow-2xl backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900">
           {error ? (
-            <div className="p-4 text-sm text-red-600 dark:text-red-400">
-              {error}
-            </div>
+            <div className="p-4 text-sm text-red-600 dark:text-red-400">{error}</div>
           ) : !query.trim() ? (
-            <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
-              검색어를 입력하세요
+            <div className="p-4 text-sm text-gray-500 dark:text-gray-400">질문을 입력하세요</div>
+          ) : mode === "semantic" ? (
+            <div className="p-4">
+              <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900 dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-200">
+                AI 검색은 입력 완료 후 <span className="font-semibold">Enter</span>를 누르면 실행됩니다.
+              </div>
             </div>
-          ) : results && (results.companies?.length > 0 || results.posts?.length > 0) ? (
+          ) : mode === "keyword" && keywordResults && (keywordResults.companies?.length > 0 || keywordResults.posts?.length > 0) ? (
             <div>
-              {/* 회사 섹션 */}
-              {results.companies && results.companies.length > 0 && (
+              {keywordResults.companies && keywordResults.companies.length > 0 && (
                 <div>
                   <div className="px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 border-b border-gray-200 dark:border-gray-600">
                     🏢 회사
                   </div>
-                  {results.companies.slice(0, 5).map((company, index) => renderCompanyItem(company, index))}
+                  {keywordResults.companies.slice(0, 5).map((company, index) => renderCompanyItem(company, index))}
                 </div>
               )}
-              
-              {/* 게시물 섹션 */}
-              {results.posts && results.posts.length > 0 && (
+
+              {keywordResults.posts && keywordResults.posts.length > 0 && (
                 <div>
                   <div className="px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 border-b border-gray-200 dark:border-gray-600">
                     📝 게시물
                   </div>
-                  {results.posts.slice(0, 5).map((post, index) => 
-                    renderPostItem(post, (results.companies?.length || 0) + index)
+                  {keywordResults.posts.slice(0, 5).map((post, index) =>
+                    renderPostItem(post, Math.min(keywordResults.companies?.length || 0, 5) + index)
                   )}
                 </div>
               )}
             </div>
-          ) : results && results.companies?.length === 0 && results.posts?.length === 0 ? (
-            <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
-              검색 결과가 없습니다
-            </div>
-          ) : null}
+          ) : (
+            <div className="p-4 text-sm text-gray-500 dark:text-gray-400">검색 결과가 없습니다</div>
+          )}
         </div>
       )}
     </div>

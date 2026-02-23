@@ -51,3 +51,33 @@ export interface SearchResponse {
 }
 
 export type SortBy = 'RELEVANCE' | 'LATEST' | 'POPULAR';
+export type SearchMode = "keyword" | "semantic";
+
+export interface SemanticSearchPost {
+  id: string;
+  title: string;
+  preview?: string | null;
+  url: string;
+  thumbnail?: string | null;
+  companyId: string;
+  companyName: string;
+  companyLogo: string;
+  viewCount: number;
+  publishedAt: string;
+  isSummary: boolean;
+  categories: string[];
+  relevanceScore: number;
+}
+
+export interface SemanticSearchResult {
+  rank: number;
+  similarityScore: number;
+  post: SemanticSearchPost;
+}
+
+export interface SemanticSearchResponse {
+  query: string;
+  totalReturned: number;
+  processingTimeMs: number;
+  results: SemanticSearchResult[];
+}

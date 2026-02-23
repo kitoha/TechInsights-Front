@@ -1,6 +1,7 @@
 "use client"
 
 import SearchBar from "@/components/search/SearchBar"
+import { Suspense } from "react"
 import { Menu } from "lucide-react"
 import { ThemeToggle } from "@/components/layout/ThemeToggle"
 import Link from "next/link"
@@ -32,7 +33,9 @@ export function TopHeader({ onMenuClick }: TopHeaderProps) {
         </div>
 
         <div className="hidden md:block flex-1 max-w-xl mx-6">
-          <SearchBar className="w-full h-8 bg-muted/60 rounded-lg" />
+          <Suspense fallback={<div className="h-10 w-full rounded-full border border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-900/80" />}>
+            <SearchBar className="w-full" />
+          </Suspense>
         </div>
 
         <div className="flex items-center space-x-2">
