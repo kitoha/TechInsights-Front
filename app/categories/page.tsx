@@ -5,6 +5,7 @@ import {
   TopCategoryCard,
 } from "@/components/category/CategoryCard";
 import { CATEGORY_PAGE_LABELS } from "@/lib/categories/ui";
+import { formatCategoryDate, sortCategoriesByActivity } from "@/lib/categories/utils";
 import { apiGet } from "@/lib/shared/api";
 import { redirect } from "next/navigation";
 
@@ -39,9 +40,8 @@ export default async function CategoriesPage() {
             name: category.category,
             postCount: category.postCount,
             totalViews: category.totalViewCount,
-            latestPost: formatDate(category.latestPostDate),
+            latestPost: formatCategoryDate(category.latestPostDate),
             latestPostDate: category.latestPostDate,
-            logoImage: `/categories/${category.category.toLowerCase()}.svg`,
           }),
         );
     }
@@ -58,75 +58,53 @@ export default async function CategoriesPage() {
         name: "FrontEnd",
         postCount: 37,
         totalViews: 6,
-        latestPost: formatDate("2025-01-02T16:39:15"),
+        latestPost: formatCategoryDate("2025-01-02T16:39:15"),
         latestPostDate: "2025-01-02T16:39:15",
-        logoImage: "/categories/frontend.svg",
       },
       {
         id: "backend",
         name: "BackEnd",
         postCount: 115,
         totalViews: 13,
-        latestPost: formatDate("2024-12-24T10:00:00"),
+        latestPost: formatCategoryDate("2024-12-24T10:00:00"),
         latestPostDate: "2024-12-24T10:00:00",
-        logoImage: "/categories/backend.svg",
       },
       {
         id: "ai",
         name: "AI",
         postCount: 15,
         totalViews: 8,
-        latestPost: formatDate("2024-12-26T10:00:00"),
+        latestPost: formatCategoryDate("2024-12-26T10:00:00"),
         latestPostDate: "2024-12-26T10:00:00",
-        logoImage: "/categories/ai.svg",
       },
       {
         id: "bigdata",
         name: "BigData",
         postCount: 21,
         totalViews: 9,
-        latestPost: formatDate("2024-12-26T10:00:00"),
+        latestPost: formatCategoryDate("2024-12-26T10:00:00"),
         latestPostDate: "2024-12-26T10:00:00",
-        logoImage: "/categories/bigdata.svg",
       },
       {
         id: "infra",
         name: "Infra",
         postCount: 82,
         totalViews: 6,
-        latestPost: formatDate("2024-12-24T00:00:00"),
+        latestPost: formatCategoryDate("2024-12-24T00:00:00"),
         latestPostDate: "2024-12-24T00:00:00",
-        logoImage: "/categories/infra.svg",
       },
       {
         id: "architecture",
         name: "Architecture",
         postCount: 90,
         totalViews: 15,
-        latestPost: formatDate("2025-01-02T16:39:15"),
+        latestPost: formatCategoryDate("2025-01-02T16:39:15"),
         latestPostDate: "2025-01-02T16:39:15",
-        logoImage: "/categories/architecture.svg",
       },
     ];
   }
 
-  const sortedCategories = [...categories].sort((a, b) => {
-    if (b.totalViews !== a.totalViews) {
-      return b.totalViews - a.totalViews;
-    }
-
-    if (b.postCount !== a.postCount) {
-      return b.postCount - a.postCount;
-    }
-
-    const bDate = new Date(b.latestPostDate).getTime();
-    const aDate = new Date(a.latestPostDate).getTime();
-    if (bDate !== aDate) {
-      return bDate - aDate;
-    }
-
-    return a.name.localeCompare(b.name);
-  });
+  const sortedCategories = sortCategoriesByActivity(categories);
 
   const topCategories = sortedCategories.slice(0, 3);
   const otherCategories = sortedCategories.slice(3);
@@ -186,17 +164,4 @@ function SummaryChip({ label, value }: { label: string; value: string }) {
       <p className="mt-1 font-bold text-gray-900 dark:text-gray-100">{value}</p>
     </div>
   );
-}
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-
-  if (Number.isNaN(date.getTime())) {
-    return "-";
-  }
-
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  return `${year}년 ${month}월 ${day}일`;
 }

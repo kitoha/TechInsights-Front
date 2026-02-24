@@ -9,7 +9,6 @@ export interface CategoryStats {
   totalViews: number;
   latestPost: string;
   latestPostDate: string;
-  logoImage: string;
 }
 
 interface CategoryCardProps {
