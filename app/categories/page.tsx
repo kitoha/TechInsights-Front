@@ -38,7 +38,7 @@ export default async function CategoriesPage() {
             name: category.category,
             postCount: category.postCount,
             totalViews: category.totalViewCount,
-            latestPost: formatTimeAgo(category.latestPostDate),
+            latestPost: formatDate(category.latestPostDate),
             latestPostDate: category.latestPostDate,
             logoImage: `/categories/${category.category.toLowerCase()}.svg`,
           }),
@@ -57,7 +57,7 @@ export default async function CategoriesPage() {
         name: "FrontEnd",
         postCount: 37,
         totalViews: 6,
-        latestPost: "51일 전",
+        latestPost: formatDate("2025-01-02T16:39:15"),
         latestPostDate: "2025-01-02T16:39:15",
         logoImage: "/categories/frontend.svg",
       },
@@ -66,7 +66,7 @@ export default async function CategoriesPage() {
         name: "BackEnd",
         postCount: 115,
         totalViews: 13,
-        latestPost: "60일 전",
+        latestPost: formatDate("2024-12-24T10:00:00"),
         latestPostDate: "2024-12-24T10:00:00",
         logoImage: "/categories/backend.svg",
       },
@@ -75,7 +75,7 @@ export default async function CategoriesPage() {
         name: "AI",
         postCount: 15,
         totalViews: 8,
-        latestPost: "58일 전",
+        latestPost: formatDate("2024-12-26T10:00:00"),
         latestPostDate: "2024-12-26T10:00:00",
         logoImage: "/categories/ai.svg",
       },
@@ -84,7 +84,7 @@ export default async function CategoriesPage() {
         name: "BigData",
         postCount: 21,
         totalViews: 9,
-        latestPost: "58일 전",
+        latestPost: formatDate("2024-12-26T10:00:00"),
         latestPostDate: "2024-12-26T10:00:00",
         logoImage: "/categories/bigdata.svg",
       },
@@ -93,7 +93,7 @@ export default async function CategoriesPage() {
         name: "Infra",
         postCount: 82,
         totalViews: 6,
-        latestPost: "60일 전",
+        latestPost: formatDate("2024-12-24T00:00:00"),
         latestPostDate: "2024-12-24T00:00:00",
         logoImage: "/categories/infra.svg",
       },
@@ -102,7 +102,7 @@ export default async function CategoriesPage() {
         name: "Architecture",
         postCount: 90,
         totalViews: 15,
-        latestPost: "51일 전",
+        latestPost: formatDate("2025-01-02T16:39:15"),
         latestPostDate: "2025-01-02T16:39:15",
         logoImage: "/categories/architecture.svg",
       },
@@ -189,30 +189,15 @@ function SummaryChip({ label, value }: { label: string; value: string }) {
   );
 }
 
-function formatTimeAgo(dateString: string): string {
-  const now = new Date();
+function formatDate(dateString: string): string {
   const date = new Date(dateString);
 
   if (Number.isNaN(date.getTime())) {
     return "-";
   }
 
-  const diffInMs = now.getTime() - date.getTime();
-  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-  const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-
-  if (diffInDays > 0) {
-    return `${diffInDays}일 전`;
-  }
-
-  if (diffInHours > 0) {
-    return `${diffInHours}시간 전`;
-  }
-
-  if (diffInMinutes > 0) {
-    return `${diffInMinutes}분 전`;
-  }
-
-  return "방금 전";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}.${month}.${day}`;
 }
