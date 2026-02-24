@@ -39,9 +39,9 @@ const rankStyleMap: Record<1 | 2 | 3, { border: string; badge: string; surface: 
 };
 
 const rankLabelMap: Record<1 | 2 | 3, string> = {
-  1: "Top Category",
-  2: "Strong Performer",
-  3: "Rising Category",
+  1: "최상위 카테고리",
+  2: "상위 활동 카테고리",
+  3: "성장 카테고리",
 };
 
 function getCategoryUrl(categoryName: string): string {
@@ -92,13 +92,13 @@ export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Metric label="TOTAL POSTS" value={formatCount(category.postCount)} />
-          <Metric label="TOTAL VIEWS" value={formatCount(category.totalViews)} />
+          <Metric label="게시글 수" value={formatCount(category.postCount)} />
+          <Metric label="조회수" value={formatCount(category.totalViews)} />
         </div>
 
         <div className="mt-auto border-t border-gray-200/80 pt-3 dark:border-gray-700/70">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">Last Activity</p>
-          <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300" title={category.latestPostDate}>
+          <p className="text-[10px] font-semibold tracking-[0.04em] text-gray-400">최근 활동</p>
+          <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300" title={category.latestPost}>
             {category.latestPost}
           </p>
         </div>
@@ -131,18 +131,18 @@ export function CompactCategoryCard({ category }: CategoryCardProps) {
 
         <div className="space-y-2 text-xs">
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-            <span>TOTAL POSTS</span>
+            <span>게시글 수</span>
             <span className="font-semibold text-gray-900 dark:text-gray-100">{formatCount(category.postCount)}</span>
           </div>
           <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-            <span>TOTAL VIEWS</span>
+            <span>조회수</span>
             <span className="font-semibold text-gray-900 dark:text-gray-100">{formatCount(category.totalViews)}</span>
           </div>
         </div>
 
         <div className="mt-auto border-t border-gray-200 pt-2 dark:border-gray-700">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400">Last Activity</p>
-          <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300" title={category.latestPostDate}>
+          <p className="text-[10px] font-semibold tracking-[0.04em] text-gray-400">최근 활동</p>
+          <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300" title={category.latestPost}>
             {category.latestPost}
           </p>
         </div>
@@ -158,7 +158,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-gray-200/80 bg-white/90 px-3 py-2 dark:border-gray-700/70 dark:bg-gray-900/80">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400">{label}</p>
+      <p className="text-[10px] font-semibold tracking-[0.04em] text-gray-400">{label}</p>
       <p className="mt-1 text-sm font-bold text-gray-900 dark:text-gray-100">{value}</p>
     </div>
   );

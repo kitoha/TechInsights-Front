@@ -138,15 +138,15 @@ export default async function CategoriesPage() {
         <section>
           <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Most Active Categories</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">활성 카테고리</h1>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 조회수, 게시글 수, 최신 활동 순으로 카테고리를 정렬했습니다.
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2 self-start text-xs sm:gap-3 sm:text-sm">
-              <SummaryChip label="Categories" value={sortedCategories.length.toLocaleString()} />
-              <SummaryChip label="Total Posts" value={totalPosts.toLocaleString()} />
-              <SummaryChip label="Total Views" value={totalViews.toLocaleString()} />
+              <SummaryChip label="카테고리" value={sortedCategories.length.toLocaleString()} />
+              <SummaryChip label="총 게시글" value={totalPosts.toLocaleString()} />
+              <SummaryChip label="총 조회수" value={totalViews.toLocaleString()} />
             </div>
           </div>
 
@@ -165,8 +165,8 @@ export default async function CategoriesPage() {
 
         {otherCategories.length > 0 && (
           <section className="mt-10">
-            <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-gray-500 dark:text-gray-400">
-              Other Active Categories
+            <h2 className="mb-4 text-xs font-semibold tracking-[0.04em] text-gray-500 dark:text-gray-400">
+              기타 활성 카테고리
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {otherCategories.map((category) => (
@@ -183,7 +183,7 @@ export default async function CategoriesPage() {
 function SummaryChip({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-[92px] rounded-xl border border-gray-200 bg-white px-3 py-2 text-right dark:border-gray-700 dark:bg-gray-900">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-gray-400">{label}</p>
+      <p className="text-[10px] font-semibold tracking-[0.04em] text-gray-400">{label}</p>
       <p className="mt-1 font-bold text-gray-900 dark:text-gray-100">{value}</p>
     </div>
   );
