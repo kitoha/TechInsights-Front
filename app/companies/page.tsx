@@ -137,6 +137,14 @@ export default async function CompaniesPage() {
       }));
   }
 
+  const totalPosts = companies.reduce((sum, company) => sum + company.postCount, 0);
+  const totalViews = companies.reduce((sum, company) => sum + company.totalViews, 0);
+  const summaryItems = [
+    { label: "회사", value: `${companies.length}개` },
+    { label: "포스트", value: `${formatCompactNumber(totalPosts)}개` },
+    { label: "조회수", value: formatCompactNumber(totalViews) },
+  ];
+
   return (
     <div className="min-h-full bg-gradient-to-b from-slate-50 via-slate-50 to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
       <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
@@ -147,8 +155,20 @@ export default async function CompaniesPage() {
           <p className="max-w-2xl text-sm text-slate-600 dark:text-slate-400 sm:text-base">
             각 기업의 기술 블로그 포스트 현황을 확인해보세요
           </p>
-          <div className="inline-flex w-fit items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-            총 {companies.length}개 회사
+          <div className="grid w-full max-w-xl grid-cols-3 gap-2">
+            {summaryItems.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+              >
+                <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  {item.label}
+                </p>
+                <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  {item.value}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -179,4 +199,14 @@ function formatTimeAgo(dateString: string): string {
   } else {
     return "방금 전";
   }
+}
+
+function formatCompactNumber(value: number): string {
+  if (value >= 1000000) {
+    return `${(value / 1000000).toFixed(1)}M`;
+  }
+  if (value >= 1000) {
+    return `${(value / 1000).toFixed(1)}K`;
+  }
+  return value.toString();
 }
