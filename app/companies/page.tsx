@@ -177,6 +177,17 @@ export default async function CompaniesPage() {
             <CompanyCard key={company.id} company={company} rank={company.rank} />
           ))}
         </div>
+
+        {companies.length === 0 && (
+          <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white/70 px-6 py-10 text-center dark:border-slate-700 dark:bg-slate-900/70">
+            <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              표시할 회사 데이터가 없습니다.
+            </p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+              잠시 후 다시 새로고침하거나 API 연결 상태를 확인해 주세요.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
