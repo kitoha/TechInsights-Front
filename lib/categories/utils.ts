@@ -1,4 +1,11 @@
-import { CategoryStats } from "@/components/category/CategoryCard";
+export interface CategoryActivityStat {
+  id: string;
+  name: string;
+  postCount: number;
+  totalViews: number;
+  latestPost: string;
+  latestPostDate: string;
+}
 
 export function formatCategoryDate(dateString: string): string {
   const date = new Date(dateString);
@@ -13,7 +20,7 @@ export function formatCategoryDate(dateString: string): string {
   return `${year}년 ${month}월 ${day}일`;
 }
 
-export function sortCategoriesByActivity(categories: CategoryStats[]): CategoryStats[] {
+export function sortCategoriesByActivity(categories: CategoryActivityStat[]): CategoryActivityStat[] {
   return [...categories].sort((a, b) => {
     if (b.totalViews !== a.totalViews) {
       return b.totalViews - a.totalViews;
