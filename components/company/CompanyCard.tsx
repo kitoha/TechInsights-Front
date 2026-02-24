@@ -1,11 +1,9 @@
 'use client'
 
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import { FileText, Eye, Clock } from "lucide-react";
 import { LogoImage } from "@/components/company/LogoImage";
-import type { KeyboardEvent } from "react";
+import Link from "next/link";
 
 export interface CompanyStats {
   id: string;
@@ -64,7 +62,6 @@ function getToneIndex(value: string): number {
 }
 
 export function CompanyCard({ company, rank }: CompanyCardProps) {
-  const router = useRouter();
   const tone = brandTones[getToneIndex(company.name)];
   
   const formatViews = (views: number) => {
@@ -76,26 +73,13 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
     return views.toString();
   };
 
-  const handleViewPosts = () => {
-    router.push(`/company/${company.id}`);
-  };
-
-  const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      handleViewPosts();
-    }
-  };
-
   return (
-    <Card
-      role="button"
-      tabIndex={0}
+    <Link
+      href={`/company/${company.id}`}
       aria-label={`${company.name} 회사 게시글 보기`}
-      onClick={handleViewPosts}
-      onKeyDown={handleCardKeyDown}
-      className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 sm:p-5 dark:border-slate-700 dark:bg-slate-900"
+      className="block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70"
     >
+      <Card className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:p-5 dark:border-slate-700 dark:bg-slate-900">
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <div className="h-full w-full bg-gradient-to-br from-blue-500/4 via-transparent to-emerald-500/6 dark:from-blue-400/6 dark:to-emerald-300/8" />
       </div>
@@ -153,17 +137,11 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
             {company.latestPost}
           </span>
         </div>
-        <Button
-          onClick={(event) => {
-            event.stopPropagation();
-            handleViewPosts();
-          }}
-          size="sm"
-          className="h-8 w-full rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-700 sm:w-auto"
-        >
+        <span className="inline-flex h-8 w-full items-center justify-center rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white transition-colors duration-200 group-hover:bg-blue-700 sm:w-auto">
           View Posts
-        </Button>
+        </span>
       </div>
-    </Card>
+      </Card>
+    </Link>
   );
 }
