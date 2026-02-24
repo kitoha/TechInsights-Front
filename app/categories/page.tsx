@@ -120,7 +120,11 @@ export default async function CategoriesPage() {
 
     const bDate = new Date(b.latestPostDate).getTime();
     const aDate = new Date(a.latestPostDate).getTime();
-    return bDate - aDate;
+    if (bDate !== aDate) {
+      return bDate - aDate;
+    }
+
+    return a.name.localeCompare(b.name);
   });
 
   const topCategories = sortedCategories.slice(0, 3);
