@@ -94,13 +94,13 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
       aria-label={`${company.name} 회사 게시글 보기`}
       onClick={handleViewPosts}
       onKeyDown={handleCardKeyDown}
-      className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 dark:border-slate-700 dark:bg-slate-900"
+      className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 sm:p-5 dark:border-slate-700 dark:bg-slate-900"
     >
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <div className="h-full w-full bg-gradient-to-br from-blue-500/4 via-transparent to-emerald-500/6 dark:from-blue-400/6 dark:to-emerald-300/8" />
       </div>
 
-      <div className="relative mb-5 flex items-center justify-between gap-3">
+      <div className="relative mb-4 flex items-center justify-between gap-3 sm:mb-5">
         <div className="flex min-w-0 items-center gap-3">
           <div
             className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border ${tone.logoBg} ${tone.logoBorder}`}
@@ -124,29 +124,29 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
         </div>
       </div>
 
-      <div className="relative grid grid-cols-2 gap-2.5">
-        <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-800/80">
+      <div className="relative grid grid-cols-2 gap-2">
+        <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-2.5 sm:p-3 dark:border-slate-700 dark:bg-slate-800/80">
           <div className="mb-1 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
             <FileText className="h-3.5 w-3.5" />
             Posts
           </div>
-          <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
+          <span className="text-lg font-bold text-slate-900 sm:text-xl dark:text-slate-100">
             {company.postCount}
           </span>
         </div>
 
-        <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-800/80">
+        <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-2.5 sm:p-3 dark:border-slate-700 dark:bg-slate-800/80">
           <div className="mb-1 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
             <Eye className="h-3.5 w-3.5" />
             Views
           </div>
-          <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
+          <span className="text-lg font-bold text-slate-900 sm:text-xl dark:text-slate-100">
             {formatViews(company.totalViews)}
           </span>
         </div>
       </div>
 
-      <div className="relative mt-4 flex items-center justify-between gap-3">
+      <div className="relative mt-4 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
         <div className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
           <Clock className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">
@@ -159,7 +159,7 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
             handleViewPosts();
           }}
           size="sm"
-          className="h-8 rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-700"
+          className="h-8 w-full rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-700 sm:w-auto"
         >
           View Posts
         </Button>
