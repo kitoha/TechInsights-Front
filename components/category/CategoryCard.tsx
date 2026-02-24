@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
 import { CATEGORY_CARD_LABELS, CATEGORY_RANK_LABELS } from "@/lib/categories/ui";
-import Image from "next/image";
 import Link from "next/link";
 
 export interface CategoryStats {
@@ -51,9 +50,15 @@ function formatCategoryName(name: string): string {
   return name.replace(/([a-z])([A-Z])/g, "$1 $2");
 }
 
+function getCategoryInitial(name: string): string {
+  const cleaned = formatCategoryName(name).replace(/\s+/g, "");
+  return cleaned.slice(0, 2).toUpperCase();
+}
+
 export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
   const rankStyle = rankStyleMap[rank];
   const displayName = formatCategoryName(category.name);
+  const initial = getCategoryInitial(category.name);
 
   return (
     <Link
@@ -72,13 +77,7 @@ export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
 
         <div className="mb-5 flex items-center gap-3 pr-10">
           <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 p-2 shadow-sm dark:border-slate-600/30 dark:bg-slate-800">
-            <Image
-              src={category.logoImage}
-              alt={`${displayName} icon`}
-              width={24}
-              height={24}
-              className="h-6 w-6 object-contain"
-            />
+            <span className="text-[11px] font-bold leading-none text-slate-700 dark:text-slate-100">{initial}</span>
           </div>
           <div>
             <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">{displayName}</h3>
@@ -104,6 +103,7 @@ export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
 
 export function CompactCategoryCard({ category }: CategoryCardProps) {
   const displayName = formatCategoryName(category.name);
+  const initial = getCategoryInitial(category.name);
 
   return (
     <Link
@@ -113,13 +113,7 @@ export function CompactCategoryCard({ category }: CategoryCardProps) {
       <Card className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
         <div className="mb-4 flex items-center gap-3">
           <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-slate-100 p-2 dark:border-slate-600/30 dark:bg-slate-800">
-            <Image
-              src={category.logoImage}
-              alt={`${displayName} icon`}
-              width={20}
-              height={20}
-              className="h-5 w-5 object-contain"
-            />
+            <span className="text-[10px] font-bold leading-none text-slate-700 dark:text-slate-100">{initial}</span>
           </div>
           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{displayName}</h3>
         </div>
