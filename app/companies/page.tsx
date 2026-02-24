@@ -138,18 +138,21 @@ export default async function CompaniesPage() {
   }
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 min-h-full">
-      <div className="max-w-[1600px] mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+    <div className="min-h-full bg-gradient-to-b from-slate-50 via-slate-50 to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
+      <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-7 flex flex-col gap-3 sm:mb-8">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
             회사별 포스트 현황
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="max-w-2xl text-sm text-slate-600 dark:text-slate-400 sm:text-base">
             각 기업의 기술 블로그 포스트 현황을 확인해보세요
           </p>
+          <div className="inline-flex w-fit items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+            총 {companies.length}개 회사
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3 2xl:grid-cols-4">
           {companies.map((company) => (
             <CompanyCard key={company.id} company={company} rank={company.rank} />
           ))}
