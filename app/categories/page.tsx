@@ -4,6 +4,7 @@ import {
   CompactCategoryCard,
   TopCategoryCard,
 } from "@/components/category/CategoryCard";
+import { CATEGORY_PAGE_LABELS } from "@/lib/categories/ui";
 import { apiGet } from "@/lib/shared/api";
 import { redirect } from "next/navigation";
 
@@ -138,15 +139,13 @@ export default async function CategoriesPage() {
         <section>
           <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">활성 카테고리</h1>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                조회수, 게시글 수, 최신 활동 순으로 카테고리를 정렬했습니다.
-              </p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{CATEGORY_PAGE_LABELS.title}</h1>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{CATEGORY_PAGE_LABELS.subtitle}</p>
             </div>
             <div className="grid grid-cols-3 gap-2 self-start text-xs sm:gap-3 sm:text-sm">
-              <SummaryChip label="카테고리" value={sortedCategories.length.toLocaleString()} />
-              <SummaryChip label="총 게시글" value={totalPosts.toLocaleString()} />
-              <SummaryChip label="총 조회수" value={totalViews.toLocaleString()} />
+              <SummaryChip label={CATEGORY_PAGE_LABELS.summaryCategories} value={sortedCategories.length.toLocaleString()} />
+              <SummaryChip label={CATEGORY_PAGE_LABELS.summaryPosts} value={totalPosts.toLocaleString()} />
+              <SummaryChip label={CATEGORY_PAGE_LABELS.summaryViews} value={totalViews.toLocaleString()} />
             </div>
           </div>
 
@@ -158,7 +157,7 @@ export default async function CategoriesPage() {
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-gray-300 bg-white/70 p-8 text-center text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-400">
-              표시할 카테고리 데이터가 없습니다.
+              {CATEGORY_PAGE_LABELS.emptyState}
             </div>
           )}
         </section>
@@ -166,7 +165,7 @@ export default async function CategoriesPage() {
         {otherCategories.length > 0 && (
           <section className="mt-10">
             <h2 className="mb-4 text-xs font-semibold tracking-[0.04em] text-gray-500 dark:text-gray-400">
-              기타 활성 카테고리
+              {CATEGORY_PAGE_LABELS.sectionOther}
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {otherCategories.map((category) => (
