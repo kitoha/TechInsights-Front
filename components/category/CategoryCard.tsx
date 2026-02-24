@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import Image from "next/image";
 import Link from "next/link";
 
 export interface CategoryStats {
@@ -37,16 +38,18 @@ const rankStyleMap: Record<1 | 2 | 3, { border: string; badge: string; surface: 
   },
 };
 
+const rankLabelMap: Record<1 | 2 | 3, string> = {
+  1: "Top Category",
+  2: "Strong Performer",
+  3: "Rising Category",
+};
+
 function getCategoryUrl(categoryName: string): string {
   return `/?category=${encodeURIComponent(categoryName)}&page=0`;
 }
 
 function formatCount(value: number): string {
   return value.toLocaleString();
-}
-
-function getCategoryInitial(name: string): string {
-  return name.slice(0, 2).toUpperCase();
 }
 
 export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
@@ -65,12 +68,18 @@ export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
         </span>
 
         <div className="mb-5 flex items-center gap-3 pr-10">
-          <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white text-sm font-bold text-gray-700 shadow-sm dark:bg-gray-800 dark:text-gray-200">
-            {getCategoryInitial(category.name)}
+          <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white p-2 shadow-sm dark:bg-gray-800">
+            <Image
+              src={category.logoImage}
+              alt={`${category.name} icon`}
+              width={24}
+              height={24}
+              className="h-6 w-6 object-contain"
+            />
           </div>
           <div>
             <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">{category.name}</h3>
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Most Active</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{rankLabelMap[rank]}</p>
           </div>
         </div>
 
@@ -93,8 +102,14 @@ export function CompactCategoryCard({ category }: CategoryCardProps) {
     <Link href={getCategoryUrl(category.name)} className="block focus-visible:outline-none">
       <Card className="rounded-2xl border border-gray-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-within:ring-2 focus-within:ring-blue-400/70 dark:border-gray-700 dark:bg-gray-900 dark:focus-within:ring-blue-500/60">
         <div className="mb-4 flex items-center gap-3">
-          <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-700 dark:bg-gray-800 dark:text-gray-200">
-            {getCategoryInitial(category.name)}
+          <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 p-2 dark:bg-gray-800">
+            <Image
+              src={category.logoImage}
+              alt={`${category.name} icon`}
+              width={20}
+              height={20}
+              className="h-5 w-5 object-contain"
+            />
           </div>
           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{category.name}</h3>
         </div>
