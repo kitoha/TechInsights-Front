@@ -76,7 +76,7 @@ export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
         </span>
 
         <div className="mb-5 flex items-center gap-3 pr-10">
-          <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white p-2 shadow-sm dark:bg-gray-800">
+          <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-700/20 bg-slate-800 p-2 shadow-sm dark:border-slate-600/30 dark:bg-slate-800">
             <Image
               src={category.logoImage}
               alt={`${displayName} icon`}
@@ -117,7 +117,7 @@ export function CompactCategoryCard({ category }: CategoryCardProps) {
     >
       <Card className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
         <div className="mb-4 flex items-center gap-3">
-          <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 p-2 dark:bg-gray-800">
+          <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-700/20 bg-slate-800 p-2 dark:border-slate-600/30 dark:bg-slate-800">
             <Image
               src={category.logoImage}
               alt={`${displayName} icon`}
