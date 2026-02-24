@@ -1,7 +1,7 @@
 'use client'
 
 import { Card } from "@/components/ui/card";
-import { FileText, Eye, ArrowRight } from "lucide-react";
+import { FileText, Eye, ArrowRight, Clock } from "lucide-react";
 import { LogoImage } from "@/components/company/LogoImage";
 import { formatCompactNumber } from "@/lib/shared/utils";
 import Link from "next/link";
@@ -77,6 +77,8 @@ export function CompanyCard({ company }: CompanyCardProps) {
 
         <div className="relative mt-4 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <div className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <span className="sr-only">Latest post: </span>
             <span className="truncate">
               {company.latestPost}
             </span>
