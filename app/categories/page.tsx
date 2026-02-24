@@ -118,7 +118,6 @@ export default async function CategoriesPage() {
           <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{CATEGORY_PAGE_LABELS.title}</h1>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{CATEGORY_PAGE_LABELS.subtitle}</p>
             </div>
             <div className="grid grid-cols-3 gap-2 self-start text-xs sm:gap-3 sm:text-sm">
               <SummaryChip label={CATEGORY_PAGE_LABELS.summaryCategories} value={sortedCategories.length.toLocaleString()} />

@@ -12,7 +12,6 @@ export const CATEGORY_CARD_LABELS = {
 
 export const CATEGORY_PAGE_LABELS = {
   title: "Category Activity Overview",
-  subtitle: "See the most active categories at a glance.",
   sectionOther: "Other Active Categories",
   summaryCategories: "Categories",
   summaryPosts: "Total Posts",
