@@ -56,9 +56,12 @@ export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
   const rankStyle = rankStyleMap[rank];
 
   return (
-    <Link href={getCategoryUrl(category.name)} className="block focus-visible:outline-none">
+    <Link
+      href={getCategoryUrl(category.name)}
+      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/70 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-500/60 dark:focus-visible:ring-offset-gray-950"
+    >
       <Card
-        className={`group relative overflow-hidden rounded-2xl border ${rankStyle.border} ${rankStyle.surface} p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-within:ring-2 focus-within:ring-blue-400/70 dark:focus-within:ring-blue-500/60`}
+        className={`group relative overflow-hidden rounded-2xl border ${rankStyle.border} ${rankStyle.surface} p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg`}
       >
         <span
           aria-label={`랭킹 ${rank}위`}
@@ -90,7 +93,9 @@ export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
 
         <div className="mt-4 border-t border-gray-200/80 pt-3 dark:border-gray-700/70">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">Last Activity</p>
-          <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300">{category.latestPost}</p>
+          <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300" title={category.latestPostDate}>
+            {category.latestPost}
+          </p>
         </div>
       </Card>
     </Link>
@@ -99,8 +104,11 @@ export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
 
 export function CompactCategoryCard({ category }: CategoryCardProps) {
   return (
-    <Link href={getCategoryUrl(category.name)} className="block focus-visible:outline-none">
-      <Card className="rounded-2xl border border-gray-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-within:ring-2 focus-within:ring-blue-400/70 dark:border-gray-700 dark:bg-gray-900 dark:focus-within:ring-blue-500/60">
+    <Link
+      href={getCategoryUrl(category.name)}
+      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/70 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-500/60 dark:focus-visible:ring-offset-gray-950"
+    >
+      <Card className="rounded-2xl border border-gray-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
         <div className="mb-4 flex items-center gap-3">
           <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 p-2 dark:bg-gray-800">
             <Image
@@ -127,7 +135,9 @@ export function CompactCategoryCard({ category }: CategoryCardProps) {
 
         <div className="mt-4 border-t border-gray-200 pt-2 dark:border-gray-700">
           <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400">Last Activity</p>
-          <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300">{category.latestPost}</p>
+          <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300" title={category.latestPostDate}>
+            {category.latestPost}
+          </p>
         </div>
       </Card>
     </Link>
