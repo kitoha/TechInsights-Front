@@ -7,6 +7,13 @@ export interface CategoryActivityStat {
   latestPostDate: string;
 }
 
+const koreaDateFormatter = new Intl.DateTimeFormat("ko-KR", {
+  timeZone: "Asia/Seoul",
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+});
+
 export function formatCategoryDate(dateString: string): string {
   const date = new Date(dateString);
 
@@ -14,9 +21,15 @@ export function formatCategoryDate(dateString: string): string {
     return "-";
   }
 
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
+  const parts = koreaDateFormatter.formatToParts(date);
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  const day = parts.find((part) => part.type === "day")?.value;
+
+  if (!year || !month || !day) {
+    return "-";
+  }
+
   return `${year}년 ${month}월 ${day}일`;
 }
 
@@ -32,6 +45,21 @@ export function sortCategoriesByActivity(categories: CategoryActivityStat[]): Ca
 
     const bDate = new Date(b.latestPostDate).getTime();
     const aDate = new Date(a.latestPostDate).getTime();
+    const aInvalid = Number.isNaN(aDate);
+    const bInvalid = Number.isNaN(bDate);
+
+    if (aInvalid && !bInvalid) {
+      return 1;
+    }
+
+    if (!aInvalid && bInvalid) {
+      return -1;
+    }
+
+    if (aInvalid && bInvalid) {
+      return 0;
+    }
+
     if (bDate !== aDate) {
       return bDate - aDate;
     }
