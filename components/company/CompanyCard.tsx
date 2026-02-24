@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { FileText, Eye, Clock } from "lucide-react";
 import { LogoImage } from "@/components/company/LogoImage";
+import type { KeyboardEvent } from "react";
 
 export interface CompanyStats {
   id: string;
@@ -37,8 +38,22 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
     router.push(`/company/${company.id}`);
   };
 
+  const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleViewPosts();
+    }
+  };
+
   return (
-    <Card className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl dark:border-slate-700 dark:bg-slate-900">
+    <Card
+      role="button"
+      tabIndex={0}
+      aria-label={`${company.name} 회사 게시글 보기`}
+      onClick={handleViewPosts}
+      onKeyDown={handleCardKeyDown}
+      className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 dark:border-slate-700 dark:bg-slate-900"
+    >
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <div className="h-full w-full bg-gradient-to-br from-blue-500/4 via-transparent to-emerald-500/6 dark:from-blue-400/6 dark:to-emerald-300/8" />
       </div>
@@ -93,7 +108,10 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
           </span>
         </div>
         <Button
-          onClick={handleViewPosts}
+          onClick={(event) => {
+            event.stopPropagation();
+            handleViewPosts();
+          }}
           size="sm"
           className="h-8 rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-700"
         >
