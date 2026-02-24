@@ -52,16 +52,21 @@ function formatCount(value: number): string {
   return value.toLocaleString();
 }
 
+function formatCategoryName(name: string): string {
+  return name.replace(/([a-z])([A-Z])/g, "$1 $2");
+}
+
 export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
   const rankStyle = rankStyleMap[rank];
+  const displayName = formatCategoryName(category.name);
 
   return (
     <Link
       href={getCategoryUrl(category.name)}
-      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/70 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-500/60 dark:focus-visible:ring-offset-gray-950"
+      className="block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/70 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-500/60 dark:focus-visible:ring-offset-gray-950"
     >
       <Card
-        className={`group relative overflow-hidden rounded-2xl border ${rankStyle.border} ${rankStyle.surface} p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg`}
+        className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border ${rankStyle.border} ${rankStyle.surface} p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg`}
       >
         <span
           aria-label={`랭킹 ${rank}위`}
@@ -74,14 +79,14 @@ export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
           <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white p-2 shadow-sm dark:bg-gray-800">
             <Image
               src={category.logoImage}
-              alt={`${category.name} icon`}
+              alt={`${displayName} icon`}
               width={24}
               height={24}
               className="h-6 w-6 object-contain"
             />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">{category.name}</h3>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">{displayName}</h3>
             <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{rankLabelMap[rank]}</p>
           </div>
         </div>
@@ -91,7 +96,7 @@ export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
           <Metric label="TOTAL VIEWS" value={formatCount(category.totalViews)} />
         </div>
 
-        <div className="mt-4 border-t border-gray-200/80 pt-3 dark:border-gray-700/70">
+        <div className="mt-auto border-t border-gray-200/80 pt-3 dark:border-gray-700/70">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">Last Activity</p>
           <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300" title={category.latestPostDate}>
             {category.latestPost}
@@ -103,23 +108,25 @@ export function TopCategoryCard({ category, rank }: TopCategoryCardProps) {
 }
 
 export function CompactCategoryCard({ category }: CategoryCardProps) {
+  const displayName = formatCategoryName(category.name);
+
   return (
     <Link
       href={getCategoryUrl(category.name)}
-      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/70 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-500/60 dark:focus-visible:ring-offset-gray-950"
+      className="block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/70 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-500/60 dark:focus-visible:ring-offset-gray-950"
     >
-      <Card className="rounded-2xl border border-gray-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
+      <Card className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
         <div className="mb-4 flex items-center gap-3">
           <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 p-2 dark:bg-gray-800">
             <Image
               src={category.logoImage}
-              alt={`${category.name} icon`}
+              alt={`${displayName} icon`}
               width={20}
               height={20}
               className="h-5 w-5 object-contain"
             />
           </div>
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{category.name}</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{displayName}</h3>
         </div>
 
         <div className="space-y-2 text-xs">
@@ -133,7 +140,7 @@ export function CompactCategoryCard({ category }: CategoryCardProps) {
           </div>
         </div>
 
-        <div className="mt-4 border-t border-gray-200 pt-2 dark:border-gray-700">
+        <div className="mt-auto border-t border-gray-200 pt-2 dark:border-gray-700">
           <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400">Last Activity</p>
           <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300" title={category.latestPostDate}>
             {category.latestPost}
