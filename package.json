@@ -2,11 +2,15 @@
   "name": "techinsights-front",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.6.0"
+  },
   "scripts": {
     "dev": "NODE_OPTIONS='--no-deprecation' next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test:categories": "node --no-warnings --test --experimental-strip-types lib/categories/utils.test.mjs"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
