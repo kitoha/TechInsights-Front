@@ -13,3 +13,18 @@ export function formatDate(dateString: string) {
     day: 'numeric',
   });
 }
+
+export function formatCompactNumber(value: number): string {
+  if (value >= 1000000) {
+    const formatted = (value / 1000000).toFixed(1);
+    return `${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}M`;
+  }
+  if (value >= 1000) {
+    const formatted = (value / 1000).toFixed(1);
+    if (formatted === '1000.0') {
+      return '1M';
+    }
+    return `${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}k`;
+  }
+  return value.toString();
+}
