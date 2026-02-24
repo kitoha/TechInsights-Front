@@ -22,8 +22,50 @@ interface CompanyCardProps {
   rank?: number;
 }
 
+const brandTones = [
+  {
+    logoBg: "bg-blue-50 dark:bg-blue-950/30",
+    logoBorder: "border-blue-200 dark:border-blue-800/60",
+    rankBadge: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
+  },
+  {
+    logoBg: "bg-emerald-50 dark:bg-emerald-950/30",
+    logoBorder: "border-emerald-200 dark:border-emerald-800/60",
+    rankBadge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
+  },
+  {
+    logoBg: "bg-amber-50 dark:bg-amber-950/30",
+    logoBorder: "border-amber-200 dark:border-amber-800/60",
+    rankBadge: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
+  },
+  {
+    logoBg: "bg-rose-50 dark:bg-rose-950/30",
+    logoBorder: "border-rose-200 dark:border-rose-800/60",
+    rankBadge: "bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300",
+  },
+  {
+    logoBg: "bg-violet-50 dark:bg-violet-950/30",
+    logoBorder: "border-violet-200 dark:border-violet-800/60",
+    rankBadge: "bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300",
+  },
+  {
+    logoBg: "bg-cyan-50 dark:bg-cyan-950/30",
+    logoBorder: "border-cyan-200 dark:border-cyan-800/60",
+    rankBadge: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-300",
+  },
+] as const;
+
+function getToneIndex(value: string): number {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
+  }
+  return hash % brandTones.length;
+}
+
 export function CompanyCard({ company, rank }: CompanyCardProps) {
   const router = useRouter();
+  const tone = brandTones[getToneIndex(company.name)];
   
   const formatViews = (views: number) => {
     if (views >= 1000000) {
@@ -60,7 +102,9 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
 
       <div className="relative mb-5 flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
+          <div
+            className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border ${tone.logoBg} ${tone.logoBorder}`}
+          >
             <LogoImage
               src={company.logoImage}
               alt={`${company.name} logo`}
@@ -73,7 +117,9 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
             {company.name}
           </h3>
         </div>
-        <div className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+        <div
+          className={`rounded-full border border-slate-200 px-2.5 py-1 text-xs font-medium dark:border-slate-700 ${tone.rankBadge}`}
+        >
           #{rank ?? "-"}
         </div>
       </div>
