@@ -20,6 +20,12 @@ interface CompanyCardProps {
   rank?: number;
 }
 
+const topRankStyles: Record<number, string> = {
+  1: "border-amber-300/90 dark:border-amber-700/70 bg-gradient-to-br from-amber-50/70 via-white to-white dark:from-amber-950/25 dark:via-slate-900 dark:to-slate-900",
+  2: "border-blue-300/90 dark:border-blue-700/70 bg-gradient-to-br from-blue-50/60 via-white to-white dark:from-blue-950/25 dark:via-slate-900 dark:to-slate-900",
+  3: "border-emerald-300/90 dark:border-emerald-700/70 bg-gradient-to-br from-emerald-50/60 via-white to-white dark:from-emerald-950/25 dark:via-slate-900 dark:to-slate-900",
+};
+
 const brandTones = [
   {
     logoBg: "bg-blue-50 dark:bg-blue-950/30",
@@ -63,6 +69,7 @@ function getToneIndex(value: string): number {
 
 export function CompanyCard({ company, rank }: CompanyCardProps) {
   const tone = brandTones[getToneIndex(company.name)];
+  const topRankClass = rank ? topRankStyles[rank] : undefined;
   
   const formatViews = (views: number) => {
     if (views >= 1000000) {
@@ -79,7 +86,9 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
       aria-label={`${company.name} 회사 게시글 보기`}
       className="block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70"
     >
-      <Card className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:p-5 dark:border-slate-700 dark:bg-slate-900">
+      <Card
+        className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:p-5 dark:border-slate-700 dark:bg-slate-900 ${topRankClass ?? ""}`}
+      >
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <div className="h-full w-full bg-gradient-to-br from-blue-500/4 via-transparent to-emerald-500/6 dark:from-blue-400/6 dark:to-emerald-300/8" />
       </div>
