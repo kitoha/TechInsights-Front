@@ -2,6 +2,7 @@ import { isAxiosError } from "axios";
 import { CompanyCard, CompanyStats } from "@/components/company/CompanyCard";
 import { apiGet } from "@/lib/shared/api";
 import { redirect } from "next/navigation";
+import { formatCompactNumber } from "@/lib/shared/utils";
 
 export interface ApiResponse<T> {
   content: T[];
@@ -52,7 +53,7 @@ export default async function CompaniesPage() {
       redirect('/maintenance.html');
     }
     console.error('Companies stats fetch error:', error);
-    
+
     // Fallback data for development
     const fallbackData = [
       {
@@ -128,7 +129,7 @@ export default async function CompaniesPage() {
         blogUrl: "https://blog.banksalad.com/rss.xml"
       }
     ];
-    
+
     companies = fallbackData
       .filter((company) => company.postCount > 0)
       .map((company) => ({
@@ -174,7 +175,7 @@ export default async function CompaniesPage() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3 2xl:grid-cols-4">
           {companies.map((company) => (
-            <CompanyCard key={company.id} company={company} rank={company.rank} />
+            <CompanyCard key={company.id} company={company} />
           ))}
         </div>
 
@@ -210,14 +211,4 @@ function formatTimeAgo(dateString: string): string {
   } else {
     return "방금 전";
   }
-}
-
-function formatCompactNumber(value: number): string {
-  if (value >= 1000000) {
-    return `${(value / 1000000).toFixed(1)}M`;
-  }
-  if (value >= 1000) {
-    return `${(value / 1000).toFixed(1)}K`;
-  }
-  return value.toString();
 }
