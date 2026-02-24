@@ -1,10 +1,10 @@
 'use client'
 
-import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { FileText, Eye, Clock } from "lucide-react";
+import { LogoImage } from "@/components/company/LogoImage";
 
 export interface CompanyStats {
   id: string;
@@ -37,86 +37,67 @@ export function CompanyCard({ company, rank }: CompanyCardProps) {
     router.push(`/company/${company.id}`);
   };
 
-  const isTop3 = rank !== undefined && rank >= 1 && rank <= 3;
-  const rankStyles = {
-    1: {
-      gradient: "bg-gradient-to-br from-amber-50/80 via-yellow-50/80 to-amber-100/80 dark:from-amber-900/15 dark:via-yellow-900/15 dark:to-amber-800/15",
-      borderGradient: "border-amber-200/80 dark:border-amber-700/50",
-      borderGlow: "shadow-[0_0_0_1px_rgba(251,191,36,0.2),0_8px_24px_rgba(251,191,36,0.1)] dark:shadow-[0_0_0_1px_rgba(251,191,36,0.3),0_8px_24px_rgba(251,191,36,0.15)]"
-    },
-    2: {
-      gradient: "bg-gradient-to-br from-blue-50/80 via-indigo-50/80 to-blue-100/80 dark:from-blue-900/15 dark:via-indigo-900/15 dark:to-blue-800/15",
-      borderGradient: "border-blue-200/80 dark:border-blue-700/50",
-      borderGlow: "shadow-[0_0_0_1px_rgba(96,165,250,0.2),0_8px_24px_rgba(96,165,250,0.1)] dark:shadow-[0_0_0_1px_rgba(96,165,250,0.3),0_8px_24px_rgba(96,165,250,0.15)]"
-    },
-    3: {
-      gradient: "bg-gradient-to-br from-purple-50/80 via-pink-50/80 to-purple-100/80 dark:from-purple-900/15 dark:via-pink-900/15 dark:to-purple-800/15",
-      borderGradient: "border-purple-200/80 dark:border-purple-700/50",
-      borderGlow: "shadow-[0_0_0_1px_rgba(192,132,252,0.2),0_8px_24px_rgba(192,132,252,0.1)] dark:shadow-[0_0_0_1px_rgba(192,132,252,0.3),0_8px_24px_rgba(192,132,252,0.15)]"
-    }
-  };
-  const rankBadge = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null;
-
-  const top3Style = isTop3 && rank && rank >= 1 && rank <= 3 ? rankStyles[rank as keyof typeof rankStyles] : null;
-
   return (
-    <Card className={`p-6 hover:shadow-lg transition-all duration-300 relative overflow-hidden flex flex-col h-full ${
-      top3Style 
-        ? `${top3Style.gradient} border ${top3Style.borderGradient} ${top3Style.borderGlow} hover:scale-[1.02]` 
-        : ""
-    }`}>
-      {isTop3 && rankBadge && (
-        <div className="absolute top-4 right-4 text-2xl">
-          {rankBadge}
-        </div>
-      )}
-      <div className="flex items-center gap-4 mb-4">
-        <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-          <Image 
-            src={company.logoImage} 
-            alt={`${company.name} logo`} 
-            width={48} 
-            height={48} 
-            className="object-cover w-full h-full"
-          />
-        </div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-          {company.name}
-        </h3>
+    <Card className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl dark:border-slate-700 dark:bg-slate-900">
+      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <div className="h-full w-full bg-gradient-to-br from-blue-500/4 via-transparent to-emerald-500/6 dark:from-blue-400/6 dark:to-emerald-300/8" />
       </div>
 
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <FileText className="w-4 h-4 text-blue-500/80" />
-          <span className="text-sm text-gray-600 dark:text-gray-300">게시글 수</span>
-          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+      <div className="relative mb-5 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
+            <LogoImage
+              src={company.logoImage}
+              alt={`${company.name} logo`}
+              width={44}
+              height={44}
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <h3 className="truncate text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+            {company.name}
+          </h3>
+        </div>
+        <div className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+          #{rank ?? "-"}
+        </div>
+      </div>
+
+      <div className="relative grid grid-cols-2 gap-2.5">
+        <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-800/80">
+          <div className="mb-1 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            <FileText className="h-3.5 w-3.5" />
+            Posts
+          </div>
+          <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
             {company.postCount}
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Eye className="w-4 h-4 text-emerald-500/80" />
-          <span className="text-sm text-gray-600 dark:text-gray-300">총 조회 수</span>
-          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-800/80">
+          <div className="mb-1 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            <Eye className="h-3.5 w-3.5" />
+            Views
+          </div>
+          <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
             {formatViews(company.totalViews)}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-amber-500/80" />
-          <span className="text-sm text-gray-600 dark:text-gray-300">최근 게시글</span>
-          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            {company.latestPost}
           </span>
         </div>
       </div>
 
-      <div className="mt-auto pt-6">
-        <Button 
+      <div className="relative mt-4 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <Clock className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">
+            {company.latestPost}
+          </span>
+        </div>
+        <Button
           onClick={handleViewPosts}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+          size="sm"
+          className="h-8 rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-700"
         >
-          회사 게시글 보기
+          View Posts
         </Button>
       </div>
     </Card>
