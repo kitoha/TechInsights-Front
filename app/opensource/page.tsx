@@ -6,6 +6,7 @@ import { RepoCard } from "@/components/opensource/RepoCard";
 import { LanguageFilter } from "@/components/opensource/LanguageFilter";
 import { SortTabs } from "@/components/opensource/SortTabs";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
+import { StateView } from "@/components/opensource/StateView";
 import { fetchTrendingRepos } from "@/lib/opensource/api";
 import type { TrendingRepo, SortType, LanguageFilter as LanguageFilterType } from "@/lib/opensource/types";
 
@@ -16,13 +17,19 @@ export default function OpensourcePage() {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
 
+    const [error, setError] = useState(false);
+
     const loadRepos = useCallback(async () => {
         setLoading(true);
+        setError(false);
         try {
             const data = await fetchTrendingRepos(language, sort);
+            // Simulating a potential error for demonstration
+            // if (language === 'Zig') throw new Error("API Error");
             setRepos(data);
-        } catch (error) {
-            console.error("Failed to fetch trending repos:", error);
+        } catch (err) {
+            console.error("Failed to fetch trending repos:", err);
+            setError(true);
         } finally {
             setLoading(false);
         }
@@ -39,6 +46,11 @@ export default function OpensourcePage() {
         setLoadingMore(false);
     };
 
+    const resetFilters = () => {
+        setLanguage("All Languages");
+        setSort("trending");
+    };
+
     const featuredRepo = repos[0];
     const gridRepos = repos.slice(1);
 
@@ -50,37 +62,48 @@ export default function OpensourcePage() {
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-3xl">
                         Daily Trending Repositories
                     </h1>
-                    <p className="mt-2 max-w-2xl text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <p className="mt-2 max-w-2xl text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
                         Discover the hottest open-source projects, summarized by AI in Korean.
                         <br className="hidden sm:block" />
                         Stay ahead of the curve with daily updates.
                     </p>
                 </div>
 
-                {/* Filters */}
-                <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <LanguageFilter selected={language} onChange={setLanguage} />
+                {/* Filters Panel */}
+                <div className="mb-8 flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-1 bg-white dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                        <LanguageFilter selected={language} onChange={setLanguage} />
+                        <div className="px-2">
+                            <SortTabs selected={sort} onChange={setSort} />
+                        </div>
+                    </div>
                 </div>
 
-                {/* Sort Tabs */}
-                <div className="mb-6">
-                    <SortTabs selected={sort} onChange={setSort} />
-                </div>
-
-                {/* Loading State */}
+                {/* content Area */}
                 {loading ? (
                     <div className="space-y-4">
-                        {/* Featured skeleton */}
                         <div className="h-64 rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 animate-pulse" />
-                        {/* Grid skeleton */}
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             {[1, 2, 3, 4].map((i) => (
                                 <div key={i} className="h-48 rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 animate-pulse" />
                             ))}
                         </div>
                     </div>
+                ) : error ? (
+                    <StateView
+                        type="error"
+                        onActionPrimary={loadRepos}
+                        onActionSecondary={() => window.open('https://techinsights.shop/support', '_blank')}
+                    />
+                ) : repos.length === 0 ? (
+                    <StateView
+                        type="empty"
+                        keyword={language !== 'All Languages' ? language : undefined}
+                        onActionPrimary={() => setLanguage("All Languages")}
+                        onActionSecondary={resetFilters}
+                    />
                 ) : (
-                    <>
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
                         {/* Featured Card */}
                         {featuredRepo && (
                             <div className="mb-5">
@@ -97,28 +120,11 @@ export default function OpensourcePage() {
                             </div>
                         )}
 
-                        {/* Empty State */}
-                        {repos.length === 0 && (
-                            <div className="rounded-2xl border border-dashed border-gray-300 bg-white/70 px-6 py-12 text-center dark:border-gray-700 dark:bg-gray-900/70">
-                                <svg className="mx-auto h-10 w-10 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                    No repositories found
-                                </p>
-                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                    Try changing the language filter or sort option.
-                                </p>
-                            </div>
-                        )}
-
                         {/* Load More */}
-                        {repos.length > 0 && (
-                            <div className="mt-8">
-                                <LoadMoreButton onClick={handleLoadMore} loading={loadingMore} />
-                            </div>
-                        )}
-                    </>
+                        <div className="mt-12">
+                            <LoadMoreButton onClick={handleLoadMore} loading={loadingMore} />
+                        </div>
+                    </div>
                 )}
             </div>
         </div>
