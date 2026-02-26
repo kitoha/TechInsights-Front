@@ -54,12 +54,10 @@ export default function OpensourcePage() {
 
     const totalRepos = repos.length;
     const totalStars = repos.reduce((sum, r) => sum + r.stars, 0);
-    const aiSummarized = repos.filter(r => r.aiSummary).length;
 
     const summaryItems = [
         { label: "Repositories", value: `${totalRepos}개` },
         { label: "Total Stars", value: formatCompactNumber(totalStars) },
-        { label: "AI Summaries", value: `${aiSummarized}개` },
     ];
 
     const featuredRepo = repos[0];
@@ -82,7 +80,7 @@ export default function OpensourcePage() {
                     </div>
 
                     {/* Stats Summary Area */}
-                    <div className="grid w-full max-w-xl grid-cols-3 gap-3">
+                    <div className="grid w-full max-w-md grid-cols-2 gap-3">
                         {summaryItems.map((item) => (
                             <div
                                 key={item.label}
