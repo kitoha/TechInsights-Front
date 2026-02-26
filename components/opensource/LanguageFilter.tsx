@@ -158,6 +158,7 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                         <button
                             onClick={handleClear}
                             className="ml-1 p-0.5 rounded-full hover:bg-blue-100 text-blue-400 hover:text-blue-600 transition-colors dark:hover:bg-blue-900/50 dark:text-blue-500 dark:hover:text-blue-300"
+                            aria-label={`Clear ${selected} filter`}
                         >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6" />

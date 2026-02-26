@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { FeaturedRepoCard } from "@/components/opensource/FeaturedRepoCard";
 import { RepoCard } from "@/components/opensource/RepoCard";
+import { formatCompactNumber } from "@/lib/shared/utils";
 import { LanguageFilter } from "@/components/opensource/LanguageFilter";
 import { SortTabs } from "@/components/opensource/SortTabs";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
@@ -51,35 +52,65 @@ export default function OpensourcePage() {
         setSort("trending");
     };
 
+    const totalRepos = repos.length;
+    const totalStars = repos.reduce((sum, r) => sum + r.stars, 0);
+    const aiSummarized = repos.filter(r => r.aiSummary).length;
+
+    const summaryItems = [
+        { label: "Repositories", value: `${totalRepos}개` },
+        { label: "Total Stars", value: formatCompactNumber(totalStars) },
+        { label: "AI Summaries", value: `${aiSummarized}개` },
+    ];
+
     const featuredRepo = repos[0];
     const gridRepos = repos.slice(1);
 
     return (
-        <div className="min-h-full bg-gray-50 dark:bg-gray-950">
-            <div className="mx-auto max-w-[960px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-                {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-3xl">
-                        Daily Trending Repositories
-                    </h1>
-                    <p className="mt-2 max-w-2xl text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
-                        Discover the hottest open-source projects, summarized by AI in Korean.
-                        <br className="hidden sm:block" />
-                        Stay ahead of the curve with daily updates.
-                    </p>
+        <div className="min-h-full bg-gradient-to-b from-slate-50 via-slate-50 to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
+            <div className="mx-auto max-w-[1100px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+                {/* Header Section */}
+                <div className="mb-10 flex flex-col gap-5">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
+                            Daily Trending Repositories
+                        </h1>
+                        <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                            Discover the hottest open-source projects, summarized by AI in Korean.
+                            <br className="hidden sm:block" />
+                            Stay ahead of the curve with daily updates.
+                        </p>
+                    </div>
+
+                    {/* Stats Summary Area */}
+                    <div className="grid w-full max-w-xl grid-cols-3 gap-3">
+                        {summaryItems.map((item) => (
+                            <div
+                                key={item.label}
+                                className="rounded-xl border border-slate-200 bg-white/50 backdrop-blur-sm px-4 py-2.5 shadow-sm dark:border-slate-800 dark:bg-slate-900/50"
+                            >
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500">
+                                    {item.label}
+                                </p>
+                                <p className="mt-0.5 text-sm font-bold text-slate-900 dark:text-slate-100">
+                                    {item.value}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Filters Panel */}
-                <div className="mb-8 flex flex-col gap-4">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-1 bg-white dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                {/* Filters Panel Area */}
+                <div className="mb-10 flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-md shadow-slate-200/20 dark:shadow-none">
                         <LanguageFilter selected={language} onChange={setLanguage} />
-                        <div className="px-2">
+                        <div className="px-2 flex items-center gap-3">
+                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider hidden sm:block">Sort by</span>
                             <SortTabs selected={sort} onChange={setSort} />
                         </div>
                     </div>
                 </div>
 
-                {/* content Area */}
+                {/* Content Area */}
                 {loading ? (
                     <div className="space-y-4">
                         <div className="h-64 rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 animate-pulse" />
