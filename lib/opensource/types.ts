@@ -18,7 +18,7 @@ export interface TrendingRepo {
 
 export type SortType = 'trending' | 'stars' | 'latest';
 
-export type LanguageFilter = 'All Languages' | 'Python' | 'JavaScript' | 'TypeScript' | 'Java' | 'Go' | 'Rust' | 'Zig';
+export type LanguageFilter = 'All Languages' | 'Python' | 'JavaScript' | 'TypeScript' | 'Java' | 'Go' | 'Rust' | 'Zig' | 'Kotlin' | 'Swift' | 'Ruby' | 'C++' | 'C' | 'Dart';
 
 export const LANGUAGE_COLORS: Record<string, string> = {
     Java: '#b07219',
