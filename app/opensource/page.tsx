@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { FeaturedRepoCard } from "@/components/opensource/FeaturedRepoCard";
 import { RepoCard } from "@/components/opensource/RepoCard";
 import { formatCompactNumber } from "@/lib/shared/utils";
@@ -11,28 +11,40 @@ import { StateView } from "@/components/opensource/StateView";
 import { fetchTrendingRepos } from "@/lib/opensource/api";
 import type { TrendingRepo, SortType, LanguageFilter as LanguageFilterType } from "@/lib/opensource/types";
 
+const PAGE_SIZE = 8;
+
 export default function OpensourcePage() {
     const [repos, setRepos] = useState<TrendingRepo[]>([]);
     const [language, setLanguage] = useState<LanguageFilterType>("All Languages");
     const [sort, setSort] = useState<SortType>("trending");
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
-
     const [error, setError] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+
+    // Used to prevent race conditions: only the latest request updates state
+    const latestRequestId = useRef(0);
 
     const loadRepos = useCallback(async () => {
+        const requestId = ++latestRequestId.current;
         setLoading(true);
         setError(false);
+        setPage(1);
         try {
-            const data = await fetchTrendingRepos(language, sort);
-            // Simulating a potential error for demonstration
-            // if (language === 'Zig') throw new Error("API Error");
+            const data = await fetchTrendingRepos(language, sort, PAGE_SIZE);
+            // Ignore stale responses
+            if (requestId !== latestRequestId.current) return;
             setRepos(data);
+            setHasMore(data.length === PAGE_SIZE);
         } catch (err) {
+            if (requestId !== latestRequestId.current) return;
             console.error("Failed to fetch trending repos:", err);
             setError(true);
         } finally {
-            setLoading(false);
+            if (requestId === latestRequestId.current) {
+                setLoading(false);
+            }
         }
     }, [language, sort]);
 
@@ -41,10 +53,26 @@ export default function OpensourcePage() {
     }, [loadRepos]);
 
     const handleLoadMore = async () => {
+        if (loadingMore || !hasMore) return;
+        const requestId = ++latestRequestId.current;
         setLoadingMore(true);
-        // Simulating load more with delay
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        setLoadingMore(false);
+        try {
+            const nextPage = page + 1;
+            const data = await fetchTrendingRepos(language, sort, nextPage * PAGE_SIZE);
+            if (requestId !== latestRequestId.current) return;
+            // Append only the new repos (those beyond the current set)
+            const newRepos = data.slice(repos.length);
+            setRepos((prev) => [...prev, ...newRepos]);
+            setPage(nextPage);
+            setHasMore(newRepos.length > 0 && data.length === nextPage * PAGE_SIZE);
+        } catch (err) {
+            if (requestId !== latestRequestId.current) return;
+            console.error("Failed to load more repos:", err);
+        } finally {
+            if (requestId === latestRequestId.current) {
+                setLoadingMore(false);
+            }
+        }
     };
 
     const resetFilters = () => {
@@ -122,7 +150,7 @@ export default function OpensourcePage() {
                     <StateView
                         type="error"
                         onActionPrimary={loadRepos}
-                        onActionSecondary={() => window.open('https://techinsights.shop/support', '_blank')}
+                        onActionSecondary={() => window.open('https://techinsights.shop/support', '_blank', 'noopener,noreferrer')}
                     />
                 ) : repos.length === 0 ? (
                     <StateView
@@ -150,9 +178,11 @@ export default function OpensourcePage() {
                         )}
 
                         {/* Load More */}
-                        <div className="mt-12">
-                            <LoadMoreButton onClick={handleLoadMore} loading={loadingMore} />
-                        </div>
+                        {hasMore && (
+                            <div className="mt-12">
+                                <LoadMoreButton onClick={handleLoadMore} loading={loadingMore} />
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

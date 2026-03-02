@@ -7,7 +7,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         fullName: 'spring-projects/spring-boot',
         owner: 'spring-projects',
         ownerAvatar: 'https://avatars.githubusercontent.com/u/317776?s=48&v=4',
-        description: '스프링 부트는 단독 실행 가능한 상용 수준의 스프링 애플리케이션을 쉽게 만들 수 있게 해줍니다. 최소한의 설정으로 즉시 실행 가능한 환경을 제공하며, 내장 톰캣 자원으로 별도 웹 서버 설치가 필요 없습니다.',
+        description: '스프링 부트는 단독 실행 가능한 상용 수준의 스프링 애플리케이션을 쉽게 만들 수 있게 해줍니다.',
         stars: 75400,
         forks: 42100,
         issues: 1200,
@@ -16,7 +16,8 @@ const MOCK_REPOS: TrendingRepo[] = [
         starsThisWeek: 320,
         topics: ['Java', 'microservices', 'rest-api'],
         url: 'https://github.com/spring-projects/spring-boot',
-        aiSummary: '스프링 부트는 단독 실행 가능한 상용 수준의 스프링 애플리케이션을 쉽게 만들 수 있게 해줍니다. 최소한의 설정으로 즉시 실행 가능한 환경을 제공하며, 내장 톰캣 자원으로 별도 웹 서버 설치가 필요 없습니다.',
+        aiSummary: '스프링 부트는 단독 실행 가능한 상용 수준의 스프링 애플리케이션을 쉽게 만들 수 있게 해줍니다. 최소한의 설정으로 즉시 실행 가능한 환경을 제공하며, 내장 톰캣 지원으로 별도 웹 서버 설치가 필요 없습니다.',
+        updatedAt: '2026-03-01T10:00:00Z',
     },
     {
         id: '2',
@@ -33,7 +34,8 @@ const MOCK_REPOS: TrendingRepo[] = [
         starsThisWeek: 1200,
         topics: ['react', 'tailwindcss', 'radix-ui', 'components'],
         url: 'https://github.com/shadcn-ui/ui',
-        aiSummary: '코어 라인 분...',
+        aiSummary: 'Radix UI와 Tailwind CSS를 기반으로 한 재사용 가능한 컴포넌트 모음입니다. 복사 & 붙여넣기 방식으로 프로젝트에 직접 통합하며, 완전한 커스터마이징이 가능합니다.',
+        updatedAt: '2026-03-02T08:30:00Z',
     },
     {
         id: '3',
@@ -41,7 +43,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         fullName: 'oven-sh/bun',
         owner: 'oven-sh',
         ownerAvatar: 'https://avatars.githubusercontent.com/u/108928776?s=48&v=4',
-        description: 'Node.js를 대체하기 키울 성장의 고고속 울와의 JavaScript 런타임입니다. Zig로 작성되어 매우 빠르며, 번들러와 패키지 매니저가 내장되어 있습니다.',
+        description: 'Node.js를 대체하기 위해 설계된 초고속 올인원 JavaScript 런타임입니다.',
         stars: 68800,
         forks: 1800,
         issues: 892,
@@ -51,6 +53,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         topics: ['javascript', 'runtime', 'bundler', 'zig'],
         url: 'https://github.com/oven-sh/bun',
         aiSummary: 'Node.js를 대체하기 위해 설계된 초고속 올인원 JavaScript 런타임입니다. Zig로 작성되어 매우 빠르며, 번들러와 패키지 매니저가 내장되어 있습니다.',
+        updatedAt: '2026-03-02T07:00:00Z',
     },
     {
         id: '4',
@@ -58,7 +61,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         fullName: 'withastro/astro',
         owner: 'withastro',
         ownerAvatar: 'https://avatars.githubusercontent.com/u/44914786?s=48&v=4',
-        description: '콘텐츠 중심 웹사이트를 위한 웹 프레임워크입니다. 기본적으로 JS를 배제하여 빠르며, 필요한 경우에만 React, Vue 또는 웬만디쯤 프로드러는 아일래드 아키텍처를 사용합니다.',
+        description: '콘텐츠 중심 웹사이트를 위한 현대적인 웹 프레임워크입니다.',
         stars: 58500,
         forks: 3200,
         issues: 245,
@@ -68,6 +71,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         topics: ['web-framework', 'ssg', 'islands-architecture'],
         url: 'https://github.com/withastro/astro',
         aiSummary: '콘텐츠 중심 웹사이트를 위한 웹 프레임워크입니다. 기본적으로 JS를 배제하여 빠르며, 필요한 경우에만 아일랜드 아키텍처를 사용합니다.',
+        updatedAt: '2026-02-28T15:00:00Z',
     },
     {
         id: '5',
@@ -84,7 +88,8 @@ const MOCK_REPOS: TrendingRepo[] = [
         starsThisWeek: 2400,
         topics: ['llm', 'ai', 'agents', 'rag'],
         url: 'https://github.com/langchain-ai/langchain',
-        aiSummary: 'AI 에널리시 KR\n모어 콘텐 통...',
+        aiSummary: 'LLM 기반 AI 에이전트와 RAG 파이프라인을 구축하기 위한 Python 프레임워크입니다. 다양한 LLM 프로바이더와 도구를 체이닝하여 컨텍스트 인식형 AI 애플리케이션을 쉽게 개발할 수 있습니다.',
+        updatedAt: '2026-03-02T12:00:00Z',
     },
     {
         id: '6',
@@ -92,7 +97,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         fullName: 'vercel/next.js',
         owner: 'vercel',
         ownerAvatar: 'https://avatars.githubusercontent.com/u/14985020?s=48&v=4',
-        description: 'The React Framework for the Web. Used by some of the world\'s largest companies, Next.js enables you to create high-quality web applications with the power of React components.',
+        description: 'The React Framework for the Web.',
         stars: 128000,
         forks: 27200,
         issues: 3200,
@@ -102,6 +107,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         topics: ['react', 'nextjs', 'framework', 'ssr'],
         url: 'https://github.com/vercel/next.js',
         aiSummary: 'React 기반 풀스택 웹 프레임워크. SSR, SSG, ISR을 지원하며 App Router로 서버 컴포넌트를 기본 제공합니다.',
+        updatedAt: '2026-02-27T09:00:00Z',
     },
     {
         id: '7',
@@ -118,6 +124,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         starsThisWeek: 450,
         topics: ['rust', 'systems-programming', 'compiler'],
         url: 'https://github.com/rust-lang/rust',
+        updatedAt: '2026-02-26T06:00:00Z',
     },
     {
         id: '8',
@@ -135,6 +142,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         topics: ['kubernetes', 'containers', 'cloud-native', 'devops'],
         url: 'https://github.com/kubernetes/kubernetes',
         aiSummary: '컨테이너 오케스트레이션 플랫폼. 자동 스케일링, 롤링 업데이트, 서비스 디스커버리를 제공합니다.',
+        updatedAt: '2026-02-25T14:00:00Z',
     },
     {
         id: '9',
@@ -151,6 +159,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         starsThisWeek: 210,
         topics: ['swift', 'compiler', 'apple'],
         url: 'https://github.com/apple/swift',
+        updatedAt: '2026-02-24T10:00:00Z',
     },
     {
         id: '10',
@@ -167,6 +176,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         starsThisWeek: 150,
         topics: ['kotlin', 'compiler', 'jvm'],
         url: 'https://github.com/JetBrains/kotlin',
+        updatedAt: '2026-02-23T11:00:00Z',
     },
     {
         id: '11',
@@ -183,6 +193,7 @@ const MOCK_REPOS: TrendingRepo[] = [
         starsThisWeek: 85,
         topics: ['rust', 'ide', 'lsp'],
         url: 'https://github.com/rust-lang/rust-analyzer',
+        updatedAt: '2026-02-22T08:00:00Z',
     },
 ];
 
@@ -195,6 +206,9 @@ export async function fetchTrendingRepos(
     // const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/opensource/trending`;
     // const res = await apiGet<TrendingRepo[]>(url, { params: { language, sort, limit } });
 
+    // Normalize limit: coerce to integer, clamp to >= 0
+    const normalizedLimit = Math.max(0, Math.floor(Number(limit) || 0));
+
     let repos = [...MOCK_REPOS];
 
     if (language !== 'All Languages') {
@@ -206,13 +220,14 @@ export async function fetchTrendingRepos(
             repos.sort((a, b) => b.stars - a.stars);
             break;
         case 'latest':
-            repos.sort((a, b) => b.starsThisWeek - a.starsThisWeek);
+            // Sort by most recently updated, not by weekly stars
+            repos.sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
             break;
         case 'trending':
         default:
-            // Already in trending order
+            // Already in trending order (ranked by starsThisWeek in data)
             break;
     }
 
-    return repos.slice(0, limit);
+    return repos.slice(0, normalizedLimit);
 }
