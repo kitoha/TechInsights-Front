@@ -17,6 +17,7 @@ const LANGUAGES: LanguageFilterType[] = [
 export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [showAllLanguages, setShowAllLanguages] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Close dropdown when clicking outside
@@ -44,6 +45,10 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
 
     const handleClear = () => {
         onChange('All Languages');
+    };
+
+    const handleViewAllClick = () => {
+        setShowAllLanguages((prev) => !prev);
     };
 
     return (
@@ -91,7 +96,7 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                         {/* Language List */}
                         <div className="max-h-72 overflow-y-auto p-2 custom-scrollbar space-y-0.5">
                             {filteredLanguages.length > 0 ? (
-                                filteredLanguages.map((lang) => {
+                                (showAllLanguages ? filteredLanguages : filteredLanguages.slice(0, 8)).map((lang) => {
                                     const isSelected = selected === lang;
                                     const langColor = LANGUAGE_COLORS[lang] || 'transparent';
                                     return (
@@ -137,9 +142,17 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
 
                         {/* Dropdown Footer */}
                         <div className="p-3 border-t border-gray-50 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/20">
-                            <button className="w-full py-2 flex items-center justify-center gap-2 rounded-lg text-[12px] font-bold text-blue-600 hover:bg-blue-50 transition-colors dark:text-blue-400 dark:hover:bg-blue-900/20">
-                                View all 50+ languages
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button
+                                type="button"
+                                onClick={handleViewAllClick}
+                                aria-expanded={showAllLanguages}
+                                className="w-full py-2 flex items-center justify-center gap-2 rounded-lg text-[12px] font-bold text-blue-600 hover:bg-blue-50 transition-colors dark:text-blue-400 dark:hover:bg-blue-900/20"
+                            >
+                                {showAllLanguages ? 'Show fewer languages' : 'View all 50+ languages'}
+                                <svg
+                                    className={cn("w-3.5 h-3.5 transition-transform duration-200", showAllLanguages && "rotate-180")}
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                >
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                 </svg>
                             </button>
