@@ -167,18 +167,6 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                     </div>
                 </div>
             )}
-
-            {/* Spacer to push 'Go' button if needed, or keeping it compact */}
-            <div className="flex-1" />
-
-            {/* Go Button - Enterprise Style */}
-            <button
-                onClick={() => onChange(selected)}
-                className="relative group px-5 py-2.5 rounded-xl bg-blue-600 text-[13px] font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 hover:shadow-blue-600/30 active:scale-95 dark:bg-blue-500 dark:hover:bg-blue-600"
-            >
-                <span className="relative z-10">Apply Filter</span>
-                <div className="absolute inset-0 rounded-xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </button>
         </div>
     );
 }
