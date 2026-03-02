@@ -59,7 +59,7 @@ export function FeaturedRepoCard({ repo }: FeaturedRepoCardProps) {
                 <div className="flex flex-wrap gap-1.5 mb-5">
                     {repo.topics.map((topic) => (
                         <span
-                            key={topic}
+                            key={`${repo.id}-${topic}`}
                             className="inline-flex items-center rounded-md bg-blue-50/80 dark:bg-blue-950/20 px-2 py-0.5 text-[11px] font-medium text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/30"
                         >
                             {topic}

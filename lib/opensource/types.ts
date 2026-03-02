@@ -14,6 +14,7 @@ export interface TrendingRepo {
     topics: string[];
     url: string;
     aiSummary?: string;
+    updatedAt: string;
 }
 
 export type SortType = 'trending' | 'stars' | 'latest';
