@@ -20,26 +20,24 @@ export default function OpensourcePage() {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState(false);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
-    // Used to prevent race conditions: only the latest request updates state
+    // Prevents race conditions: only the latest in-flight request updates state
     const latestRequestId = useRef(0);
 
     const loadRepos = useCallback(async () => {
         const requestId = ++latestRequestId.current;
         setLoading(true);
         setError(false);
-        setPage(1);
+        setCurrentPage(0);
         try {
-            const data = await fetchTrendingRepos(language, sort, PAGE_SIZE);
-            // Ignore stale responses
+            const result = await fetchTrendingRepos(language, sort, 0, PAGE_SIZE);
             if (requestId !== latestRequestId.current) return;
-            setRepos(data);
-            setHasMore(data.length === PAGE_SIZE);
-        } catch (err) {
+            setRepos(result.repos);
+            setTotalPages(result.totalPages);
+        } catch {
             if (requestId !== latestRequestId.current) return;
-            console.error("Failed to fetch trending repos:", err);
             setError(true);
         } finally {
             if (requestId === latestRequestId.current) {
@@ -53,21 +51,19 @@ export default function OpensourcePage() {
     }, [loadRepos]);
 
     const handleLoadMore = async () => {
-        if (loadingMore || !hasMore) return;
+        if (loadingMore || currentPage + 1 >= totalPages) return;
         const requestId = ++latestRequestId.current;
         setLoadingMore(true);
         try {
-            const nextPage = page + 1;
-            const data = await fetchTrendingRepos(language, sort, nextPage * PAGE_SIZE);
+            const nextPage = currentPage + 1;
+            const result = await fetchTrendingRepos(language, sort, nextPage, PAGE_SIZE);
             if (requestId !== latestRequestId.current) return;
-            // Append only the new repos (those beyond the current set)
-            const newRepos = data.slice(repos.length);
-            setRepos((prev) => [...prev, ...newRepos]);
-            setPage(nextPage);
-            setHasMore(newRepos.length > 0 && data.length === nextPage * PAGE_SIZE);
-        } catch (err) {
+            setRepos((prev) => [...prev, ...result.repos]);
+            setCurrentPage(nextPage);
+            setTotalPages(result.totalPages);
+        } catch {
             if (requestId !== latestRequestId.current) return;
-            console.error("Failed to load more repos:", err);
+            console.error("[OpensourcePage] handleLoadMore failed");
         } finally {
             if (requestId === latestRequestId.current) {
                 setLoadingMore(false);
@@ -80,11 +76,11 @@ export default function OpensourcePage() {
         setSort("trending");
     };
 
-    const totalRepos = repos.length;
+    const hasMore = currentPage + 1 < totalPages;
     const totalStars = repos.reduce((sum, r) => sum + r.stars, 0);
 
     const summaryItems = [
-        { label: "Repositories", value: `${totalRepos}개` },
+        { label: "Repositories", value: `${repos.length}개` },
         { label: "Total Stars", value: formatCompactNumber(totalStars) },
     ];
 
@@ -107,25 +103,27 @@ export default function OpensourcePage() {
                         </p>
                     </div>
 
-                    {/* Stats Summary Area */}
-                    <div className="grid w-full max-w-md grid-cols-2 gap-3">
-                        {summaryItems.map((item) => (
-                            <div
-                                key={item.label}
-                                className="rounded-xl border border-slate-200 bg-white/50 backdrop-blur-sm px-4 py-2.5 shadow-sm dark:border-slate-800 dark:bg-slate-900/50"
-                            >
-                                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500">
-                                    {item.label}
-                                </p>
-                                <p className="mt-0.5 text-sm font-bold text-slate-900 dark:text-slate-100">
-                                    {item.value}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
+                    {/* Stats Summary */}
+                    {!loading && !error && repos.length > 0 && (
+                        <div className="grid w-full max-w-md grid-cols-2 gap-3">
+                            {summaryItems.map((item) => (
+                                <div
+                                    key={item.label}
+                                    className="rounded-xl border border-slate-200 bg-white/50 backdrop-blur-sm px-4 py-2.5 shadow-sm dark:border-slate-800 dark:bg-slate-900/50"
+                                >
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500">
+                                        {item.label}
+                                    </p>
+                                    <p className="mt-0.5 text-sm font-bold text-slate-900 dark:text-slate-100">
+                                        {item.value}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                {/* Filters Panel Area */}
+                {/* Filters Panel */}
                 <div className="mb-10 flex flex-col gap-4">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-md shadow-slate-200/20 dark:shadow-none">
                         <LanguageFilter selected={language} onChange={setLanguage} />
@@ -136,7 +134,7 @@ export default function OpensourcePage() {
                     </div>
                 </div>
 
-                {/* Content Area */}
+                {/* Content */}
                 {loading ? (
                     <div className="space-y-4">
                         <div className="h-64 rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 animate-pulse" />
@@ -161,14 +159,12 @@ export default function OpensourcePage() {
                     />
                 ) : (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        {/* Featured Card */}
                         {featuredRepo && (
                             <div className="mb-5">
                                 <FeaturedRepoCard repo={featuredRepo} />
                             </div>
                         )}
 
-                        {/* Grid Cards */}
                         {gridRepos.length > 0 && (
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 {gridRepos.map((repo) => (
@@ -177,7 +173,6 @@ export default function OpensourcePage() {
                             </div>
                         )}
 
-                        {/* Load More */}
                         {hasMore && (
                             <div className="mt-12">
                                 <LoadMoreButton onClick={handleLoadMore} loading={loadingMore} />
