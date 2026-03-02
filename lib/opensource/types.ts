@@ -1,3 +1,29 @@
+// ──────────────────────────────────────────────────────────────
+// Raw response shape returned by GET /api/v1/github/trending
+// ──────────────────────────────────────────────────────────────
+export interface GithubTrendingRepoDto {
+    id: number;
+    repoName: string;
+    fullName: string;
+    description: string;
+    htmlUrl: string;
+    starCount: number;
+    forkCount: number;
+    primaryLanguage: string;
+    ownerName: string;
+    ownerAvatarUrl: string;
+    topics: string[];
+    weeklyStarDelta: number;
+    /** ISO-8601 without timezone — treat as UTC */
+    pushedAt: string;
+    fetchedAt: string;
+    readmeSummary: string | null;
+    readmeSummarizedAt: string | null;
+}
+
+// ──────────────────────────────────────────────────────────────
+// Normalized internal model used by all components
+// ──────────────────────────────────────────────────────────────
 export interface TrendingRepo {
     id: string;
     name: string;
@@ -7,8 +33,10 @@ export interface TrendingRepo {
     description: string;
     stars: number;
     forks: number;
+    /** API does not expose issues — treated as 0 */
     issues: number;
     language: string;
+    /** Derived client-side from LANGUAGE_COLORS */
     languageColor: string;
     starsThisWeek: number;
     topics: string[];
@@ -19,7 +47,22 @@ export interface TrendingRepo {
 
 export type SortType = 'trending' | 'stars' | 'latest';
 
-export type LanguageFilter = 'All Languages' | 'Python' | 'JavaScript' | 'TypeScript' | 'Java' | 'Go' | 'Rust' | 'Zig' | 'Kotlin' | 'Swift' | 'Ruby' | 'C++' | 'C' | 'Dart';
+// UI filter type — "All Languages" means no filter sent to API
+export type LanguageFilter =
+    | 'All Languages'
+    | 'Python'
+    | 'JavaScript'
+    | 'TypeScript'
+    | 'Java'
+    | 'Go'
+    | 'Rust'
+    | 'Zig'
+    | 'Kotlin'
+    | 'Swift'
+    | 'Ruby'
+    | 'C++'
+    | 'C'
+    | 'Dart';
 
 export const LANGUAGE_COLORS: Record<string, string> = {
     Java: '#b07219',
