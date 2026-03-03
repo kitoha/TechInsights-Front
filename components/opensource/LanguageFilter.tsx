@@ -20,7 +20,6 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
     const [showAllLanguages, setShowAllLanguages] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -53,7 +52,6 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
 
     return (
         <div className="flex items-center gap-3 flex-wrap" ref={dropdownRef}>
-            {/* Searchable Dropdown Button */}
             <div className="relative">
                 <button
                     onClick={() => setIsOpen(!isOpen)}
@@ -73,10 +71,8 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                     </svg>
                 </button>
 
-                {/* Dropdown Menu */}
                 {isOpen && (
                     <div className="absolute top-full left-0 mt-2 w-72 rounded-2xl border border-gray-100 bg-white shadow-2xl z-[60] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300 dark:border-gray-800 dark:bg-gray-900/95 dark:backdrop-blur-xl">
-                        {/* Search Input Area */}
                         <div className="p-3 border-b border-gray-50 dark:border-gray-800">
                             <div className="relative group">
                                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,7 +89,6 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                             </div>
                         </div>
 
-                        {/* Language List */}
                         <div className="max-h-72 overflow-y-auto p-2 custom-scrollbar space-y-0.5">
                             {filteredLanguages.length > 0 ? (
                                 (showAllLanguages ? filteredLanguages : filteredLanguages.slice(0, 8)).map((lang) => {
@@ -140,7 +135,6 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                             )}
                         </div>
 
-                        {/* Dropdown Footer */}
                         <div className="p-3 border-t border-gray-50 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/20">
                             <button
                                 type="button"
@@ -161,7 +155,6 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                 )}
             </div>
 
-            {/* Selected Language Chip */}
             {selected !== 'All Languages' && (
                 <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-300">
                     <div className="h-6 w-px bg-gray-200 dark:bg-gray-800 mx-1" />

@@ -17,7 +17,6 @@ export function RepoCard({ repo }: RepoCardProps) {
             rel="noopener noreferrer"
             className="group block rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-900 dark:hover:border-gray-600"
         >
-            {/* Header */}
             <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2.5 min-w-0">
                     <img
@@ -42,7 +41,6 @@ export function RepoCard({ repo }: RepoCardProps) {
                 </div>
             </div>
 
-            {/* AI Badge + Description */}
             {repo.aiSummary && (
                 <div className="mb-3">
                     <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/40 mb-2">
@@ -60,7 +58,6 @@ export function RepoCard({ repo }: RepoCardProps) {
                 </p>
             )}
 
-            {/* Footer Stats */}
             <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500 pt-2 border-t border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1">

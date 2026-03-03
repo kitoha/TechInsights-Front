@@ -23,7 +23,6 @@ export default function OpensourcePage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
 
-    // Prevents race conditions: only the latest in-flight request updates state
     const latestRequestId = useRef(0);
 
     const loadRepos = useCallback(async () => {
@@ -90,7 +89,6 @@ export default function OpensourcePage() {
     return (
         <div className="min-h-full bg-gradient-to-b from-slate-50 via-slate-50 to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
             <div className="mx-auto max-w-[1100px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-                {/* Header Section */}
                 <div className="mb-10 flex flex-col gap-5">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
@@ -103,7 +101,6 @@ export default function OpensourcePage() {
                         </p>
                     </div>
 
-                    {/* Stats Summary */}
                     {!loading && !error && repos.length > 0 && (
                         <div className="grid w-full max-w-md grid-cols-2 gap-3">
                             {summaryItems.map((item) => (
@@ -123,7 +120,6 @@ export default function OpensourcePage() {
                     )}
                 </div>
 
-                {/* Filters Panel */}
                 <div className="mb-10 flex flex-col gap-4">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-md shadow-slate-200/20 dark:shadow-none">
                         <LanguageFilter selected={language} onChange={setLanguage} />
@@ -134,7 +130,6 @@ export default function OpensourcePage() {
                     </div>
                 </div>
 
-                {/* Content */}
                 {loading ? (
                     <div className="space-y-4">
                         <div className="h-64 rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 animate-pulse" />
