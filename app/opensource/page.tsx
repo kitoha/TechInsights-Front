@@ -148,11 +148,11 @@ export default function OpensourcePage() {
                     {debouncedSearchQuery && !loading && (
                         <div className="flex items-center justify-between px-2 animate-in fade-in slide-in-from-top-2 duration-500">
                             <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                                <svg className="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-800/20 mr-1">
+                                    <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-tight">✨ AI Discovery</span>
+                                </div>
                                 <span className="font-bold text-slate-900 dark:text-slate-100 italic">"{debouncedSearchQuery}"</span>
-                                <span>검색 결과 {repos.length}개를 찾았습니다.</span>
+                                <span>의 시맨틱 검색 결과 {repos.length}개를 찾았습니다.</span>
                             </div>
                             <button
                                 onClick={() => setSearchQuery("")}

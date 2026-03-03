@@ -51,7 +51,7 @@ export function SearchInput({ value, onChange, placeholder, className }: SearchI
                     onChange={(e) => onChange(e.target.value)}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    placeholder={placeholder || "레포 검색... (예: '실시간 채팅' 또는 'socket.io')"}
+                    placeholder={placeholder || "찾고 싶은 레포의 기능을 문장으로 설명해보세요 (AI 검색)"}
                     className="w-full bg-transparent border-none py-2.5 pr-20 text-[13px] font-medium text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:text-gray-100 dark:placeholder:text-gray-600"
                 />
 
