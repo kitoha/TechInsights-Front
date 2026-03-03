@@ -41,14 +41,25 @@ export function RepoCard({ repo }: RepoCardProps) {
                 </div>
             </div>
 
-            {repo.aiSummary && (
+            {(repo.aiSummary || repo.relevance !== undefined) && (
                 <div className="mb-3">
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/40 mb-2">
-                        <span className="text-[9px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">AI Analysis (KR)</span>
+                    <div className="flex items-center gap-1.5 mb-2">
+                        {repo.aiSummary && (
+                            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/40">
+                                <span className="text-[9px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">AI Analysis (KR)</span>
+                            </div>
+                        )}
+                        {repo.relevance !== undefined && (
+                            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-950/30 border border-violet-200/60 dark:border-violet-800/40">
+                                <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider">{Math.round(repo.relevance * 100)}% Match</span>
+                            </div>
+                        )}
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2">
-                        {repo.aiSummary}
-                    </p>
+                    {repo.aiSummary && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2">
+                            {repo.aiSummary}
+                        </p>
+                    )}
                 </div>
             )}
 
