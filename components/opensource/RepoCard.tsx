@@ -41,7 +41,7 @@ export function RepoCard({ repo, isFavorite, onToggleFavorite }: RepoCardProps) 
                             onToggleFavorite?.(repo.id);
                         }}
                         className={cn(
-                            "p-1.5 rounded-lg transition-all duration-300",
+                            "p-1.5 rounded-lg transition-all duration-300 cursor-pointer",
                             isFavorite
                                 ? "bg-amber-50 text-amber-500 dark:bg-amber-900/20 dark:text-amber-400"
                                 : "text-gray-300 hover:text-gray-400 hover:bg-gray-100 dark:text-gray-600 dark:hover:text-gray-500 dark:hover:bg-gray-800"

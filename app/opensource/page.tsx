@@ -152,7 +152,7 @@ export default function OpensourcePage() {
                                 <button
                                     onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
                                     className={cn(
-                                        "flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-300 border shadow-sm",
+                                        "flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-300 border shadow-sm cursor-pointer",
                                         showFavoritesOnly
                                             ? "bg-amber-50 border-amber-200 text-amber-600 dark:bg-amber-900/20 dark:border-amber-800/50 dark:text-amber-400"
                                             : "bg-white border-gray-100 text-gray-500 hover:text-gray-700 hover:border-gray-200 dark:bg-gray-950 dark:border-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
@@ -181,7 +181,7 @@ export default function OpensourcePage() {
                             </div>
                             <button
                                 onClick={() => setSearchQuery("")}
-                                className="text-xs font-bold text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 transition-colors"
+                                className="text-xs font-bold text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 transition-colors cursor-pointer"
                             >
                                 검색 초기화
                             </button>
@@ -198,7 +198,7 @@ export default function OpensourcePage() {
                             </div>
                             <button
                                 onClick={() => setShowFavoritesOnly(false)}
-                                className="text-xs font-bold text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 transition-colors"
+                                className="text-xs font-bold text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 transition-colors cursor-pointer"
                             >
                                 전체 보기
                             </button>
