@@ -1,7 +1,7 @@
 "use client";
 
 import { TrendingRepo, LANGUAGE_COLORS } from "@/lib/opensource/types";
-import { formatCompactNumber } from "@/lib/shared/utils";
+import { formatCompactNumber, cn } from "@/lib/shared/utils";
 
 interface RepoCardProps {
     repo: TrendingRepo;
