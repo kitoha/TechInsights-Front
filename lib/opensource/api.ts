@@ -22,18 +22,19 @@ const SORT_MAP: Record<SortType, string> = {
 // Adapter: convert raw DTO → normalized TrendingRepo
 // ──────────────────────────────────────────────────────────────
 function adaptRepo(dto: GithubTrendingRepoDto): TrendingRepo {
+    const language = dto.primaryLanguage ?? '';
     return {
         id: String(dto.id),
         name: dto.repoName,
         fullName: dto.fullName,
         owner: dto.ownerName,
         ownerAvatar: dto.ownerAvatarUrl,
-        description: dto.description,
+        description: dto.description ?? '',
         stars: dto.starCount,
         forks: dto.forkCount,
         issues: 0, // not exposed by API
-        language: dto.primaryLanguage,
-        languageColor: LANGUAGE_COLORS[dto.primaryLanguage] ?? '#6e7681',
+        language,
+        languageColor: LANGUAGE_COLORS[language] ?? '#6e7681',
         starsThisWeek: dto.weeklyStarDelta,
         topics: dto.topics ?? [],
         url: dto.htmlUrl,
