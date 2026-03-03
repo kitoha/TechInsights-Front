@@ -34,6 +34,7 @@ export interface TrendingRepo {
     url: string;
     aiSummary?: string;
     updatedAt: string;
+    relevance?: number;
 }
 
 export type SortType = 'trending' | 'stars' | 'latest';
