@@ -5,9 +5,11 @@ import { formatCompactNumber } from "@/lib/shared/utils";
 
 interface FeaturedRepoCardProps {
     repo: TrendingRepo;
+    isFavorite?: boolean;
+    onToggleFavorite?: (id: string) => void;
 }
 
-export function FeaturedRepoCard({ repo }: FeaturedRepoCardProps) {
+export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite }: FeaturedRepoCardProps) {
     const langColor = LANGUAGE_COLORS[repo.language] || '#6e7681';
 
     return (
@@ -31,13 +33,32 @@ export function FeaturedRepoCard({ repo }: FeaturedRepoCardProps) {
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{repo.fullName}</p>
                     </div>
                 </div>
-                <div className="flex-shrink-0 flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-1 border border-emerald-200/60 dark:border-emerald-800/40">
-                    <svg className="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                    </svg>
-                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                        +{formatCompactNumber(repo.starsThisWeek)} this week
-                    </span>
+                <div className="flex-shrink-0 flex items-center gap-3">
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onToggleFavorite?.(repo.id);
+                        }}
+                        className={cn(
+                            "p-2 rounded-xl transition-all duration-300",
+                            isFavorite
+                                ? "bg-amber-50 text-amber-500 dark:bg-amber-900/20 dark:text-amber-400 ring-1 ring-amber-200 dark:ring-amber-800"
+                                : "text-gray-300 hover:text-gray-400 hover:bg-gray-100 dark:text-gray-600 dark:hover:text-gray-500 dark:hover:bg-gray-800 border border-gray-100 dark:border-gray-800"
+                        )}
+                    >
+                        <svg className="w-5 h-5" fill={isFavorite ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
+                    </button>
+                    <div className="flex-shrink-0 flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-1 border border-emerald-200/60 dark:border-emerald-800/40">
+                        <svg className="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                        </svg>
+                        <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                            +{formatCompactNumber(repo.starsThisWeek)} this week
+                        </span>
+                    </div>
                 </div>
             </div>
 
