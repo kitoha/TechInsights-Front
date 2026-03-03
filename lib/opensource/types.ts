@@ -5,11 +5,11 @@ export interface GithubTrendingRepoDto {
     id: number;
     repoName: string;
     fullName: string;
-    description: string;
+    description: string | null;
     htmlUrl: string;
     starCount: number;
     forkCount: number;
-    primaryLanguage: string;
+    primaryLanguage: string | null;
     ownerName: string;
     ownerAvatarUrl: string;
     topics: string[];
