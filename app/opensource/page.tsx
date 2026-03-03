@@ -6,6 +6,7 @@ import { RepoCard } from "@/components/opensource/RepoCard";
 import { formatCompactNumber } from "@/lib/shared/utils";
 import { LanguageFilter } from "@/components/opensource/LanguageFilter";
 import { SortTabs } from "@/components/opensource/SortTabs";
+import { SearchInput } from "@/components/opensource/SearchInput";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
 import { StateView } from "@/components/opensource/StateView";
 import { fetchTrendingRepos } from "@/lib/opensource/api";
@@ -17,6 +18,8 @@ export default function OpensourcePage() {
     const [repos, setRepos] = useState<TrendingRepo[]>([]);
     const [language, setLanguage] = useState<LanguageFilterType>("All Languages");
     const [sort, setSort] = useState<SortType>("trending");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState(false);
@@ -31,7 +34,7 @@ export default function OpensourcePage() {
         setError(false);
         setCurrentPage(0);
         try {
-            const result = await fetchTrendingRepos(language, sort, 0, PAGE_SIZE);
+            const result = await fetchTrendingRepos(language, sort, 0, PAGE_SIZE, debouncedSearchQuery);
             if (requestId !== latestRequestId.current) return;
             setRepos(result.repos);
             setTotalPages(result.totalPages);
@@ -49,13 +52,22 @@ export default function OpensourcePage() {
         loadRepos();
     }, [loadRepos]);
 
+    // Debounce search query
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
     const handleLoadMore = async () => {
         if (loadingMore || currentPage + 1 >= totalPages) return;
         const requestId = ++latestRequestId.current;
         setLoadingMore(true);
         try {
             const nextPage = currentPage + 1;
-            const result = await fetchTrendingRepos(language, sort, nextPage, PAGE_SIZE);
+            const result = await fetchTrendingRepos(language, sort, nextPage, PAGE_SIZE, debouncedSearchQuery);
             if (requestId !== latestRequestId.current) return;
             setRepos((prev) => [...prev, ...result.repos]);
             setCurrentPage(nextPage);
@@ -73,6 +85,7 @@ export default function OpensourcePage() {
     const resetFilters = () => {
         setLanguage("All Languages");
         setSort("trending");
+        setSearchQuery("");
     };
 
     const hasMore = currentPage + 1 < totalPages;
@@ -121,9 +134,13 @@ export default function OpensourcePage() {
                 </div>
 
                 <div className="mb-10 flex flex-col gap-4">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-md shadow-slate-200/20 dark:shadow-none">
-                        <LanguageFilter selected={language} onChange={setLanguage} />
-                        <div className="px-2 flex items-center gap-3">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-md shadow-slate-200/20 dark:shadow-none">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1">
+                            <SearchInput value={searchQuery} onChange={setSearchQuery} />
+                            <div className="hidden sm:block w-px h-8 bg-gray-200 dark:bg-gray-800 mx-1" />
+                            <LanguageFilter selected={language} onChange={setLanguage} />
+                        </div>
+                        <div className="px-2 flex items-center justify-between sm:justify-end gap-3 border-t lg:border-t-0 border-gray-100 dark:border-gray-800 pt-3 lg:pt-0 mt-1 lg:mt-0">
                             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider hidden sm:block">Sort by</span>
                             <SortTabs selected={sort} onChange={setSort} />
                         </div>
@@ -148,8 +165,11 @@ export default function OpensourcePage() {
                 ) : repos.length === 0 ? (
                     <StateView
                         type="empty"
-                        keyword={language !== 'All Languages' ? language : undefined}
-                        onActionPrimary={() => setLanguage("All Languages")}
+                        keyword={debouncedSearchQuery || (language !== 'All Languages' ? language : undefined)}
+                        onActionPrimary={() => {
+                            if (debouncedSearchQuery) setSearchQuery("");
+                            else setLanguage("All Languages");
+                        }}
                         onActionSecondary={resetFilters}
                     />
                 ) : (
