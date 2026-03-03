@@ -17,7 +17,6 @@ export function FeaturedRepoCard({ repo }: FeaturedRepoCardProps) {
             rel="noopener noreferrer"
             className="group block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-900 dark:hover:border-gray-600"
         >
-            {/* Header */}
             <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3.5 min-w-0">
                     <img
@@ -42,7 +41,6 @@ export function FeaturedRepoCard({ repo }: FeaturedRepoCardProps) {
                 </div>
             </div>
 
-            {/* AI Summary Badge */}
             {repo.aiSummary && (
                 <div className="mb-4">
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/40 mb-2.5">
@@ -54,7 +52,6 @@ export function FeaturedRepoCard({ repo }: FeaturedRepoCardProps) {
                 </div>
             )}
 
-            {/* Topics */}
             {repo.topics.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-5">
                     {repo.topics.map((topic) => (
@@ -68,7 +65,6 @@ export function FeaturedRepoCard({ repo }: FeaturedRepoCardProps) {
                 </div>
             )}
 
-            {/* Stats */}
             <div className="flex items-center gap-5 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center gap-1.5">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

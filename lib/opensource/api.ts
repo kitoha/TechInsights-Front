@@ -9,18 +9,12 @@ import {
     LANGUAGE_COLORS,
 } from './types';
 
-// ──────────────────────────────────────────────────────────────
-// Sort mapping: UI value → API query param expected by backend
-// ──────────────────────────────────────────────────────────────
 const SORT_MAP: Record<SortType, string> = {
     trending: 'TRENDING',
     stars: 'STARS',
     latest: 'LATEST',
 };
 
-// ──────────────────────────────────────────────────────────────
-// Adapter: convert raw DTO → normalized TrendingRepo
-// ──────────────────────────────────────────────────────────────
 function adaptRepo(dto: GithubTrendingRepoDto): TrendingRepo {
     const language = dto.primaryLanguage ?? '';
     return {
@@ -32,7 +26,7 @@ function adaptRepo(dto: GithubTrendingRepoDto): TrendingRepo {
         description: dto.description ?? '',
         stars: dto.starCount,
         forks: dto.forkCount,
-        issues: 0, // not exposed by API
+        issues: 0,
         language,
         languageColor: LANGUAGE_COLORS[language] ?? '#6e7681',
         starsThisWeek: dto.weeklyStarDelta,
@@ -43,9 +37,6 @@ function adaptRepo(dto: GithubTrendingRepoDto): TrendingRepo {
     };
 }
 
-// ──────────────────────────────────────────────────────────────
-// Response shape returned to callers
-// ──────────────────────────────────────────────────────────────
 export interface FetchTrendingResult {
     repos: TrendingRepo[];
     totalPages: number;
@@ -54,20 +45,12 @@ export interface FetchTrendingResult {
 
 const TRENDING_URL = '/api/v1/github/trending';
 
-// ──────────────────────────────────────────────────────────────
-// Main fetch function
-//
-// Mirrors the pattern used in lib/posts/api.ts and
-// lib/companies/api.ts: use apiGet + PagedResponse, map to
-// internal model, and always return a safe fallback on error.
-// ──────────────────────────────────────────────────────────────
 export async function fetchTrendingRepos(
     language: LanguageFilter = 'All Languages',
     sort: SortType = 'trending',
     page: number = 0,
     size: number = 8,
 ): Promise<FetchTrendingResult> {
-    // Normalize page / size defensively
     const safePage = Math.max(0, Math.floor(Number(page) || 0));
     const safeSize = Math.max(1, Math.min(100, Math.floor(Number(size) || 8)));
 
@@ -78,7 +61,6 @@ export async function fetchTrendingRepos(
             sort: SORT_MAP[sort],
         };
 
-        // Only send language param when a specific language is selected
         if (language !== 'All Languages') {
             params.language = language;
         }
@@ -95,7 +77,6 @@ export async function fetchTrendingRepos(
 
         return { repos: [], totalPages: 1, totalElements: 0 };
     } catch (error: unknown) {
-        // Pass through 503 (handled globally by the axios interceptor)
         if (isAxiosError(error) && error.response?.status === 503) {
             throw error;
         }
