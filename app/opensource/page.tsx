@@ -3,13 +3,14 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { FeaturedRepoCard } from "@/components/opensource/FeaturedRepoCard";
 import { RepoCard } from "@/components/opensource/RepoCard";
-import { formatCompactNumber } from "@/lib/shared/utils";
+import { formatCompactNumber, cn } from "@/lib/shared/utils";
 import { LanguageFilter } from "@/components/opensource/LanguageFilter";
 import { SortTabs } from "@/components/opensource/SortTabs";
 import { SearchInput } from "@/components/opensource/SearchInput";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
 import { StateView } from "@/components/opensource/StateView";
 import { fetchTrendingRepos } from "@/lib/opensource/api";
+import { useFavorites } from "@/hooks/opensource/useFavorites";
 import type { TrendingRepo, SortType, LanguageFilter as LanguageFilterType } from "@/lib/opensource/types";
 
 const PAGE_SIZE = 8;
@@ -20,6 +21,7 @@ export default function OpensourcePage() {
     const [sort, setSort] = useState<SortType>("trending");
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState(false);
@@ -27,6 +29,7 @@ export default function OpensourcePage() {
     const [totalPages, setTotalPages] = useState(1);
 
     const latestRequestId = useRef(0);
+    const { favorites, toggleFavorite, isFavorite } = useFavorites();
 
     const loadRepos = useCallback(async () => {
         const requestId = ++latestRequestId.current;
@@ -86,18 +89,24 @@ export default function OpensourcePage() {
         setLanguage("All Languages");
         setSort("trending");
         setSearchQuery("");
+        setShowFavoritesOnly(false);
     };
 
-    const hasMore = currentPage + 1 < totalPages;
-    const totalStars = repos.reduce((sum, r) => sum + r.stars, 0);
+    // Filter by favorites if active
+    const filteredRepos = showFavoritesOnly
+        ? repos.filter(repo => favorites.includes(repo.id))
+        : repos;
+
+    const hasMore = currentPage + 1 < totalPages && !showFavoritesOnly;
+    const totalStars = filteredRepos.reduce((sum, r) => sum + r.stars, 0);
 
     const summaryItems = [
-        { label: "Repositories", value: `${repos.length}개` },
+        { label: "Repositories", value: `${filteredRepos.length}개` },
         { label: "Total Stars", value: formatCompactNumber(totalStars) },
     ];
 
-    const featuredRepo = repos[0];
-    const gridRepos = repos.slice(1);
+    const featuredRepo = filteredRepos[0];
+    const gridRepos = filteredRepos.slice(1);
 
     return (
         <div className="min-h-full bg-gradient-to-b from-slate-50 via-slate-50 to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
@@ -138,7 +147,23 @@ export default function OpensourcePage() {
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1">
                             <SearchInput value={searchQuery} onChange={setSearchQuery} />
                             <div className="hidden sm:block w-px h-8 bg-gray-200 dark:bg-gray-800 mx-1" />
-                            <LanguageFilter selected={language} onChange={setLanguage} />
+                            <div className="flex items-center gap-2">
+                                <LanguageFilter selected={language} onChange={setLanguage} />
+                                <button
+                                    onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                                    className={cn(
+                                        "flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-300 border shadow-sm",
+                                        showFavoritesOnly
+                                            ? "bg-amber-50 border-amber-200 text-amber-600 dark:bg-amber-900/20 dark:border-amber-800/50 dark:text-amber-400"
+                                            : "bg-white border-gray-100 text-gray-500 hover:text-gray-700 hover:border-gray-200 dark:bg-gray-950 dark:border-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
+                                    )}
+                                >
+                                    <svg className={cn("w-4 h-4", showFavoritesOnly && "fill-current")} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                    </svg>
+                                    <span>Favorites</span>
+                                </button>
+                            </div>
                         </div>
                         <div className="px-2 flex items-center justify-between sm:justify-end gap-3 border-t lg:border-t-0 border-gray-100 dark:border-gray-800 pt-3 lg:pt-0 mt-1 lg:mt-0">
                             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider hidden sm:block">Sort by</span>
@@ -152,13 +177,30 @@ export default function OpensourcePage() {
                                     <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-tight">✨ AI Discovery</span>
                                 </div>
                                 <span className="font-bold text-slate-900 dark:text-slate-100 italic">"{debouncedSearchQuery}"</span>
-                                <span>의 시맨틱 검색 결과 {repos.length}개를 찾았습니다.</span>
+                                <span>의 시맨틱 검색 결과 {filteredRepos.length}개를 찾았습니다.</span>
                             </div>
                             <button
                                 onClick={() => setSearchQuery("")}
                                 className="text-xs font-bold text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 transition-colors"
                             >
                                 검색 초기화
+                            </button>
+                        </div>
+                    )}
+
+                    {showFavoritesOnly && !debouncedSearchQuery && (
+                        <div className="flex items-center justify-between px-2 animate-in fade-in slide-in-from-top-2 duration-500">
+                            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/20 mr-1">
+                                    <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tight">★ Favorites Only</span>
+                                </div>
+                                <span>총 {filteredRepos.length}개의 즐겨찾기 프로젝트를 불러왔습니다.</span>
+                            </div>
+                            <button
+                                onClick={() => setShowFavoritesOnly(false)}
+                                className="text-xs font-bold text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 transition-colors"
+                            >
+                                전체 보기
                             </button>
                         </div>
                     )}
@@ -179,12 +221,13 @@ export default function OpensourcePage() {
                         onActionPrimary={loadRepos}
                         onActionSecondary={() => window.open('https://techinsights.shop/support', '_blank', 'noopener,noreferrer')}
                     />
-                ) : repos.length === 0 ? (
+                ) : filteredRepos.length === 0 ? (
                     <StateView
                         type="empty"
-                        keyword={debouncedSearchQuery || (language !== 'All Languages' ? language : undefined)}
+                        keyword={showFavoritesOnly ? "Favorites" : (debouncedSearchQuery || (language !== 'All Languages' ? language : undefined))}
                         onActionPrimary={() => {
-                            if (debouncedSearchQuery) setSearchQuery("");
+                            if (showFavoritesOnly) setShowFavoritesOnly(false);
+                            else if (debouncedSearchQuery) setSearchQuery("");
                             else setLanguage("All Languages");
                         }}
                         onActionSecondary={resetFilters}
@@ -193,14 +236,23 @@ export default function OpensourcePage() {
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
                         {featuredRepo && (
                             <div className="mb-5">
-                                <FeaturedRepoCard repo={featuredRepo} />
+                                <FeaturedRepoCard
+                                    repo={featuredRepo}
+                                    isFavorite={isFavorite(featuredRepo.id)}
+                                    onToggleFavorite={toggleFavorite}
+                                />
                             </div>
                         )}
 
                         {gridRepos.length > 0 && (
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 {gridRepos.map((repo) => (
-                                    <RepoCard key={repo.id} repo={repo} />
+                                    <RepoCard
+                                        key={repo.id}
+                                        repo={repo}
+                                        isFavorite={isFavorite(repo.id)}
+                                        onToggleFavorite={toggleFavorite}
+                                    />
                                 ))}
                             </div>
                         )}
