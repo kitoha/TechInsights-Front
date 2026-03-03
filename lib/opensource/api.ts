@@ -15,7 +15,7 @@ const SORT_MAP: Record<SortType, string> = {
     latest: 'LATEST',
 };
 
-function adaptRepo(dto: GithubTrendingRepoDto): TrendingRepo {
+function adaptRepo(dto: GithubTrendingRepoDto & { relevance?: number }): TrendingRepo {
     const language = dto.primaryLanguage ?? '';
     return {
         id: String(dto.id),
@@ -34,6 +34,7 @@ function adaptRepo(dto: GithubTrendingRepoDto): TrendingRepo {
         url: dto.htmlUrl,
         aiSummary: dto.readmeSummary ?? undefined,
         updatedAt: dto.pushedAt,
+        relevance: dto.relevance,
     };
 }
 
@@ -50,6 +51,7 @@ export async function fetchTrendingRepos(
     sort: SortType = 'trending',
     page: number = 0,
     size: number = 8,
+    query?: string,
 ): Promise<FetchTrendingResult> {
     const safePage = Math.max(0, Math.floor(Number(page) || 0));
     const safeSize = Math.max(1, Math.min(100, Math.floor(Number(size) || 8)));
@@ -65,7 +67,11 @@ export async function fetchTrendingRepos(
             params.language = language;
         }
 
-        const res = await apiGet<PagedResponse<GithubTrendingRepoDto>>(TRENDING_URL, { params });
+        if (query?.trim()) {
+            params.query = query.trim();
+        }
+
+        const res = await apiGet<PagedResponse<GithubTrendingRepoDto & { relevance?: number }>>(TRENDING_URL, { params });
 
         if (Array.isArray(res?.data?.content)) {
             return {
