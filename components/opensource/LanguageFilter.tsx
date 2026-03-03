@@ -56,7 +56,7 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className={cn(
-                        "flex items-center justify-between gap-3 min-w-[150px] rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-bold text-gray-800 shadow-sm transition-all hover:border-gray-300 hover:bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:border-gray-700 dark:hover:bg-gray-900/50 dark:focus:ring-blue-900/20",
+                        "flex items-center justify-between gap-3 min-w-[150px] rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-bold text-gray-800 shadow-sm transition-all hover:border-gray-300 hover:bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:border-gray-700 dark:hover:bg-gray-900/50 dark:focus:ring-blue-900/20 cursor-pointer",
                         isOpen && "border-blue-500 ring-2 ring-blue-100 dark:border-blue-500/50 dark:ring-blue-900/30 shadow-blue-500/5"
                     )}
                 >
@@ -99,7 +99,7 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                                             key={lang}
                                             onClick={() => handleSelect(lang)}
                                             className={cn(
-                                                "flex items-center justify-between w-full rounded-xl px-3 py-2.5 text-left text-[13px] transition-all group",
+                                                "flex items-center justify-between w-full rounded-xl px-3 py-2.5 text-left text-[13px] transition-all group cursor-pointer",
                                                 isSelected
                                                     ? "bg-blue-50 text-blue-600 font-bold dark:bg-blue-900/30 dark:text-blue-400"
                                                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
@@ -140,7 +140,7 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                                 type="button"
                                 onClick={handleViewAllClick}
                                 aria-expanded={showAllLanguages}
-                                className="w-full py-2 flex items-center justify-center gap-2 rounded-lg text-[12px] font-bold text-blue-600 hover:bg-blue-50 transition-colors dark:text-blue-400 dark:hover:bg-blue-900/20"
+                                className="w-full py-2 flex items-center justify-center gap-2 rounded-lg text-[12px] font-bold text-blue-600 hover:bg-blue-50 transition-colors dark:text-blue-400 dark:hover:bg-blue-900/20 cursor-pointer"
                             >
                                 {showAllLanguages ? 'Show fewer languages' : 'View all 50+ languages'}
                                 <svg
@@ -163,7 +163,7 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                         <span className="text-[12px] font-bold text-blue-700 dark:text-blue-400">{selected}</span>
                         <button
                             onClick={handleClear}
-                            className="ml-1 p-0.5 rounded-full hover:bg-blue-100 text-blue-400 hover:text-blue-600 transition-colors dark:hover:bg-blue-900/50 dark:text-blue-500 dark:hover:text-blue-300"
+                            className="ml-1 p-0.5 rounded-full hover:bg-blue-100 text-blue-400 hover:text-blue-600 transition-colors dark:hover:bg-blue-900/50 dark:text-blue-500 dark:hover:text-blue-300 cursor-pointer"
                             aria-label={`Clear ${selected} filter`}
                         >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

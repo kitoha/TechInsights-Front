@@ -59,7 +59,7 @@ export function SearchInput({ value, onChange, placeholder, className }: SearchI
                 {value && (
                     <button
                         onClick={handleClear}
-                        className="absolute right-12 p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors dark:hover:bg-gray-800 dark:text-gray-500 dark:hover:text-gray-300"
+                        className="absolute right-12 p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors dark:hover:bg-gray-800 dark:text-gray-500 dark:hover:text-gray-300 cursor-pointer"
                     >
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6" />

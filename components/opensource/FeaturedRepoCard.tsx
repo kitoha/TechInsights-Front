@@ -41,7 +41,7 @@ export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite }: Feature
                             onToggleFavorite?.(repo.id);
                         }}
                         className={cn(
-                            "p-2 rounded-xl transition-all duration-300",
+                            "p-2 rounded-xl transition-all duration-300 cursor-pointer",
                             isFavorite
                                 ? "bg-amber-50 text-amber-500 dark:bg-amber-900/20 dark:text-amber-400 ring-1 ring-amber-200 dark:ring-amber-800"
                                 : "text-gray-300 hover:text-gray-400 hover:bg-gray-100 dark:text-gray-600 dark:hover:text-gray-500 dark:hover:bg-gray-800 border border-gray-100 dark:border-gray-800"
