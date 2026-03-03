@@ -18,7 +18,7 @@ const SORT_MAP: Record<SortType, string> = {
 function adaptRepo(dto: GithubTrendingRepoDto & { relevance?: number }): TrendingRepo {
     const language = dto.primaryLanguage ?? '';
     return {
-        id: String(dto.id),
+        id: dto.fullName,
         name: dto.repoName,
         fullName: dto.fullName,
         owner: dto.ownerName,
