@@ -166,7 +166,6 @@ export default function OpensourcePage() {
                             </div>
                         </div>
                         <div className="px-2 flex items-center justify-between sm:justify-end gap-3 border-t lg:border-t-0 border-gray-100 dark:border-gray-800 pt-3 lg:pt-0 mt-1 lg:mt-0">
-                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider hidden sm:block">Sort by</span>
                             <SortTabs selected={sort} onChange={setSort} />
                         </div>
                     </div>
@@ -222,16 +221,29 @@ export default function OpensourcePage() {
                         onActionSecondary={() => window.open('https://techinsights.shop/support', '_blank', 'noopener,noreferrer')}
                     />
                 ) : filteredRepos.length === 0 ? (
-                    <StateView
-                        type="empty"
-                        keyword={showFavoritesOnly ? "Favorites" : (debouncedSearchQuery || (language !== 'All Languages' ? language : undefined))}
-                        onActionPrimary={() => {
-                            if (showFavoritesOnly) setShowFavoritesOnly(false);
-                            else if (debouncedSearchQuery) setSearchQuery("");
-                            else setLanguage("All Languages");
-                        }}
-                        onActionSecondary={resetFilters}
-                    />
+                    showFavoritesOnly && favorites.length === 0 ? (
+                        <StateView
+                            type="empty"
+                            title="즐겨찾기한 프로젝트가 없습니다"
+                            description={
+                                <span>
+                                    마음에 드는 오픈소스 프로젝트의 <strong className="text-amber-500 dark:text-amber-400">★ 북마크 아이콘</strong>을 클릭하여 즐겨찾기에 추가해 보세요.
+                                </span>
+                            }
+                            onActionPrimary={() => setShowFavoritesOnly(false)}
+                        />
+                    ) : (
+                        <StateView
+                            type="empty"
+                            keyword={showFavoritesOnly ? "Favorites" : (debouncedSearchQuery || (language !== 'All Languages' ? language : undefined))}
+                            onActionPrimary={() => {
+                                if (showFavoritesOnly) setShowFavoritesOnly(false);
+                                else if (debouncedSearchQuery) setSearchQuery("");
+                                else setLanguage("All Languages");
+                            }}
+                            onActionSecondary={resetFilters}
+                        />
+                    )
                 ) : (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
                         {featuredRepo && (
