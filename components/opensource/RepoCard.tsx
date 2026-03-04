@@ -10,18 +10,16 @@ interface RepoCardProps {
 }
 
 export function RepoCard({ repo, isFavorite, onToggleFavorite }: RepoCardProps) {
-    const langColor = LANGUAGE_COLORS[repo.language] || '#6e7681';
+    const displayLanguage = repo.language?.trim() || '언어 없음';
+    const langColor = LANGUAGE_COLORS[displayLanguage] || '#6e7681';
 
     const isHighRelevance = repo.relevance !== undefined && repo.relevance >= 0.8;
     const isLowRelevance = repo.relevance !== undefined && repo.relevance < 0.65;
 
     return (
-        <a
-            href={repo.url}
-            target="_blank"
-            rel="noopener noreferrer"
+        <article
             className={cn(
-                "group block rounded-xl border bg-white p-5 shadow-sm transition-all hover:shadow-md dark:bg-gray-900",
+                "rounded-xl border bg-white p-5 shadow-sm transition-all hover:shadow-md dark:bg-gray-900",
                 isHighRelevance
                     ? "border-emerald-100/80 hover:border-emerald-300 shadow-emerald-500/5 dark:border-emerald-900/30 dark:hover:border-emerald-700/50"
                     : "border-gray-200 hover:border-gray-300 dark:border-gray-700/60 dark:hover:border-gray-600",
@@ -29,19 +27,24 @@ export function RepoCard({ repo, isFavorite, onToggleFavorite }: RepoCardProps) 
             )}
         >
             <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex items-center gap-2.5 min-w-0">
+                <a
+                    href={repo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group/repo-link flex items-center gap-2.5 min-w-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
+                >
                     <img
                         src={repo.ownerAvatar}
                         alt={repo.owner}
                         className="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-700 flex-shrink-0"
                     />
                     <div className="min-w-0">
-                        <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate group-hover/repo-link:text-blue-600 dark:group-hover/repo-link:text-blue-400 transition-colors">
                             {repo.name}
                         </h3>
                         <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">{repo.fullName}</p>
                     </div>
-                </div>
+                </a>
                 <div className="flex-shrink-0 flex items-center gap-2">
                     {repo.relevance !== undefined && (() => {
                         const score = repo.relevance;
@@ -85,11 +88,11 @@ export function RepoCard({ repo, isFavorite, onToggleFavorite }: RepoCardProps) 
                         );
                     })()}
                     <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
+                        type="button"
+                        onClick={() => {
                             onToggleFavorite?.(repo.id);
                         }}
+                        aria-label={isFavorite ? `${repo.name} 즐겨찾기 해제` : `${repo.name} 즐겨찾기 추가`}
                         className={cn(
                             "p-1.5 rounded-lg transition-all duration-300 cursor-pointer",
                             isFavorite
@@ -148,9 +151,10 @@ export function RepoCard({ repo, isFavorite, onToggleFavorite }: RepoCardProps) 
                 </div>
                 <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full" style={{ backgroundColor: langColor }} />
-                    <span className="font-semibold text-gray-600 dark:text-gray-300">{repo.language}</span>
+                    <span className="font-semibold text-gray-600 dark:text-gray-300">{displayLanguage}</span>
                 </div>
             </div>
-        </a>
+
+        </article>
     );
 }

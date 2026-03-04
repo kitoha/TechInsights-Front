@@ -16,7 +16,7 @@ const SORT_MAP: Record<SortType, string> = {
 };
 
 function adaptRepo(dto: GithubTrendingRepoDto & { relevance?: number }): TrendingRepo {
-    const language = dto.primaryLanguage ?? '';
+    const language = dto.primaryLanguage?.trim() || '언어 없음';
     return {
         id: dto.fullName,
         name: dto.repoName,
@@ -87,7 +87,7 @@ export async function fetchTrendingRepos(
             throw error;
         }
         console.error('[opensource/api] fetchTrendingRepos error:', error);
-        return { repos: [], totalPages: 1, totalElements: 0 };
+        throw error;
     }
 }
 
@@ -122,25 +122,28 @@ export async function fetchSemanticRepos(
 
         if (res?.data?.results) {
             return {
-                repos: res.data.results.map(r => ({
-                    id: r.fullName,
-                    name: r.repoName,
-                    fullName: r.fullName,
-                    owner: r.ownerName,
-                    ownerAvatar: r.ownerAvatarUrl,
-                    description: r.description ?? '',
-                    stars: r.starCount,
-                    forks: 0,
-                    issues: 0,
-                    language: r.primaryLanguage ?? '',
-                    languageColor: LANGUAGE_COLORS[r.primaryLanguage ?? ''] ?? '#6e7681',
-                    starsThisWeek: 0,
-                    topics: r.topics ?? [],
-                    url: r.htmlUrl,
-                    aiSummary: r.readmeSummary ?? undefined,
-                    updatedAt: new Date().toISOString(),
-                    relevance: r.similarityScore,
-                })),
+                repos: res.data.results.map(r => {
+                    const language = r.primaryLanguage?.trim() || '언어 없음';
+                    return {
+                        id: r.fullName,
+                        name: r.repoName,
+                        fullName: r.fullName,
+                        owner: r.ownerName,
+                        ownerAvatar: r.ownerAvatarUrl,
+                        description: r.description ?? '',
+                        stars: r.starCount,
+                        forks: 0,
+                        issues: 0,
+                        language,
+                        languageColor: LANGUAGE_COLORS[language] ?? '#6e7681',
+                        starsThisWeek: 0,
+                        topics: r.topics ?? [],
+                        url: r.htmlUrl,
+                        aiSummary: r.readmeSummary ?? undefined,
+                        updatedAt: new Date().toISOString(),
+                        relevance: r.similarityScore,
+                    };
+                }),
                 totalPages: 1,
                 totalElements: res.data.totalReturned,
             };

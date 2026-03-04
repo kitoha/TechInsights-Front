@@ -11,9 +11,17 @@ export function useFavorites() {
         const saved = localStorage.getItem(FAVORITES_KEY);
         if (saved) {
             try {
-                setFavorites(JSON.parse(saved));
+                const parsed: unknown = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.every((item) => typeof item === "string")) {
+                    setFavorites(parsed);
+                } else {
+                    localStorage.removeItem(FAVORITES_KEY);
+                    setFavorites([]);
+                }
             } catch (e) {
                 console.error("Failed to parse favorites", e);
+                localStorage.removeItem(FAVORITES_KEY);
+                setFavorites([]);
             }
         }
     }, []);

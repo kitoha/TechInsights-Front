@@ -70,7 +70,7 @@ export function StateView({ type, keyword, title, description, onActionPrimary, 
                     <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
                         {keyword && (
                             <span className="block mb-1">
-                                "<span className="text-blue-600 dark:text-blue-400 font-bold">{keyword}</span>"에 대한 결과를 찾을 수 없습니다.
+                                &ldquo;<span className="text-blue-600 dark:text-blue-400 font-bold">{keyword}</span>&rdquo;에 대한 결과를 찾을 수 없습니다.
                             </span>
                         )}
                         다른 키워드로 검색하거나 필터를 변경해 보세요.
@@ -82,39 +82,51 @@ export function StateView({ type, keyword, title, description, onActionPrimary, 
             <div className="flex items-center gap-3">
                 {isError ? (
                     <>
-                        <button
-                            onClick={onActionPrimary}
-                            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            다시 시도
-                        </button>
-                        <button
-                            onClick={onActionSecondary}
-                            className="px-6 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-bold transition-all active:scale-95"
-                        >
-                            고객센터 문의
-                        </button>
+                        {onActionPrimary && (
+                            <button
+                                type="button"
+                                onClick={onActionPrimary}
+                                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                다시 시도
+                            </button>
+                        )}
+                        {onActionSecondary && (
+                            <button
+                                type="button"
+                                onClick={onActionSecondary}
+                                className="px-6 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-bold transition-all active:scale-95"
+                            >
+                                고객센터 문의
+                            </button>
+                        )}
                     </>
                 ) : (
                     <>
-                        <button
-                            onClick={onActionSecondary}
-                            className="px-6 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-bold transition-all active:scale-95"
-                        >
-                            필터 초기화
-                        </button>
-                        <button
-                            onClick={onActionPrimary}
-                            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            전체 보기
-                        </button>
+                        {onActionSecondary && (
+                            <button
+                                type="button"
+                                onClick={onActionSecondary}
+                                className="px-6 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-bold transition-all active:scale-95"
+                            >
+                                필터 초기화
+                            </button>
+                        )}
+                        {onActionPrimary && (
+                            <button
+                                type="button"
+                                onClick={onActionPrimary}
+                                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                                전체 보기
+                            </button>
+                        )}
                     </>
                 )}
             </div>

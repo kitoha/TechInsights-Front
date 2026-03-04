@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useId, type KeyboardEvent } from "react";
 import { LanguageFilter as LanguageFilterType, LANGUAGE_COLORS } from "@/lib/opensource/types";
 import { cn } from "@/lib/shared/utils";
 
@@ -18,12 +18,19 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [showAllLanguages, setShowAllLanguages] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(-1);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const listboxRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
+    const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+    const listboxId = useId();
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
+                setActiveIndex(-1);
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
@@ -36,10 +43,32 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
         );
     }, [searchQuery]);
 
+    const visibleLanguages = useMemo(
+        () => (showAllLanguages ? filteredLanguages : filteredLanguages.slice(0, 8)),
+        [filteredLanguages, showAllLanguages]
+    );
+
+    useEffect(() => {
+        if (!isOpen) return;
+        if (visibleLanguages.length === 0) {
+            setActiveIndex(-1);
+            return;
+        }
+        const selectedIndex = visibleLanguages.findIndex((lang) => lang === selected);
+        setActiveIndex(selectedIndex >= 0 ? selectedIndex : 0);
+    }, [isOpen, visibleLanguages, selected]);
+
+    useEffect(() => {
+        if (!isOpen || activeIndex < 0) return;
+        optionRefs.current[activeIndex]?.scrollIntoView({ block: "nearest" });
+    }, [isOpen, activeIndex]);
+
     const handleSelect = (lang: LanguageFilterType) => {
         onChange(lang);
         setIsOpen(false);
         setSearchQuery("");
+        setActiveIndex(-1);
+        triggerRef.current?.focus();
     };
 
     const handleClear = () => {
@@ -50,11 +79,93 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
         setShowAllLanguages((prev) => !prev);
     };
 
+    const handleTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+        if (event.key === "ArrowDown") {
+            event.preventDefault();
+            setIsOpen(true);
+            setTimeout(() => listboxRef.current?.focus(), 0);
+            return;
+        }
+
+        if (event.key === "Escape") {
+            event.preventDefault();
+            setIsOpen(false);
+            setActiveIndex(-1);
+        }
+    };
+
+    const handleSearchInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowDown" && visibleLanguages.length > 0) {
+            event.preventDefault();
+            listboxRef.current?.focus();
+            if (activeIndex < 0) {
+                setActiveIndex(0);
+            }
+            return;
+        }
+
+        if (event.key === "Escape") {
+            event.preventDefault();
+            setIsOpen(false);
+            setActiveIndex(-1);
+            triggerRef.current?.focus();
+        }
+    };
+
+    const handleListboxKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+        if (visibleLanguages.length === 0) return;
+        const lastIndex = visibleLanguages.length - 1;
+
+        if (event.key === "ArrowDown") {
+            event.preventDefault();
+            setActiveIndex((prev) => (prev >= lastIndex ? 0 : prev + 1));
+            return;
+        }
+
+        if (event.key === "ArrowUp") {
+            event.preventDefault();
+            setActiveIndex((prev) => (prev <= 0 ? lastIndex : prev - 1));
+            return;
+        }
+
+        if (event.key === "Home") {
+            event.preventDefault();
+            setActiveIndex(0);
+            return;
+        }
+
+        if (event.key === "End") {
+            event.preventDefault();
+            setActiveIndex(lastIndex);
+            return;
+        }
+
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            const indexToSelect = activeIndex >= 0 ? activeIndex : 0;
+            handleSelect(visibleLanguages[indexToSelect]);
+            return;
+        }
+
+        if (event.key === "Escape") {
+            event.preventDefault();
+            setIsOpen(false);
+            setActiveIndex(-1);
+            triggerRef.current?.focus();
+        }
+    };
+
     return (
         <div className="flex items-center gap-3 flex-wrap" ref={dropdownRef}>
             <div className="relative">
                 <button
+                    ref={triggerRef}
+                    type="button"
                     onClick={() => setIsOpen(!isOpen)}
+                    onKeyDown={handleTriggerKeyDown}
+                    aria-haspopup="listbox"
+                    aria-expanded={isOpen}
+                    aria-controls={listboxId}
                     className={cn(
                         "flex items-center justify-between gap-3 min-w-[150px] rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-bold text-gray-800 shadow-sm transition-all hover:border-gray-300 hover:bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:border-gray-700 dark:hover:bg-gray-900/50 dark:focus:ring-blue-900/20 cursor-pointer",
                         isOpen && "border-blue-500 ring-2 ring-blue-100 dark:border-blue-500/50 dark:ring-blue-900/30 shadow-blue-500/5"
@@ -79,30 +190,51 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                                 <input
+                                    ref={searchInputRef}
                                     type="text"
                                     placeholder="언어 검색..."
                                     autoFocus
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={handleSearchInputKeyDown}
                                     className="w-full rounded-xl bg-gray-50 border-none px-10 py-2.5 text-[13px] text-gray-900 placeholder:text-gray-400 focus:ring-1 focus:ring-blue-500/20 dark:bg-gray-800/50 dark:text-gray-100 dark:placeholder:text-gray-500"
                                 />
                             </div>
                         </div>
 
-                        <div className="max-h-72 overflow-y-auto p-2 custom-scrollbar space-y-0.5">
+                        <div
+                            id={listboxId}
+                            ref={listboxRef}
+                            role="listbox"
+                            tabIndex={0}
+                            aria-label="프로그래밍 언어 필터"
+                            aria-activedescendant={activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined}
+                            onKeyDown={handleListboxKeyDown}
+                            className="max-h-72 overflow-y-auto p-2 custom-scrollbar space-y-0.5 outline-none"
+                        >
                             {filteredLanguages.length > 0 ? (
-                                (showAllLanguages ? filteredLanguages : filteredLanguages.slice(0, 8)).map((lang) => {
+                                visibleLanguages.map((lang, index) => {
                                     const isSelected = selected === lang;
                                     const langColor = LANGUAGE_COLORS[lang] || 'transparent';
+                                    const isActive = activeIndex === index;
                                     return (
                                         <button
                                             key={lang}
+                                            ref={(element) => {
+                                                optionRefs.current[index] = element;
+                                            }}
+                                            id={`${listboxId}-option-${index}`}
+                                            type="button"
+                                            role="option"
+                                            aria-selected={isSelected}
                                             onClick={() => handleSelect(lang)}
+                                            onMouseEnter={() => setActiveIndex(index)}
                                             className={cn(
                                                 "flex items-center justify-between w-full rounded-xl px-3 py-2.5 text-left text-[13px] transition-all group cursor-pointer",
                                                 isSelected
                                                     ? "bg-blue-50 text-blue-600 font-bold dark:bg-blue-900/30 dark:text-blue-400"
-                                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200",
+                                                isActive && "ring-1 ring-blue-200 dark:ring-blue-800"
                                             )}
                                         >
                                             <div className="flex items-center gap-3">
@@ -142,7 +274,7 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                                 aria-expanded={showAllLanguages}
                                 className="w-full py-2 flex items-center justify-center gap-2 rounded-lg text-[12px] font-bold text-blue-600 hover:bg-blue-50 transition-colors dark:text-blue-400 dark:hover:bg-blue-900/20 cursor-pointer"
                             >
-                                {showAllLanguages ? 'Show fewer languages' : 'View all 50+ languages'}
+                                {showAllLanguages ? 'Show fewer languages' : `View all ${LANGUAGES.length} languages`}
                                 <svg
                                     className={cn("w-3.5 h-3.5 transition-transform duration-200", showAllLanguages && "rotate-180")}
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -162,6 +294,7 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                         <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: LANGUAGE_COLORS[selected] }} />
                         <span className="text-[12px] font-bold text-blue-700 dark:text-blue-400">{selected}</span>
                         <button
+                            type="button"
                             onClick={handleClear}
                             className="ml-1 p-0.5 rounded-full hover:bg-blue-100 text-blue-400 hover:text-blue-600 transition-colors dark:hover:bg-blue-900/50 dark:text-blue-500 dark:hover:text-blue-300 cursor-pointer"
                             aria-label={`Clear ${selected} filter`}

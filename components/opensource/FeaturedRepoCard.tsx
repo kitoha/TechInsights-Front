@@ -10,29 +10,30 @@ interface FeaturedRepoCardProps {
 }
 
 export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite }: FeaturedRepoCardProps) {
-    const langColor = LANGUAGE_COLORS[repo.language] || '#6e7681';
+    const displayLanguage = repo.language?.trim() || '언어 없음';
+    const langColor = LANGUAGE_COLORS[displayLanguage] || '#6e7681';
 
     return (
-        <a
-            href={repo.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-900 dark:hover:border-gray-600"
-        >
+        <article className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-900 dark:hover:border-gray-600">
             <div className="flex items-start justify-between gap-4 mb-4">
-                <div className="flex items-center gap-3.5 min-w-0">
+                <a
+                    href={repo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group/repo-link flex items-center gap-3.5 min-w-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
+                >
                     <img
                         src={repo.ownerAvatar}
                         alt={repo.owner}
                         className="w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-700 flex-shrink-0"
                     />
                     <div className="min-w-0">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate group-hover/repo-link:text-blue-600 dark:group-hover/repo-link:text-blue-400 transition-colors">
                             {repo.name}
                         </h3>
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{repo.fullName}</p>
                     </div>
-                </div>
+                </a>
                 <div className="flex-shrink-0 flex items-center gap-3">
                     {repo.relevance !== undefined && (() => {
                         const score = repo.relevance;
@@ -76,11 +77,11 @@ export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite }: Feature
                         );
                     })()}
                     <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
+                        type="button"
+                        onClick={() => {
                             onToggleFavorite?.(repo.id);
                         }}
+                        aria-label={isFavorite ? `${repo.name} 즐겨찾기 해제` : `${repo.name} 즐겨찾기 추가`}
                         className={cn(
                             "p-2 rounded-xl transition-all duration-300 cursor-pointer",
                             isFavorite
@@ -154,9 +155,10 @@ export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite }: Feature
                 <div className="flex items-center gap-1.5 ml-auto">
                     <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: langColor }} />
                     <span className="font-medium">Language</span>
-                    <span className="font-bold text-gray-900 dark:text-gray-100">{repo.language}</span>
+                    <span className="font-bold text-gray-900 dark:text-gray-100">{displayLanguage}</span>
                 </div>
             </div>
-        </a>
+
+        </article>
     );
 }
