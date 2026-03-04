@@ -6,16 +6,18 @@ import { cn } from "@/lib/shared/utils";
 interface SearchInputProps {
     value: string;
     onChange: (value: string) => void;
+    onSubmit: (value: string) => void;
     placeholder?: string;
     className?: string;
 }
 
-export function SearchInput({ value, onChange, placeholder, className }: SearchInputProps) {
+export function SearchInput({ value, onChange, onSubmit, placeholder, className }: SearchInputProps) {
     const [isFocused, setIsFocused] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleClear = () => {
         onChange("");
+        onSubmit("");
         inputRef.current?.focus();
     };
 
@@ -29,7 +31,11 @@ export function SearchInput({ value, onChange, placeholder, className }: SearchI
                     : "border-gray-200 hover:border-gray-300 dark:border-gray-800 dark:hover:border-gray-700"
             )}>
                 {/* Search Icon */}
-                <div className="pl-4 pr-2 flex items-center justify-center pointer-events-none">
+                <button
+                    type="button"
+                    onClick={() => onSubmit(value)}
+                    className="pl-4 pr-2 flex items-center justify-center cursor-pointer pointer-events-auto"
+                >
                     <svg
                         className={cn(
                             "w-4 h-4 transition-colors duration-200",
@@ -41,7 +47,7 @@ export function SearchInput({ value, onChange, placeholder, className }: SearchI
                     >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                </div>
+                </button>
 
                 {/* Input */}
                 <input
@@ -49,6 +55,11 @@ export function SearchInput({ value, onChange, placeholder, className }: SearchI
                     type="text"
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            onSubmit(value);
+                        }
+                    }}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     placeholder={placeholder || "찾고 싶은 레포의 기능을 문장으로 설명해보세요 (AI 검색)"}

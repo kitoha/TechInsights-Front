@@ -9,7 +9,7 @@ import { SortTabs } from "@/components/opensource/SortTabs";
 import { SearchInput } from "@/components/opensource/SearchInput";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
 import { StateView } from "@/components/opensource/StateView";
-import { fetchTrendingRepos } from "@/lib/opensource/api";
+import { fetchTrendingRepos, fetchSemanticRepos } from "@/lib/opensource/api";
 import { useFavorites } from "@/hooks/opensource/useFavorites";
 import type { TrendingRepo, SortType, LanguageFilter as LanguageFilterType } from "@/lib/opensource/types";
 
@@ -20,7 +20,7 @@ export default function OpensourcePage() {
     const [language, setLanguage] = useState<LanguageFilterType>("All Languages");
     const [sort, setSort] = useState<SortType>("trending");
     const [searchQuery, setSearchQuery] = useState("");
-    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+    const [submittedQuery, setSubmittedQuery] = useState("");
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -37,7 +37,9 @@ export default function OpensourcePage() {
         setError(false);
         setCurrentPage(0);
         try {
-            const result = await fetchTrendingRepos(language, sort, 0, PAGE_SIZE, debouncedSearchQuery);
+            const result = submittedQuery
+                ? await fetchSemanticRepos(submittedQuery, PAGE_SIZE)
+                : await fetchTrendingRepos(language, sort, 0, PAGE_SIZE);
             if (requestId !== latestRequestId.current) return;
             setRepos(result.repos);
             setTotalPages(result.totalPages);
@@ -49,20 +51,11 @@ export default function OpensourcePage() {
                 setLoading(false);
             }
         }
-    }, [language, sort]);
+    }, [language, sort, submittedQuery]);
 
     useEffect(() => {
         loadRepos();
     }, [loadRepos]);
-
-    // Debounce search query
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearchQuery(searchQuery);
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
 
     const handleLoadMore = async () => {
         if (loadingMore || currentPage + 1 >= totalPages) return;
@@ -70,7 +63,9 @@ export default function OpensourcePage() {
         setLoadingMore(true);
         try {
             const nextPage = currentPage + 1;
-            const result = await fetchTrendingRepos(language, sort, nextPage, PAGE_SIZE, debouncedSearchQuery);
+            const result = submittedQuery
+                ? { repos: [], totalPages: 1, totalElements: repos.length }
+                : await fetchTrendingRepos(language, sort, nextPage, PAGE_SIZE);
             if (requestId !== latestRequestId.current) return;
             setRepos((prev) => [...prev, ...result.repos]);
             setCurrentPage(nextPage);
@@ -89,6 +84,7 @@ export default function OpensourcePage() {
         setLanguage("All Languages");
         setSort("trending");
         setSearchQuery("");
+        setSubmittedQuery("");
         setShowFavoritesOnly(false);
     };
 
@@ -145,7 +141,11 @@ export default function OpensourcePage() {
                 <div className="mb-10 flex flex-col gap-4">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-md shadow-slate-200/20 dark:shadow-none">
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1">
-                            <SearchInput value={searchQuery} onChange={setSearchQuery} />
+                            <SearchInput
+                                value={searchQuery}
+                                onChange={setSearchQuery}
+                                onSubmit={setSubmittedQuery}
+                            />
                             <div className="hidden sm:block w-px h-8 bg-gray-200 dark:bg-gray-800 mx-1" />
                             <div className="flex items-center gap-2">
                                 <LanguageFilter selected={language} onChange={setLanguage} />
@@ -169,17 +169,20 @@ export default function OpensourcePage() {
                             <SortTabs selected={sort} onChange={setSort} />
                         </div>
                     </div>
-                    {debouncedSearchQuery && !loading && (
+                    {submittedQuery && !loading && (
                         <div className="flex items-center justify-between px-2 animate-in fade-in slide-in-from-top-2 duration-500">
                             <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                                 <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-800/20 mr-1">
                                     <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-tight">✨ AI Discovery</span>
                                 </div>
-                                <span className="font-bold text-slate-900 dark:text-slate-100 italic">"{debouncedSearchQuery}"</span>
+                                <span className="font-bold text-slate-900 dark:text-slate-100 italic">"{submittedQuery}"</span>
                                 <span>의 시맨틱 검색 결과 {filteredRepos.length}개를 찾았습니다.</span>
                             </div>
                             <button
-                                onClick={() => setSearchQuery("")}
+                                onClick={() => {
+                                    setSearchQuery("");
+                                    setSubmittedQuery("");
+                                }}
                                 className="text-xs font-bold text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 transition-colors cursor-pointer"
                             >
                                 검색 초기화
@@ -187,7 +190,7 @@ export default function OpensourcePage() {
                         </div>
                     )}
 
-                    {showFavoritesOnly && !debouncedSearchQuery && (
+                    {showFavoritesOnly && !submittedQuery && (
                         <div className="flex items-center justify-between px-2 animate-in fade-in slide-in-from-top-2 duration-500">
                             <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                                 <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/20 mr-1">
@@ -235,10 +238,13 @@ export default function OpensourcePage() {
                     ) : (
                         <StateView
                             type="empty"
-                            keyword={showFavoritesOnly ? "Favorites" : (debouncedSearchQuery || (language !== 'All Languages' ? language : undefined))}
+                            keyword={showFavoritesOnly ? "Favorites" : (submittedQuery || (language !== 'All Languages' ? language : undefined))}
                             onActionPrimary={() => {
                                 if (showFavoritesOnly) setShowFavoritesOnly(false);
-                                else if (debouncedSearchQuery) setSearchQuery("");
+                                else if (submittedQuery) {
+                                    setSearchQuery("");
+                                    setSubmittedQuery("");
+                                }
                                 else setLanguage("All Languages");
                             }}
                             onActionSecondary={resetFilters}
