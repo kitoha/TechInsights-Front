@@ -34,6 +34,47 @@ export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite }: Feature
                     </div>
                 </div>
                 <div className="flex-shrink-0 flex items-center gap-3">
+                    {repo.relevance !== undefined && (() => {
+                        const score = repo.relevance;
+                        const percentage = Math.round(score * 100);
+                        let style = {
+                            icon: (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            ),
+                            text: `${percentage}% 약간 유사`,
+                            className: "bg-slate-50 text-slate-600 border-slate-200/60 dark:bg-slate-900/50 dark:text-slate-400 dark:border-slate-800/40"
+                        };
+                        if (score >= 0.8) {
+                            style = {
+                                icon: (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                ),
+                                text: `${percentage}% 매우 유사`,
+                                className: "bg-emerald-50 text-emerald-600 border-emerald-200/60 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800/40"
+                            };
+                        } else if (score >= 0.65) {
+                            style = {
+                                icon: (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                                    </svg>
+                                ),
+                                text: `${percentage}% 부분 유사`,
+                                className: "bg-blue-50 text-blue-600 border-blue-200/60 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/40"
+                            };
+                        }
+
+                        return (
+                            <div className={cn("hidden sm:flex items-center gap-1.5 rounded-xl px-3 py-1.5 border", style.className)}>
+                                {style.icon}
+                                <span className="text-sm font-bold tracking-tight">{style.text}</span>
+                            </div>
+                        );
+                    })()}
                     <button
                         onClick={(e) => {
                             e.preventDefault();
@@ -62,25 +103,16 @@ export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite }: Feature
                 </div>
             </div>
 
-            {(repo.aiSummary || repo.relevance !== undefined) && (
+            {repo.aiSummary && (
                 <div className="mb-4">
                     <div className="flex items-center gap-1.5 mb-2.5">
-                        {repo.aiSummary && (
-                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/40">
-                                <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">AI Summary (KR)</span>
-                            </div>
-                        )}
-                        {repo.relevance !== undefined && (
-                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-50 dark:bg-violet-950/30 border border-violet-200/60 dark:border-violet-800/40">
-                                <span className="text-[10px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider">{Math.round(repo.relevance * 100)}% Match</span>
-                            </div>
-                        )}
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/40">
+                            <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">AI Summary (KR)</span>
+                        </div>
                     </div>
-                    {repo.aiSummary && (
-                        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
-                            {repo.aiSummary}
-                        </p>
-                    )}
+                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
+                        {repo.aiSummary}
+                    </p>
                 </div>
             )}
 
