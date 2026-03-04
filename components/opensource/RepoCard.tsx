@@ -43,23 +43,6 @@ export function RepoCard({ repo, isFavorite, onToggleFavorite }: RepoCardProps) 
                     </div>
                 </div>
                 <div className="flex-shrink-0 flex items-center gap-2">
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onToggleFavorite?.(repo.id);
-                        }}
-                        className={cn(
-                            "p-1.5 rounded-lg transition-all duration-300 cursor-pointer",
-                            isFavorite
-                                ? "bg-amber-50 text-amber-500 dark:bg-amber-900/20 dark:text-amber-400"
-                                : "text-gray-300 hover:text-gray-400 hover:bg-gray-100 dark:text-gray-600 dark:hover:text-gray-500 dark:hover:bg-gray-800"
-                        )}
-                    >
-                        <svg className="w-4 h-4" fill={isFavorite ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                    </button>
                     {repo.relevance !== undefined && (() => {
                         const score = repo.relevance;
                         const percentage = Math.round(score * 100);
@@ -101,16 +84,31 @@ export function RepoCard({ repo, isFavorite, onToggleFavorite }: RepoCardProps) 
                             </div>
                         );
                     })()}
-                    {repo.starsThisWeek !== undefined && repo.starsThisWeek > 0 && (
-                        <div className="flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 border border-emerald-200/60 dark:border-emerald-800/40">
-                            <svg className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                            </svg>
-                            <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
-                                +{formatCompactNumber(repo.starsThisWeek)}
-                            </span>
-                        </div>
-                    )}
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onToggleFavorite?.(repo.id);
+                        }}
+                        className={cn(
+                            "p-1.5 rounded-lg transition-all duration-300 cursor-pointer",
+                            isFavorite
+                                ? "bg-amber-50 text-amber-500 dark:bg-amber-900/20 dark:text-amber-400"
+                                : "text-gray-300 hover:text-gray-400 hover:bg-gray-100 dark:text-gray-600 dark:hover:text-gray-500 dark:hover:bg-gray-800"
+                        )}
+                    >
+                        <svg className="w-4 h-4" fill={isFavorite ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
+                    </button>
+                    <div className="flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 border border-emerald-200/60 dark:border-emerald-800/40">
+                        <svg className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                        </svg>
+                        <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
+                            +{formatCompactNumber(repo.starsThisWeek)}
+                        </span>
+                    </div>
                 </div>
             </div>
 
