@@ -90,3 +90,68 @@ export async function fetchTrendingRepos(
         return { repos: [], totalPages: 1, totalElements: 0 };
     }
 }
+
+export interface GithubSemanticSearchResponse {
+    query: string;
+    results: Array<{
+        fullName: string;
+        repoName: string;
+        description: string;
+        readmeSummary: string;
+        primaryLanguage: string;
+        starCount: number;
+        ownerName: string;
+        ownerAvatarUrl: string;
+        topics: string[];
+        htmlUrl: string;
+        similarityScore: number;
+        rank: number;
+    }>;
+    totalReturned: number;
+    processingTimeMs: number;
+}
+
+export async function fetchSemanticRepos(
+    query: string,
+    size: number = 8
+): Promise<FetchTrendingResult> {
+    try {
+        const res = await apiGet<GithubSemanticSearchResponse>('/api/v1/github/search', {
+            params: { query, size }
+        });
+
+        if (res?.data?.results) {
+            return {
+                repos: res.data.results.map(r => ({
+                    id: r.fullName,
+                    name: r.repoName,
+                    fullName: r.fullName,
+                    owner: r.ownerName,
+                    ownerAvatar: r.ownerAvatarUrl,
+                    description: r.description ?? '',
+                    stars: r.starCount,
+                    forks: 0,
+                    issues: 0,
+                    language: r.primaryLanguage ?? '',
+                    languageColor: LANGUAGE_COLORS[r.primaryLanguage ?? ''] ?? '#6e7681',
+                    starsThisWeek: 0,
+                    topics: r.topics ?? [],
+                    url: r.htmlUrl,
+                    aiSummary: r.readmeSummary ?? undefined,
+                    updatedAt: new Date().toISOString(),
+                    relevance: r.similarityScore,
+                })),
+                totalPages: 1,
+                totalElements: res.data.totalReturned,
+            };
+        }
+
+        return { repos: [], totalPages: 1, totalElements: 0 };
+    } catch (error: unknown) {
+        if (isAxiosError(error) && error.response?.status === 503) {
+            throw error;
+        }
+        console.error('[opensource/api] fetchSemanticRepos error:', error);
+        return { repos: [], totalPages: 1, totalElements: 0 };
+    }
+}
