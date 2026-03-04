@@ -74,9 +74,7 @@ export default function OpensourcePage() {
             if (requestId !== latestRequestId.current) return;
             console.error("[OpensourcePage] handleLoadMore failed");
         } finally {
-            if (requestId === latestRequestId.current) {
-                setLoadingMore(false);
-            }
+            setLoadingMore(false);
         }
     };
 
@@ -175,7 +173,7 @@ export default function OpensourcePage() {
                                 <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-800/20 mr-1">
                                     <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-tight">✨ AI Discovery</span>
                                 </div>
-                                <span className="font-bold text-slate-900 dark:text-slate-100 italic">"{submittedQuery}"</span>
+                                <span className="font-bold text-slate-900 dark:text-slate-100 italic">&ldquo;{submittedQuery}&rdquo;</span>
                                 <span>의 시맨틱 검색 결과 {filteredRepos.length}개를 찾았습니다.</span>
                             </div>
                             <button

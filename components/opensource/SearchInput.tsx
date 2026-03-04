@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { cn } from "@/lib/shared/utils";
 
 interface SearchInputProps {
@@ -14,6 +14,11 @@ interface SearchInputProps {
 export function SearchInput({ value, onChange, onSubmit, placeholder, className }: SearchInputProps) {
     const [isFocused, setIsFocused] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const trimmedValue = value.trim();
+
+    const handleSubmit = () => {
+        onSubmit(trimmedValue);
+    };
 
     const handleClear = () => {
         onChange("");
@@ -33,8 +38,10 @@ export function SearchInput({ value, onChange, onSubmit, placeholder, className 
                 {/* Search Icon */}
                 <button
                     type="button"
-                    onClick={() => onSubmit(value)}
-                    className="pl-4 pr-2 flex items-center justify-center cursor-pointer pointer-events-auto"
+                    onClick={handleSubmit}
+                    disabled={!trimmedValue}
+                    aria-label="검색 실행"
+                    className="pl-4 pr-2 flex items-center justify-center cursor-pointer pointer-events-auto disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     <svg
                         className={cn(
@@ -57,7 +64,7 @@ export function SearchInput({ value, onChange, onSubmit, placeholder, className 
                     onChange={(e) => onChange(e.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                            onSubmit(value);
+                            handleSubmit();
                         }
                     }}
                     onFocus={() => setIsFocused(true)}
@@ -69,7 +76,9 @@ export function SearchInput({ value, onChange, onSubmit, placeholder, className 
                 {/* Clear Button */}
                 {value && (
                     <button
+                        type="button"
                         onClick={handleClear}
+                        aria-label="검색어 지우기"
                         className="absolute right-12 p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors dark:hover:bg-gray-800 dark:text-gray-500 dark:hover:text-gray-300 cursor-pointer"
                     >
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
