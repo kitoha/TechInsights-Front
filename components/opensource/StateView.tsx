@@ -5,11 +5,13 @@ import { cn } from "@/lib/shared/utils";
 interface StateViewProps {
     type: 'empty' | 'error';
     keyword?: string;
+    title?: React.ReactNode;
+    description?: React.ReactNode;
     onActionPrimary?: () => void;
     onActionSecondary?: () => void;
 }
 
-export function StateView({ type, keyword, onActionPrimary, onActionSecondary }: StateViewProps) {
+export function StateView({ type, keyword, title, description, onActionPrimary, onActionSecondary }: StateViewProps) {
     const isError = type === 'error';
 
     return (
@@ -51,11 +53,15 @@ export function StateView({ type, keyword, onActionPrimary, onActionSecondary }:
 
             {/* Text Content */}
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3 tracking-tight">
-                {isError ? "데이터를 불러오는 중 오류가 발생했습니다" : "검색 결과가 없습니다"}
+                {title || (isError ? "데이터를 불러오는 중 오류가 발생했습니다" : "검색 결과가 없습니다")}
             </h2>
 
             <div className="max-w-md mx-auto mb-10">
-                {isError ? (
+                {description ? (
+                    <div className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
+                        {description}
+                    </div>
+                ) : isError ? (
                     <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
                         일시적인 네트워크 문제이거나 서버 점검 중일 수 있습니다.<br />
                         잠시 후 다시 시도해 주세요. 문제가 지속되면 고객센터에 문의해 주세요.
