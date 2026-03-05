@@ -203,7 +203,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                   </div>
                 </div>
 
-                <div className={`relative w-full aspect-[16/9] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 ${post.thumbnail ? '' : 'bg-gradient-to-br from-[#2665ff] via-[#2452db] to-[#1b3dbe]'}`}>
+                <div className="relative w-full aspect-[16/9] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                   {post.thumbnail ? (
                     <OptimizedImage
                       src={post.thumbnail}
@@ -214,15 +214,20 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                       fallbackSrc="/placeholder.svg"
                     />
                   ) : (
-                    <div className="flex items-center justify-center w-full h-full p-16">
-                      <OptimizedImage
-                        src={post.logoImageName ? `/logos/${post.logoImageName}` : "/placeholder.svg"}
-                        alt={post.companyName}
-                        width={400}
-                        height={400}
-                        className="w-full h-full max-w-sm object-contain opacity-85 drop-shadow-2xl"
-                        fallbackSrc="/placeholder.svg"
-                      />
+                    <div className="w-full h-full">
+                      {post.logoImageName ? (
+                        <OptimizedImage
+                          src={`/logos/${post.logoImageName}`}
+                          alt={post.companyName}
+                          fill
+                          className="object-cover"
+                          fallbackSrc="/placeholder.svg"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+                          <span className="text-5xl font-bold text-blue-200 dark:text-blue-900/30">{post.companyName[0]}</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -314,11 +319,11 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                       </div>
                     )}
                     <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center gap-2.5">
-                      <span>{post.companyName}</span>
-                      {displayViewCount !== null && (
-                        <>
-                          <span>·</span>
+                      <div className="flex items-center gap-2.5">
+                        <span>{post.companyName}</span>
+                        {displayViewCount !== null && (
+                          <>
+                            <span>·</span>
                             <span>조회 {displayViewCount.toLocaleString()}</span>
                           </>
                         )}

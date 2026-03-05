@@ -212,8 +212,21 @@ const PostCard = memo(function PostCard({ post }: { post: Post }) {
                 />
               </div>
             ) : (
-              <div className="w-28 h-full flex-shrink-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/10 dark:to-indigo-950/10 rounded-xl flex items-center justify-center border border-gray-100 dark:border-gray-800 text-blue-200 dark:text-blue-900/30">
-                <span className="text-3xl font-bold">{post.companyName[0]}</span>
+              <div className="relative w-28 h-full flex-shrink-0 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden group-hover:bg-gray-100 dark:group-hover:bg-gray-800 transition-colors">
+                {post.logoImageName ? (
+                  <div className="relative w-full h-full group-hover:scale-110 transition-transform duration-700 ease-out">
+                    <OptimizedImage
+                      src={`/logos/${post.logoImageName}`}
+                      alt={post.companyName}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+                    <span className="text-3xl font-bold text-blue-200 dark:text-blue-900/30">{post.companyName[0]}</span>
+                  </div>
+                )}
               </div>
             )}
 
