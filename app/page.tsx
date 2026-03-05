@@ -9,7 +9,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const page = Number(params?.page) || 0;
   const categories = ["FrontEnd", "BackEnd", "AI", "Big Data", "Infra", "Architecture"];
   const selectedCategory = params?.category || "All";
-  
+
   const [postsData, trendingCompanies, companies, recommendedPosts] = await Promise.all([
     fetchPosts(page, selectedCategory),
     fetchTrendingCompanies(),
@@ -33,7 +33,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   return (
     <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-8 py-8 md:py-10">
+      <div className="w-full px-6 lg:px-8 xl:px-10 py-8 md:py-10">
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Main Content */}
           <MainContent
