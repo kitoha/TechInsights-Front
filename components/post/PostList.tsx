@@ -19,6 +19,7 @@ interface Post {
   categories?: string[];
   viewCount?: number;
   thumbnail?: string;
+  isFavorite?: boolean;
 }
 
 interface PostListProps {
@@ -76,7 +77,7 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
 
       <section className="mb-12">
 
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-4">
 
 
           {posts.length === 0 ? (
@@ -97,7 +98,7 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
                     다른 회사의 게시글을 확인해보세요.
                   </p>
                   <div className="mt-6">
-                    <button 
+                    <button
                       onClick={() => window.location.href = '/'}
                       className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200"
                     >
@@ -172,112 +173,109 @@ const PostCard = memo(function PostCard({ post }: { post: Post }) {
   const thumbnail = post.thumbnail || post.image;
 
   return (
-    <Card className="group bg-white dark:bg-gray-800 border border-gray-200/60 dark:border-gray-700/60 hover:border-blue-300 dark:hover:border-blue-700 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 rounded-2xl overflow-hidden">
+    <Card className="group relative bg-white dark:bg-gray-800 border border-gray-200/60 dark:border-gray-700/60 hover:border-blue-400 dark:hover:border-blue-700 transition-all duration-300 rounded-xl overflow-hidden shadow-sm hover:shadow-md">
+      {/* Bookmark Ribbon */}
+      <div className="absolute top-0 right-6 z-10">
+        <div className="relative group/bookmark cursor-pointer">
+          <svg
+            width="28"
+            height="38"
+            viewBox="0 0 24 32"
+            fill="none"
+            className={`transition-all duration-300 drop-shadow-sm ${post.isFavorite
+              ? "fill-blue-600 stroke-blue-600"
+              : "fill-gray-100/80 dark:fill-gray-700/80 stroke-gray-200 dark:stroke-gray-600 group-hover/bookmark:fill-blue-100 dark:group-hover/bookmark:fill-blue-900/30 group-hover/bookmark:stroke-blue-300"
+              }`}
+          >
+            <path d="M0 0H24V32L12 26L0 32V0Z" strokeWidth="1.5" strokeLinejoin="round" />
+            <path
+              d="M12 7l1.637 3.317L17.29 10.8l-2.645 2.578.625 3.636L12 15.3l-3.27 1.714.625-3.636L6.71 10.8l3.653-.483L12 7z"
+              fill={post.isFavorite ? "white" : "currentColor"}
+              className={post.isFavorite ? "" : "opacity-40 group-hover/bookmark:opacity-100"}
+            />
+          </svg>
+        </div>
+      </div>
+
       <Link href={`/post/${post.id}`}>
         <CardContent className="p-0">
-          <div className="flex flex-col md:flex-row gap-5">
-            {/* Thumbnail Section */}
+          <div className="flex items-stretch gap-5 px-5 py-4 h-[130px]">
+            {/* Thumbnail */}
             {thumbnail ? (
-              <div className="relative w-full md:w-56 h-44 md:h-auto flex-shrink-0 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 md:ml-5 md:my-5 rounded-lg">
+              <div className="relative w-28 h-full flex-shrink-0 overflow-hidden bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800">
                 <OptimizedImage
                   src={thumbnail}
                   alt={post.title}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                   fallbackSrc="/placeholder.svg"
                 />
-                {/* Overlay gradient for better text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
             ) : (
-              /* Fallback: Company Logo as Background */
-              <div className="relative w-full md:w-56 h-44 md:h-auto flex-shrink-0 overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 md:ml-5 md:my-5 rounded-lg">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  {post.logoImageName ? (
-                    <OptimizedImage
-                      src={`/logos/${post.logoImageName}`}
-                      alt={post.companyName}
-                      width={112}
-                      height={112}
-                      className="opacity-20 object-contain"
-                      fallbackSrc="/placeholder.svg"
-                    />
-                  ) : (
-                    <div className="text-5xl font-bold text-white/20">
-                      {post.companyName[0]}
-                    </div>
-                  )}
-                </div>
+              <div className="w-28 h-full flex-shrink-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/10 dark:to-indigo-950/10 rounded-xl flex items-center justify-center border border-gray-100 dark:border-gray-800 text-blue-200 dark:text-blue-900/30">
+                <span className="text-3xl font-bold">{post.companyName[0]}</span>
               </div>
             )}
 
-            {/* Content Section */}
-            <div className="flex-1 p-6 md:pr-6 md:py-6 md:pl-0 flex flex-col justify-between min-h-[200px]">
-              <div className="space-y-3">
-                {/* Header: Company & Date */}
-                <div className="flex items-center space-x-2.5">
-                  <div className="w-5 h-5 rounded-full bg-background border border-border/50 flex items-center justify-center overflow-hidden">
+            {/* Main Content Area */}
+            <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="w-4 h-4 rounded-full overflow-hidden border border-gray-100 dark:border-gray-800 flex-shrink-0 bg-white">
                     {post.logoImageName ? (
                       <OptimizedImage
                         src={`/logos/${post.logoImageName}`}
                         alt={post.companyName}
-                        width={18}
-                        height={18}
+                        width={16}
+                        height={16}
                         className="object-contain"
                       />
                     ) : (
-                      <div className="w-full h-full bg-primary/10 flex items-center justify-center text-[9px] font-bold">
+                      <div className="w-full h-full bg-blue-100 flex items-center justify-center text-[8px] font-bold text-blue-600">
                         {post.companyName[0]}
                       </div>
                     )}
                   </div>
-                  <span className="text-[13px] font-semibold text-foreground/90">{post.companyName}</span>
-                  <span className="text-[13px] text-muted-foreground/50">•</span>
-                  <span className="text-[13px] text-muted-foreground/70">
+                  <span className="text-[12px] font-bold text-gray-700 dark:text-gray-300 truncate">{post.companyName}</span>
+                  <span className="text-[12px] text-gray-400 dark:text-gray-600">•</span>
+                  <span className="text-[12px] text-gray-500 dark:text-gray-500">
                     {(() => {
                       const date = new Date(post.publishedAt);
-                      const year = date.getFullYear();
-                      const month = String(date.getMonth() + 1).padStart(2, '0');
-                      const day = String(date.getDate()).padStart(2, '0');
-                      return `${year}년 ${month}월 ${day}일`;
+                      return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
                     })()}
                   </span>
+                  {post.viewCount !== undefined && (
+                    <>
+                      <span className="text-[12px] text-gray-300 dark:text-gray-700">|</span>
+                      <div className="flex items-center gap-1 text-[11px] font-medium text-gray-400 dark:text-gray-500">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        <span>{post.viewCount} Views</span>
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                {/* Title: Large & Bold */}
-                <h2 className="text-[20px] md:text-[22px] font-bold text-foreground leading-[1.35] tracking-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <h2 className="text-[18px] md:text-[19px] font-bold text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
                   {post.title}
                 </h2>
 
-                {/* Description */}
-                <p className="text-[14px] md:text-[15px] text-muted-foreground/75 leading-[1.6] line-clamp-2">
+                <p className="text-[14px] text-gray-500 dark:text-gray-400 line-clamp-1 mt-1 font-medium opacity-80">
                   {post.description}
                 </p>
               </div>
 
-              {/* Footer: Tags & Actions */}
-              <div className="flex items-center justify-between pt-3 mt-auto">
-                <div className="flex items-center gap-2 flex-wrap">
-                  {post.categories?.slice(0, 2).map((cat) => (
-                    <span
-                      key={cat}
-                      className="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/30 text-[11px] font-semibold rounded-lg text-blue-600 dark:text-blue-400 uppercase tracking-wide hover:bg-blue-100 dark:hover:bg-blue-950/50 transition-colors cursor-pointer"
-                    >
-                      {cat}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center space-x-1.5">
-                  <button className="p-2 text-muted-foreground/60 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-colors cursor-pointer">
-                    <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                  </button>
-                  <button className="p-2 text-muted-foreground/60 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-colors cursor-pointer">
-                    <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" /></svg>
-                  </button>
-                </div>
+              {/* Bottom: Left Categories */}
+              <div className="flex items-center gap-1.5 flex-wrap mt-3">
+                {post.categories?.slice(0, 3).map((cat) => (
+                  <span key={cat} className="px-2.5 py-1 bg-blue-50/50 dark:bg-blue-900/20 text-[10px] font-bold rounded-lg text-blue-600/80 dark:text-blue-400/80 uppercase tracking-tight border border-blue-100/50 dark:border-blue-800/20">
+                    {cat}
+                  </span>
+                ))}
               </div>
             </div>
+
+            {/* Right Spacer for Ribbon */}
+            <div className="w-12 flex-shrink-0" />
           </div>
         </CardContent>
       </Link>
