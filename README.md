@@ -45,6 +45,17 @@ npm install
 NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
+운영 API 연결 검증이 필요하면 `.env.local`을 바꾸는 대신 아래 스크립트를 쓰는 편이 안전합니다.
+
+```bash
+npm run dev:local-api
+npm run dev:prod-api
+```
+
+`dev:prod-api`는 로컬 프런트가 `https://api.techinsights.shop`에 직접 붙습니다. 이때 화면 상단에 운영 API 연결 배너가 표시됩니다.
+
+인증 기능까지 확인하려면 운영 백엔드에서 `http://localhost:3000`에 대한 CORS + credential 쿠키 설정이 허용되어 있어야 합니다.
+
 ### 3) 개발 서버 실행
 
 ```bash
@@ -55,6 +66,8 @@ npm run dev
 
 ```bash
 npm run dev      # 개발 서버 실행
+npm run dev:local-api  # 로컬 API로 개발 서버 실행
+npm run dev:prod-api   # 운영 API로 개발 서버 실행
 npm run build    # 프로덕션 빌드
 npm run start    # 프로덕션 서버 실행
 npm run lint     # ESLint 검사

@@ -1,8 +1,9 @@
 import axios, { AxiosError, AxiosHeaders, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getDeviceId } from './deviceId';
 
-const isProd = process.env.VERCEL_ENV === 'production';
 const isServer = typeof window === 'undefined';
+const PROD_API_URL = 'https://api.techinsights.shop';
+const DEFAULT_LOCAL_API_URL = 'http://localhost:8080';
 
 const REFRESH_ENDPOINT = '/api/v1/auth/refresh';
 const USERS_ME_ENDPOINT = '/api/v1/users/me';
@@ -14,9 +15,16 @@ function isAuthRequiredUrl(url: string | undefined): boolean {
 }
 
 export function getApiBaseUrl(): string {
-  return isProd
-    ? 'https://api.techinsights.shop'
-    : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+  return (
+    process.env.NEXT_PUBLIC_API_URL ||
+    (process.env.VERCEL_ENV === 'production' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+      ? PROD_API_URL
+      : DEFAULT_LOCAL_API_URL)
+  );
+}
+
+export function isProductionApiTarget(): boolean {
+  return getApiBaseUrl().startsWith(PROD_API_URL);
 }
 
 export const api = axios.create({

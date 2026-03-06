@@ -4,8 +4,7 @@ import { Company, CompanyInfo, TrendingPost } from "@/lib/companies/types";
 
 export async function fetchCompanyInfo(companyId: string): Promise<CompanyInfo | null> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies/${companyId}`;
-    const res = await apiGet<CompanyInfo>(url);
+    const res = await apiGet<CompanyInfo>(`/api/v1/companies/${companyId}`);
 
     if (res?.data) {
       return {
@@ -23,9 +22,8 @@ export async function fetchCompanyInfo(companyId: string): Promise<CompanyInfo |
 
 export async function fetchTrendingCompanies(): Promise<TrendingPost[]> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies/top-by-views`;
     const paramsObj = { page: 0, size: 5 };
-    const res = await apiGet<PagedResponse<{ logoImageName: string; name: string; totalViewCount: number }>>(url, {
+    const res = await apiGet<PagedResponse<{ logoImageName: string; name: string; totalViewCount: number }>>("/api/v1/companies/top-by-views", {
       params: paramsObj,
     });
 
@@ -55,9 +53,8 @@ export async function fetchTrendingCompanies(): Promise<TrendingPost[]> {
 
 export async function fetchCompanies(): Promise<Company[]> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies`;
     const paramsObj = { page: 0, size: 30 };
-    const res = await apiGet<PagedResponse<{ name: string; logoImageName: string }>>(url, {
+    const res = await apiGet<PagedResponse<{ name: string; logoImageName: string }>>("/api/v1/companies", {
       params: paramsObj,
     });
 

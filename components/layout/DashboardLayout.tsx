@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { LeftSidebar } from "@/components/layout/LeftSidebar"
 import { TopHeader } from "@/components/layout/TopHeader"
+import { ApiTargetBanner } from "@/components/layout/ApiTargetBanner"
 import { usePathname } from "next/navigation"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -19,6 +20,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         />
       )}
       <div className="flex-1 flex flex-col">
+        <ApiTargetBanner />
         <TopHeader
           onMenuClick={() => setIsSidebarOpen(true)}
           showMenuButton={!isPostDetail}

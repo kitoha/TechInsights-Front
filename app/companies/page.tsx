@@ -18,7 +18,6 @@ export default async function CompaniesPage() {
   let companies: (CompanyStats & { rank: number })[] = [];
 
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companiesSummaries`;
     const res = await apiGet<{
       id: string;
       name: string;
@@ -28,7 +27,7 @@ export default async function CompaniesPage() {
       postCount: number;
       lastPostedAt: string | null;
       rank?: number;
-    }[]>(url);
+    }[]>("/api/v1/companiesSummaries");
 
     if (res?.data && Array.isArray(res.data)) {
       let rank = 1;
