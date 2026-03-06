@@ -28,8 +28,7 @@ export default async function CategoriesPage() {
   let categories: CategoryStats[] = [];
 
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/categories/summary`;
-    const res = await apiGet<CategorySummaryResponse[]>(url);
+    const res = await apiGet<CategorySummaryResponse[]>("/api/v1/categories/summary");
 
     if (res && typeof res === "object" && "data" in res && res.data && Array.isArray(res.data)) {
       categories = res.data

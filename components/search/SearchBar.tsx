@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react"
 import { Search, Loader2, Sparkles } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { apiGet } from "@/lib/shared/api"
+import { apiGet, getApiBaseUrl } from "@/lib/shared/api"
 import { InstantSearchCompany, InstantSearchPost, InstantSearchResponse, SearchMode } from "@/lib/search/types"
 import { isAxiosError } from "axios"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -52,19 +52,14 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   }, [mode, keywordResults])
 
   useEffect(() => {
-    const isProd = process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-    const apiBaseUrl = isProd
-      ? "https://api.techinsights.shop"
-      : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-
     const preconnect = document.createElement("link")
     preconnect.rel = "preconnect"
-    preconnect.href = apiBaseUrl
+    preconnect.href = getApiBaseUrl()
     preconnect.crossOrigin = "anonymous"
 
     const dnsPrefetch = document.createElement("link")
     dnsPrefetch.rel = "dns-prefetch"
-    dnsPrefetch.href = apiBaseUrl
+    dnsPrefetch.href = getApiBaseUrl()
 
     document.head.appendChild(preconnect)
     document.head.appendChild(dnsPrefetch)

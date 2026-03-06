@@ -9,14 +9,13 @@ export async function fetchPosts(
   category: string = "All"
 ): Promise<{ content: Post[]; totalPages: number }> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts`;
     const paramsObj = {
       page,
       size: 10,
       ...(category && category !== "All" ? { category } : {}),
     };
 
-    const res = await apiGet<PagedResponse<Post>>(url, { params: paramsObj });
+    const res = await apiGet<PagedResponse<Post>>("/api/v1/posts", { params: paramsObj });
 
     if (res?.data?.content) {
       return {
@@ -41,14 +40,13 @@ export async function fetchPostsByCompany(
   page: number = 0
 ): Promise<{ content: Post[]; totalPages: number }> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts`;
     const paramsObj = {
       page,
       size: 10,
       companyId,
     };
 
-    const res = await apiGet<PagedResponse<Post>>(url, { params: paramsObj });
+    const res = await apiGet<PagedResponse<Post>>("/api/v1/posts", { params: paramsObj });
 
     if (res?.data?.content) {
       return {
@@ -70,8 +68,7 @@ export async function fetchPostsByCompany(
 
 export async function fetchRecommendedPosts(): Promise<RecommendedPost[]> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/recommendations`;
-    const res = await apiGet<{ postId: string; title: string; logoImageName: string }[]>(url);
+    const res = await apiGet<{ postId: string; title: string; logoImageName: string }[]>("/api/v1/recommendations");
 
     if (Array.isArray(res?.data)) {
       return res.data.map((item) => ({

@@ -7,6 +7,8 @@
   },
   "scripts": {
     "dev": "NODE_OPTIONS='--no-deprecation' next dev --turbopack",
+    "dev:local-api": "NEXT_PUBLIC_API_TARGET=local NEXT_PUBLIC_API_URL=http://localhost:8080 NODE_OPTIONS='--no-deprecation' next dev --turbopack",
+    "dev:prod-api": "NEXT_PUBLIC_API_TARGET=prod NEXT_PUBLIC_API_URL=https://api.techinsights.shop NODE_OPTIONS='--no-deprecation' next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
