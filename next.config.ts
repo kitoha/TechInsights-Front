@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**.woowa.in' },
       { protocol: 'https', hostname: '**.kakaocdn.net' },
       { protocol: 'https', hostname: '**.banksalad.com' },
+      { protocol: 'https', hostname: 'oliveyoung.tech' },
       { protocol: 'https', hostname: '**.oliveyoung.tech' },
       { protocol: 'https', hostname: '**.medium.com' },
       { protocol: 'https', hostname: '**.kakaopay.com' },

@@ -8,6 +8,7 @@ import type { ComponentType, SVGProps } from "react"
 interface LeftSidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  topOffsetClassName?: string;
 }
 
 type MenuIconProps = SVGProps<SVGSVGElement>;
@@ -17,7 +18,7 @@ type MenuItem = {
   icon: ComponentType<MenuIconProps>;
 };
 
-export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
+export function LeftSidebar({ isOpen, onClose, topOffsetClassName = "lg:top-14" }: LeftSidebarProps) {
   const pathname = usePathname()
 
   const menuItems: MenuItem[] = [
@@ -58,7 +59,8 @@ export function LeftSidebar({ isOpen, onClose }: LeftSidebarProps) {
 
       <aside className={`
         fixed left-0 top-0 h-screen bg-gray-50 dark:bg-gray-950 flex flex-col z-50 transition-transform duration-300 ease-in-out
-        w-56 lg:translate-x-0 border-r border-gray-300 dark:border-gray-700 lg:top-14 shadow-lg lg:shadow-none
+        w-56 lg:translate-x-0 border-r border-gray-300 dark:border-gray-700 shadow-lg lg:h-[calc(100vh-var(--layout-top-offset,3.5rem))] lg:shadow-none
+        ${topOffsetClassName}
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}>
         {/* Mobile Logo Section - only visible on mobile */}
