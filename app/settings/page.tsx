@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
-import { api } from "@/lib/shared/api"
+import { authPost } from "@/lib/shared/api"
 import { isAxiosError } from "axios"
 
 export default function SettingsPage() {
@@ -31,7 +31,7 @@ export default function SettingsPage() {
     setMessage({ type: "", text: "" })
 
     try {
-      await api.post("/api/v1/users/me/nickname", { nickname })
+      await authPost("/api/v1/users/me/nickname", { nickname })
       await refetchUser()
       setMessage({ type: "success", text: "새로운 닉네임이 잘 반영되었습니다!" })
     } catch (error: unknown) {

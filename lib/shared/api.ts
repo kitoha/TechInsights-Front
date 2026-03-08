@@ -8,7 +8,6 @@ const BFF_BASE_PATH = '/api/bff';
 
 const REFRESH_ENDPOINT = '/api/v1/auth/refresh';
 const USERS_ME_ENDPOINT = '/api/v1/users/me';
-const DIRECT_BACKEND_PATTERNS = ['/api/v1/auth/', '/api/v1/users/me'];
 
 const AUTH_REQUIRED_PATTERNS = ['/api/v1/auth/'];
 function isAuthRequiredUrl(url: string | undefined): boolean {
@@ -29,56 +28,18 @@ export function isProductionApiTarget(): boolean {
   return getBackendApiBaseUrl().startsWith(PROD_API_URL);
 }
 
-export function isCrossOriginApiTargetInBrowser(): boolean {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-
-  try {
-    return new URL(getBackendApiBaseUrl()).origin !== window.location.origin;
-  } catch {
-    return false;
-  }
-}
-
-export function shouldUseBff(url: string | undefined): boolean {
-  if (!url || !url.startsWith('/')) {
-    return false;
-  }
-
-  return !DIRECT_BACKEND_PATTERNS.some((pattern) => url.startsWith(pattern));
-}
-
-export function getClientApiBaseUrl(url: string | undefined): string {
-  if (!isServer && shouldUseBff(url)) {
-    return BFF_BASE_PATH;
-  }
-
-  return getBackendApiBaseUrl();
-}
-
-export const api = axios.create({
-  baseURL: getBackendApiBaseUrl(),
-  timeout: 10000,
-  withCredentials: true,
-});
-
-let onUnauthorized: (() => void) | null = null;
-export function setUnauthorizedHandler(handler: (() => void) | null): void {
-  onUnauthorized = handler;
-}
-
-api.interceptors.request.use((config) => {
-  config.withCredentials = true; 
-  config.baseURL = getClientApiBaseUrl(config.url);
+function applyDefaultHeaders(config: AxiosRequestConfig): AxiosRequestConfig {
+  config.withCredentials = true;
   const headers = AxiosHeaders.from(config.headers || {});
+
   if (!isServer) {
-    headers.set('X-Requested-With', 'XMLHttpRequest'); 
+    headers.set('X-Requested-With', 'XMLHttpRequest');
     const deviceId = getDeviceId();
     if (deviceId) {
       headers.set('X-Device-Id', deviceId);
     }
   }
+
   if (isServer) {
     const cloudflareSecret = process.env.CLOUDFLARE_SECRET_KEY;
     if (cloudflareSecret) {
@@ -92,11 +53,51 @@ api.interceptors.request.use((config) => {
       }
     }
   }
+
   config.headers = headers;
   return config;
+}
+
+export const publicApi = axios.create({
+  baseURL: isServer ? getBackendApiBaseUrl() : BFF_BASE_PATH,
+  timeout: 10000,
+  withCredentials: true,
 });
 
-api.interceptors.response.use(
+export const authApi = axios.create({
+  baseURL: getBackendApiBaseUrl(),
+  timeout: 10000,
+  withCredentials: true,
+});
+
+let onUnauthorized: (() => void) | null = null;
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  onUnauthorized = handler;
+}
+
+publicApi.interceptors.request.use((config) => applyDefaultHeaders(config));
+authApi.interceptors.request.use((config) => applyDefaultHeaders(config));
+
+publicApi.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const status = error?.response?.status;
+
+    if (status === 503) {
+      if (typeof window !== 'undefined') {
+        try {
+          window.location.href = '/maintenance.html';
+        } catch {
+          // no-op
+        }
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+authApi.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const status = error?.response?.status;
@@ -127,8 +128,8 @@ api.interceptors.response.use(
       }
       config._retry = true;
       try {
-        await api.post(REFRESH_ENDPOINT);
-        return api.request(config);
+        await authApi.post(REFRESH_ENDPOINT);
+        return authApi.request(config);
       } catch {
         onUnauthorized?.();
         return Promise.reject(error);
@@ -140,17 +141,33 @@ api.interceptors.response.use(
 );
 
 export async function apiGet<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-  return api.get<T>(url, config);
+  return publicApi.get<T>(url, config);
 }
 
 export async function apiPost<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-  return api.post<T>(url, data, config);
+  return publicApi.post<T>(url, data, config);
 }
 
 export async function apiPut<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-  return api.put<T>(url, data, config);
+  return publicApi.put<T>(url, data, config);
 }
 
 export async function apiDelete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-  return api.delete<T>(url, config);
+  return publicApi.delete<T>(url, config);
+}
+
+export async function authGet<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  return authApi.get<T>(url, config);
+}
+
+export async function authPost<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  return authApi.post<T>(url, data, config);
+}
+
+export async function authPut<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  return authApi.put<T>(url, data, config);
+}
+
+export async function authDelete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  return authApi.delete<T>(url, config);
 }

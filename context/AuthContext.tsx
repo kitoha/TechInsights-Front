@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { api, setUnauthorizedHandler } from "@/lib/shared/api";
+import { authGet, authPost, setUnauthorizedHandler } from "@/lib/shared/api";
 import { getLoginRedirectUrl, type UserProfile } from "@/lib/shared/auth";
 
 const USERS_ME = "/api/v1/users/me";
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 외부에서 명시적으로 호출하는 refetch - 로그인 후 상태 갱신 목적
   const refetchUser = useCallback(async () => {
     try {
-      const res = await api.get<unknown>(USERS_ME, {
+      const res = await authGet<unknown>(USERS_ME, {
         validateStatus: (s) => s < 500,
       });
       const profile = res.status === 200 ? parseUserProfile(res) : null;
@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     const runMe = async () => {
       try {
-        const res = await api.get<unknown>(USERS_ME, {
+        const res = await authGet<unknown>(USERS_ME, {
           validateStatus: (s) => s < 500,
         });
         if (cancelled) return;
@@ -160,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      await api.post(LOGOUT_ENDPOINT);
+      await authPost(LOGOUT_ENDPOINT);
     } finally {
       isLoggedInRef.current = false;
       setState({
