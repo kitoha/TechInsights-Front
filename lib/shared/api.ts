@@ -4,9 +4,11 @@ import { getDeviceId } from './deviceId';
 const isServer = typeof window === 'undefined';
 const PROD_API_URL = 'https://api.techinsights.shop';
 const DEFAULT_LOCAL_API_URL = 'http://localhost:8080';
+const BFF_BASE_PATH = '/api/bff';
 
 const REFRESH_ENDPOINT = '/api/v1/auth/refresh';
 const USERS_ME_ENDPOINT = '/api/v1/users/me';
+const DIRECT_BACKEND_PATTERNS = ['/api/v1/auth/', '/api/v1/users/me'];
 
 const AUTH_REQUIRED_PATTERNS = ['/api/v1/auth/'];
 function isAuthRequiredUrl(url: string | undefined): boolean {
@@ -14,7 +16,7 @@ function isAuthRequiredUrl(url: string | undefined): boolean {
   return AUTH_REQUIRED_PATTERNS.some((p) => url.includes(p));
 }
 
-export function getApiBaseUrl(): string {
+export function getBackendApiBaseUrl(): string {
   return (
     process.env.NEXT_PUBLIC_API_URL ||
     (process.env.VERCEL_ENV === 'production' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
@@ -24,11 +26,39 @@ export function getApiBaseUrl(): string {
 }
 
 export function isProductionApiTarget(): boolean {
-  return getApiBaseUrl().startsWith(PROD_API_URL);
+  return getBackendApiBaseUrl().startsWith(PROD_API_URL);
+}
+
+export function isCrossOriginApiTargetInBrowser(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return new URL(getBackendApiBaseUrl()).origin !== window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
+export function shouldUseBff(url: string | undefined): boolean {
+  if (!url || !url.startsWith('/')) {
+    return false;
+  }
+
+  return !DIRECT_BACKEND_PATTERNS.some((pattern) => url.startsWith(pattern));
+}
+
+export function getClientApiBaseUrl(url: string | undefined): string {
+  if (!isServer && shouldUseBff(url)) {
+    return BFF_BASE_PATH;
+  }
+
+  return getBackendApiBaseUrl();
 }
 
 export const api = axios.create({
-  baseURL: getApiBaseUrl(),
+  baseURL: getBackendApiBaseUrl(),
   timeout: 10000,
   withCredentials: true,
 });
@@ -40,6 +70,7 @@ export function setUnauthorizedHandler(handler: (() => void) | null): void {
 
 api.interceptors.request.use((config) => {
   config.withCredentials = true; 
+  config.baseURL = getClientApiBaseUrl(config.url);
   const headers = AxiosHeaders.from(config.headers || {});
   if (!isServer) {
     headers.set('X-Requested-With', 'XMLHttpRequest'); 

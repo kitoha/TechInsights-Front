@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react"
 import { Search, Loader2, Sparkles } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { apiGet, getApiBaseUrl } from "@/lib/shared/api"
+import { apiGet, getBackendApiBaseUrl } from "@/lib/shared/api"
 import { InstantSearchCompany, InstantSearchPost, InstantSearchResponse, SearchMode } from "@/lib/search/types"
 import { isAxiosError } from "axios"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -54,12 +54,12 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
   useEffect(() => {
     const preconnect = document.createElement("link")
     preconnect.rel = "preconnect"
-    preconnect.href = getApiBaseUrl()
+    preconnect.href = getBackendApiBaseUrl()
     preconnect.crossOrigin = "anonymous"
 
     const dnsPrefetch = document.createElement("link")
     dnsPrefetch.rel = "dns-prefetch"
-    dnsPrefetch.href = getApiBaseUrl()
+    dnsPrefetch.href = getBackendApiBaseUrl()
 
     document.head.appendChild(preconnect)
     document.head.appendChild(dnsPrefetch)
