@@ -1,8 +1,7 @@
-import { isAxiosError } from "axios";
 import { CompanyCard, CompanyStats } from "@/components/company/CompanyCard";
-import { apiGet } from "@/lib/shared/api";
 import { redirect } from "next/navigation";
 import { formatCompactNumber } from "@/lib/shared/utils";
+import { fetchBackendJson, isBackendFetchError } from "@/lib/shared/server-fetch";
 
 export interface ApiResponse<T> {
   content: T[];
@@ -12,13 +11,11 @@ export interface ApiResponse<T> {
   totalPages: number;
 }
 
-export const dynamic = 'force-dynamic';
-
 export default async function CompaniesPage() {
   let companies: (CompanyStats & { rank: number })[] = [];
 
   try {
-    const res = await apiGet<{
+    const data = await fetchBackendJson<{
       id: string;
       name: string;
       blogUrl: string;
@@ -27,11 +24,13 @@ export default async function CompaniesPage() {
       postCount: number;
       lastPostedAt: string | null;
       rank?: number;
-    }[]>("/api/v1/companiesSummaries");
+    }[]>("/api/v1/companiesSummaries", {
+      revalidate: 300,
+    });
 
-    if (res?.data && Array.isArray(res.data)) {
+    if (Array.isArray(data)) {
       let rank = 1;
-      companies = res.data
+      companies = data
         .filter((company) => (company.postCount ?? 0) > 0)
         .map((company): CompanyStats & { rank: number } => ({
           id: company.id,
@@ -44,10 +43,10 @@ export default async function CompaniesPage() {
           rank: rank++
         }));
     } else {
-      console.error('Invalid API response structure:', res);
+      console.error('Invalid API response structure:', data);
     }
   } catch (error: unknown) {
-    const status: number | undefined = isAxiosError(error) ? error.response?.status : undefined;
+    const status: number | undefined = isBackendFetchError(error) ? error.status : undefined;
     if (status === 503) {
       redirect('/maintenance.html');
     }

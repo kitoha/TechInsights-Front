@@ -1,9 +1,8 @@
 import { Suspense } from "react"
 import { SearchMode, SearchResponse, SemanticSearchResponse, SortBy } from "@/lib/search/types"
-import { apiGet } from "@/lib/shared/api"
-import { isAxiosError } from "axios"
 import { redirect } from "next/navigation"
 import SearchResults from "@/components/search/SearchResults"
+import { fetchBackendJson, isBackendFetchError } from "@/lib/shared/server-fetch"
 
 interface SearchPageProps {
   searchParams: Promise<{
@@ -91,19 +90,27 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   } else {
     try {
       if (mode === "semantic") {
-        const companyIdParam = companyId ? `&companyId=${encodeURIComponent(companyId)}` : ""
-        const response = await apiGet<SemanticSearchResponse>(
-          `/api/v1/search/semantic?query=${encodeURIComponent(trimmedQuery)}&size=${size}${companyIdParam}`
-        )
-        semanticData = response.data
+        semanticData = await fetchBackendJson<SemanticSearchResponse>("/api/v1/search/semantic", {
+          params: {
+            query: trimmedQuery,
+            size,
+            companyId,
+          },
+          cache: "no-store",
+        })
       } else {
-        const response = await apiGet<SearchResponse>(
-          `/api/v1/search?query=${encodeURIComponent(trimmedQuery)}&page=${page}&size=20&sortBy=${sortBy}`
-        )
-        keywordData = response.data
+        keywordData = await fetchBackendJson<SearchResponse>("/api/v1/search", {
+          params: {
+            query: trimmedQuery,
+            page,
+            size: 20,
+            sortBy,
+          },
+          cache: "no-store",
+        })
       }
     } catch (err) {
-      const status: number | undefined = isAxiosError(err) ? err.response?.status : undefined
+      const status: number | undefined = isBackendFetchError(err) ? err.status : undefined
       if (status === 503) {
         redirect("/maintenance.html")
       }
@@ -114,16 +121,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       } else {
         error = "검색 중 오류가 발생했습니다."
       }
-      if (isAxiosError(err)) {
-        console.error("Search error", {
-          status: err.response?.status,
-          message: err.message,
-        })
-      } else {
-        console.error("Search error", {
-          message: err instanceof Error ? err.message : "Unknown error",
-        })
-      }
+      console.error("Search error", {
+        status,
+        message: err instanceof Error ? err.message : "Unknown error",
+      })
     }
   }
 

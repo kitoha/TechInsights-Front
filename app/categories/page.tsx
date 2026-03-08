@@ -1,4 +1,3 @@
-import { isAxiosError } from "axios";
 import {
   CategoryStats,
   CompactCategoryCard,
@@ -6,8 +5,8 @@ import {
 } from "@/components/category/CategoryCard";
 import { CATEGORY_PAGE_LABELS } from "@/lib/categories/ui";
 import { formatCategoryDate, sortCategoriesByActivity } from "@/lib/categories/utils";
-import { apiGet } from "@/lib/shared/api";
 import { redirect } from "next/navigation";
+import { fetchBackendJson, isBackendFetchError } from "@/lib/shared/server-fetch";
 
 export interface ApiResponse<T> {
   content: T[];
@@ -28,10 +27,12 @@ export default async function CategoriesPage() {
   let categories: CategoryStats[] = [];
 
   try {
-    const res = await apiGet<CategorySummaryResponse[]>("/api/v1/categories/summary");
+    const data = await fetchBackendJson<CategorySummaryResponse[]>("/api/v1/categories/summary", {
+      revalidate: 300,
+    });
 
-    if (res && typeof res === "object" && "data" in res && res.data && Array.isArray(res.data)) {
-      categories = res.data
+    if (Array.isArray(data)) {
+      categories = data
         .filter((category) => category.category.toLowerCase() !== "all")
         .map(
           (category): CategoryStats => ({
@@ -45,7 +46,7 @@ export default async function CategoriesPage() {
         );
     }
   } catch (error: unknown) {
-    const status: number | undefined = isAxiosError(error) ? error.response?.status : undefined;
+    const status: number | undefined = isBackendFetchError(error) ? error.status : undefined;
     if (status === 503) {
       redirect("/maintenance.html");
     }
