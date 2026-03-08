@@ -72,13 +72,30 @@ async function proxyRequest(request: NextRequest, context: { params: Promise<{ p
   const method = request.method;
   const headers = copyRequestHeaders(request);
 
-  const upstreamResponse = await fetch(targetUrl, {
-    method,
-    headers,
-    body: method === "GET" || method === "HEAD" ? undefined : await request.text(),
-    cache: "no-store",
-    redirect: "manual",
-  });
+  let upstreamResponse: Response;
+  try {
+    upstreamResponse = await fetch(targetUrl, {
+      method,
+      headers,
+      body: method === "GET" || method === "HEAD" ? undefined : new Uint8Array(await request.arrayBuffer()),
+      cache: "no-store",
+      redirect: "manual",
+    });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        message: "Upstream request failed",
+        detail: error instanceof Error ? error.message : "Unknown upstream error",
+      }),
+      {
+        status: 502,
+        headers: new Headers({
+          "content-type": "application/json; charset=utf-8",
+          "cache-control": "no-store",
+        }),
+      },
+    );
+  }
 
   return new Response(upstreamResponse.body, {
     status: upstreamResponse.status,
