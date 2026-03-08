@@ -3,7 +3,12 @@ import { getBackendApiBaseUrl } from "@/lib/shared/api";
 
 const REQUEST_HEADER_ALLOWLIST = [
   "accept",
+  "authorization",
+  "cookie",
   "content-type",
+  "origin",
+  "referer",
+  "user-agent",
   "x-device-id",
   "x-requested-with",
 ];
@@ -41,12 +46,22 @@ function copyRequestHeaders(request: NextRequest): Headers {
 
 function copyResponseHeaders(upstreamHeaders: Headers): Headers {
   const headers = new Headers();
+  const getSetCookie = (upstreamHeaders as Headers & { getSetCookie?: () => string[] }).getSetCookie;
 
   upstreamHeaders.forEach((value, key) => {
+    if (key.toLowerCase() === "set-cookie") {
+      return;
+    }
     if (!RESPONSE_HEADER_BLOCKLIST.has(key.toLowerCase())) {
       headers.set(key, value);
     }
   });
+
+  if (typeof getSetCookie === "function") {
+    for (const cookie of getSetCookie.call(upstreamHeaders)) {
+      headers.append("set-cookie", cookie);
+    }
+  }
 
   return headers;
 }
@@ -62,6 +77,7 @@ async function proxyRequest(request: NextRequest, context: { params: Promise<{ p
     headers,
     body: method === "GET" || method === "HEAD" ? undefined : await request.text(),
     cache: "no-store",
+    redirect: "manual",
   });
 
   return new Response(upstreamResponse.body, {
