@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosHeaders, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosHeaders, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { getDeviceId } from './deviceId';
 
 const isServer = typeof window === 'undefined';
@@ -28,9 +28,19 @@ export function isProductionApiTarget(): boolean {
   return getBackendApiBaseUrl().startsWith(PROD_API_URL);
 }
 
-function applyDefaultHeaders(config: AxiosRequestConfig): AxiosRequestConfig {
+function applyDefaultHeaders(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
   config.withCredentials = true;
-  const headers = AxiosHeaders.from(config.headers || {});
+  const headers = new AxiosHeaders();
+
+  if (config.headers instanceof AxiosHeaders) {
+    headers.set(config.headers);
+  } else if (config.headers) {
+    Object.entries(config.headers as Record<string, unknown>).forEach(([key, value]) => {
+      if (value !== undefined) {
+        headers.set(key, value as string | number | boolean | string[] | null);
+      }
+    });
+  }
 
   if (!isServer) {
     headers.set('X-Requested-With', 'XMLHttpRequest');
