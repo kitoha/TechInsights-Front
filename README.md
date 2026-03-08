@@ -53,6 +53,7 @@ npm run dev:prod-api
 ```
 
 `dev:prod-api`는 로컬 프런트가 `https://api.techinsights.shop`에 직접 붙습니다. 이때 화면 상단에 운영 API 연결 배너가 표시됩니다.
+이 배너는 `dev:prod-api` 스크립트에서만 뜨고, 실제 운영 배포에서는 표시되지 않습니다.
 
 인증 기능까지 확인하려면 운영 백엔드에서 `http://localhost:3000`에 대한 CORS + credential 쿠키 설정이 허용되어 있어야 합니다.
 
