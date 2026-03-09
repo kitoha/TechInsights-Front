@@ -48,7 +48,7 @@ interface PostDetailFadeProps {
 
 export default function PostDetailFade({ post, recommendedPosts }: PostDetailFadeProps) {
   const { isLoggedIn } = useAuth();
-  const { bookmarkedPostIds, markPostBookmark } = useBookmarks();
+  const { bookmarkedPostIds, markPostBookmark, isInitialized } = useBookmarks();
   const [isLoaded, setIsLoaded] = useState(false);
   const [displayViewCount, setDisplayViewCount] = useState<number | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(!!post.isBookmarked);
@@ -136,15 +136,17 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
       return;
     }
 
-    setIsBookmarked(bookmarkedPostIds.has(post.id));
-  }, [bookmarkedPostIds, isLoggedIn, post.id]);
+    if (isInitialized) {
+      setIsBookmarked(bookmarkedPostIds.has(post.id));
+    }
+  }, [bookmarkedPostIds, isLoggedIn, post.id, isInitialized]);
 
   const handleBookmarkClick = async () => {
     if (!isLoggedIn) {
       setShowLoginModal(true);
       return;
     }
-    if (isBookmarkPending) {
+    if (isBookmarkPending || !isInitialized) {
       return;
     }
 
@@ -391,10 +393,10 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                           title={isBookmarked ? "저장됨" : "저장"}
                           className={`inline-flex items-center justify-center rounded-full p-2 transition-all duration-200 ${isBookmarked
                             ? "bg-blue-100 text-blue-600 shadow-sm dark:bg-blue-500/20 dark:text-blue-400"
-                            : "bg-gray-100/80 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"} ${!isBookmarkPending ? "hover:scale-105 active:scale-95" : ""} ${isBookmarkPending ? "cursor-wait opacity-60" : "cursor-pointer"}`}
+                            : "bg-gray-100/80 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"} ${!isBookmarkPending && isInitialized ? "hover:scale-105 active:scale-95" : ""} ${isBookmarkPending || !isInitialized ? "cursor-wait opacity-60" : "cursor-pointer"}`}
                           aria-label={isBookmarked ? "북마크 해제" : "북마크"}
                           onClick={handleBookmarkClick}
-                          disabled={isBookmarkPending}
+                          disabled={isBookmarkPending || !isInitialized}
                         >
                           <Bookmark className="h-4 w-4" fill={isBookmarked ? "currentColor" : "none"} strokeWidth={isBookmarked ? 0 : 2} />
                         </button>
