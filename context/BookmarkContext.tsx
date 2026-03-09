@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -16,6 +17,7 @@ interface BookmarkContextValue {
   bookmarkedPostIds: Set<string>;
   bookmarkedRepoIds: Set<string>;
   isLoading: boolean;
+  isInitialized: boolean;
   refreshBookmarks: () => Promise<void>;
   markPostBookmark: (postId: string, bookmarked: boolean) => void;
   markRepoBookmark: (repoId: string, bookmarked: boolean) => void;
@@ -28,15 +30,20 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
   const [bookmarkedPostIds, setBookmarkedPostIds] = useState<Set<string>>(new Set());
   const [bookmarkedRepoIds, setBookmarkedRepoIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  
+  const requestCounter = useRef(0);
 
   const refreshBookmarks = useCallback(async () => {
-
     if (isAuthLoading) return;
+
+    const currentRequest = ++requestCounter.current;
 
     if (!isLoggedIn) {
       setBookmarkedPostIds(new Set());
       setBookmarkedRepoIds(new Set());
       setIsLoading(false);
+      setIsInitialized(true);
       return;
     }
 
@@ -46,14 +53,20 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
         fetchAllBookmarkedPostIds(),
         fetchAllBookmarkedRepoIds(),
       ]);
-      setBookmarkedPostIds(postIds);
-      setBookmarkedRepoIds(repoIds);
+
+      if (currentRequest === requestCounter.current) {
+        setBookmarkedPostIds(postIds);
+        setBookmarkedRepoIds(repoIds);
+        setIsInitialized(true);
+      }
     } catch (error) {
       console.error("[BookmarkContext] failed to refresh bookmarks", error);
     } finally {
-      setIsLoading(false);
+      if (currentRequest === requestCounter.current) {
+        setIsLoading(false);
+      }
     }
-  }, [isLoggedIn]);
+  }, [isAuthLoading, isLoggedIn]);
 
   useEffect(() => {
     void refreshBookmarks();
@@ -88,11 +101,12 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
       bookmarkedPostIds,
       bookmarkedRepoIds,
       isLoading,
+      isInitialized,
       refreshBookmarks,
       markPostBookmark,
       markRepoBookmark,
     }),
-    [bookmarkedPostIds, bookmarkedRepoIds, isLoading, refreshBookmarks, markPostBookmark, markRepoBookmark]
+    [bookmarkedPostIds, bookmarkedRepoIds, isLoading, isInitialized, refreshBookmarks, markPostBookmark, markRepoBookmark]
   );
 
   return <BookmarkContext.Provider value={value}>{children}</BookmarkContext.Provider>;

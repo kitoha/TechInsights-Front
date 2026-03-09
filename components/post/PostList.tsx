@@ -40,17 +40,13 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
   const pageNumbers = Array.from({ length: end - start }, (_, i) => start + i);
 
   useEffect(() => {
-    setDisplayPosts(posts);
-  }, [posts]);
-
-  useEffect(() => {
-    if (!isLoggedIn || posts.length === 0) {
-      return;
-    }
-    setDisplayPosts((prev) =>
-      prev.map((post) => ({ ...post, isBookmarked: bookmarkedPostIds.has(post.id) }))
+    setDisplayPosts(
+      posts.map((post) => ({
+        ...post,
+        isBookmarked: isLoggedIn ? bookmarkedPostIds.has(post.id) : false,
+      }))
     );
-  }, [bookmarkedPostIds, isLoggedIn, posts.length]);
+  }, [bookmarkedPostIds, isLoggedIn, posts]);
 
   const handlePageClick = useCallback((p: number) => {
 

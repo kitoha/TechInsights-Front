@@ -157,8 +157,9 @@ export function BookmarksContent() {
     }
     if (pendingPostIds.includes(postId)) return;
 
-    const previousPosts = bookmarkedPosts;
-    const previousTotalElements = postTotalElements;
+    const postToRestore = bookmarkedPosts.find((post) => post.id === postId);
+    if (!postToRestore) return;
+
     setPendingPostIds((prev) => [...prev, postId]);
     setBookmarkedPosts((prev) => prev.filter((post) => post.id !== postId));
     setPostTotalElements((prev) => Math.max(0, prev - 1));
@@ -171,8 +172,11 @@ export function BookmarksContent() {
         await loadPosts(0, false);
       }
     } catch (error: unknown) {
-      setBookmarkedPosts(previousPosts);
-      setPostTotalElements(previousTotalElements);
+      setBookmarkedPosts((prev) => {
+        if (prev.some((p) => p.id === postId)) return prev;
+        return [...prev, postToRestore];
+      });
+      setPostTotalElements((prev) => prev + 1);
       markPostBookmark(postId, true);
       if (isAxiosError(error) && error.response?.status === 401) {
         setShowLoginModal(true);
@@ -182,7 +186,7 @@ export function BookmarksContent() {
     } finally {
       setPendingPostIds((prev) => prev.filter((id) => id !== postId));
     }
-  }, [bookmarkedPosts, isLoggedIn, loadPosts, markPostBookmark, pendingPostIds, postTotalElements]);
+  }, [bookmarkedPosts, isLoggedIn, loadPosts, markPostBookmark, pendingPostIds]);
 
   const handleToggleRepoBookmark = useCallback(async (repoId: string) => {
     if (!isLoggedIn) {
@@ -191,8 +195,9 @@ export function BookmarksContent() {
     }
     if (pendingRepoIds.includes(repoId)) return;
 
-    const previousRepos = bookmarkedRepos;
-    const previousTotalElements = repoTotalElements;
+    const repoToRestore = bookmarkedRepos.find((repo) => repo.id === repoId);
+    if (!repoToRestore) return;
+
     setPendingRepoIds((prev) => [...prev, repoId]);
     setBookmarkedRepos((prev) => prev.filter((repo) => repo.id !== repoId));
     setRepoTotalElements((prev) => Math.max(0, prev - 1));
@@ -205,8 +210,11 @@ export function BookmarksContent() {
         await loadRepos(0, false);
       }
     } catch (error: unknown) {
-      setBookmarkedRepos(previousRepos);
-      setRepoTotalElements(previousTotalElements);
+      setBookmarkedRepos((prev) => {
+        if (prev.some((r) => r.id === repoId)) return prev;
+        return [...prev, repoToRestore];
+      });
+      setRepoTotalElements((prev) => prev + 1);
       markRepoBookmark(repoId, true);
       if (isAxiosError(error) && error.response?.status === 401) {
         setShowLoginModal(true);
@@ -216,7 +224,7 @@ export function BookmarksContent() {
     } finally {
       setPendingRepoIds((prev) => prev.filter((id) => id !== repoId));
     }
-  }, [bookmarkedRepos, isLoggedIn, loadRepos, markRepoBookmark, pendingRepoIds, repoTotalElements]);
+  }, [bookmarkedRepos, isLoggedIn, loadRepos, markRepoBookmark, pendingRepoIds]);
 
   const handleLoadMore = async () => {
     if (loadingMore) return;
