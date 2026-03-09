@@ -8,7 +8,8 @@ import { memo, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { useAuth } from "@/context/AuthContext";
-import { fetchAllBookmarkedPostIds, togglePostBookmark } from "@/lib/bookmarks";
+import { useBookmarks } from "@/context/BookmarkContext";
+import { togglePostBookmark } from "@/lib/bookmarks";
 
 
 interface Post {
@@ -39,6 +40,7 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
 
   const router = useRouter();
   const { isLoggedIn } = useAuth();
+  const { bookmarkedPostIds, markPostBookmark } = useBookmarks();
   const [displayPosts, setDisplayPosts] = useState(posts);
   const [pendingIds, setPendingIds] = useState<string[]>([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -59,25 +61,10 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
     if (!isLoggedIn || posts.length === 0) {
       return;
     }
-    let cancelled = false;
-    const syncBookmarkedState = async () => {
-      try {
-        const bookmarkedIds = await fetchAllBookmarkedPostIds();
-        if (cancelled) return;
-        setDisplayPosts((prev) =>
-          prev.map((post) => ({ ...post, isFavorite: bookmarkedIds.has(post.id) }))
-        );
-      } catch (error) {
-        if (!cancelled) {
-          console.error("[PostList] failed to sync bookmarked post ids", error);
-        }
-      }
-    };
-    void syncBookmarkedState();
-    return () => {
-      cancelled = true;
-    };
-  }, [isLoggedIn, posts.length]);
+    setDisplayPosts((prev) =>
+      prev.map((post) => ({ ...post, isFavorite: bookmarkedPostIds.has(post.id) }))
+    );
+  }, [bookmarkedPostIds, isLoggedIn, posts.length]);
 
   const handlePageClick = useCallback((p: number) => {
 
@@ -120,16 +107,19 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
     setDisplayPosts((prev) =>
       prev.map((item) => item.id === postId ? { ...item, isFavorite: !previousBookmarked } : item)
     );
+    markPostBookmark(postId, !previousBookmarked);
 
     try {
       const result = await togglePostBookmark(postId);
       setDisplayPosts((prev) =>
         prev.map((item) => item.id === postId ? { ...item, isFavorite: result.bookmarked } : item)
       );
+      markPostBookmark(postId, result.bookmarked);
     } catch (error: unknown) {
       setDisplayPosts((prev) =>
         prev.map((item) => item.id === postId ? { ...item, isFavorite: previousBookmarked } : item)
       );
+      markPostBookmark(postId, previousBookmarked);
       if (isAxiosError(error) && error.response?.status === 401) {
         setShowLoginModal(true);
       } else {
@@ -138,7 +128,7 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
     } finally {
       setPendingIds((prev) => prev.filter((id) => id !== postId));
     }
-  }, [displayPosts, isLoggedIn, pendingIds]);
+  }, [displayPosts, isLoggedIn, markPostBookmark, pendingIds]);
 
 
 
