@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { isAxiosError } from "axios";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
 import { RepoCard } from "@/components/opensource/RepoCard";
+import { PostCard } from "@/components/post/PostCard";
 import { useAuth } from "@/context/AuthContext";
 import { useBookmarks } from "@/context/BookmarkContext";
 import {
@@ -25,7 +25,7 @@ import { cn } from "@/lib/shared/utils";
 type BookmarkTab = "posts" | "repos";
 
 const TAB_BUTTON_STYLES =
-  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors";
+  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors cursor-pointer";
 
 export function BookmarksContent() {
   const router = useRouter();
@@ -248,7 +248,7 @@ export function BookmarksContent() {
           <button
             type="button"
             onClick={() => setShowLoginModal(true)}
-            className="mt-6 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+            className="mt-6 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 cursor-pointer"
           >
             로그인하기
           </button>
@@ -302,7 +302,7 @@ export function BookmarksContent() {
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((item) => (
-                <div key={item} className="h-28 animate-pulse rounded-xl border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950" />
+                <div key={item} className="h-28 rounded-xl border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950" />
               ))}
             </div>
           ) : error ? (
@@ -318,7 +318,7 @@ export function BookmarksContent() {
                   }
                   void loadRepos(0, false);
                 }}
-                className="mt-3 rounded-md border border-red-300 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-red-100 dark:border-red-800 dark:hover:bg-red-950/40"
+                className="mt-3 rounded-md border border-red-300 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-red-100 dark:border-red-800 dark:hover:bg-red-950/40 cursor-pointer"
               >
                 다시 시도
               </button>
@@ -332,45 +332,12 @@ export function BookmarksContent() {
           ) : tab === "posts" ? (
             <div className="space-y-4">
               {bookmarkedPosts.map((post) => (
-                <article
+                <PostCard
                   key={post.id}
-                  className="flex min-h-[140px] flex-col rounded-xl border border-gray-200 bg-white p-5 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-gray-950 dark:hover:border-gray-700"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="mb-2 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                        <span className="font-semibold text-gray-700 dark:text-gray-300">{post.companyName}</span>
-                        <span>•</span>
-                        <span>{new Date(post.publishedAt).toLocaleDateString("ko-KR")}</span>
-                      </div>
-                      <Link href={`/post/${post.id}`} className="block">
-                        <h2 className="line-clamp-2 text-lg font-semibold text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400">
-                          {post.title}
-                        </h2>
-                        {post.preview && (
-                          <p className="mt-2 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
-                            {post.preview}
-                          </p>
-                        )}
-                      </Link>
-                    </div>
-                    <button
-                      type="button"
-                      disabled={pendingPostIds.includes(post.id)}
-                      onClick={() => {
-                        void handleTogglePostBookmark(post.id);
-                      }}
-                      className={cn(
-                        "shrink-0 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
-                        pendingPostIds.includes(post.id)
-                          ? "cursor-wait opacity-60"
-                          : "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300"
-                      )}
-                    >
-                      북마크 해제
-                    </button>
-                  </div>
-                </article>
+                  post={post}
+                  disabled={pendingPostIds.includes(post.id)}
+                  onToggleBookmark={handleTogglePostBookmark}
+                />
               ))}
             </div>
           ) : (
