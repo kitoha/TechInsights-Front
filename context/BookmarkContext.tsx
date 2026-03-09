@@ -24,12 +24,15 @@ interface BookmarkContextValue {
 const BookmarkContext = createContext<BookmarkContextValue | null>(null);
 
 export function BookmarkProvider({ children }: { children: ReactNode }) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuth();
   const [bookmarkedPostIds, setBookmarkedPostIds] = useState<Set<string>>(new Set());
   const [bookmarkedRepoIds, setBookmarkedRepoIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
 
   const refreshBookmarks = useCallback(async () => {
+
+    if (isAuthLoading) return;
+
     if (!isLoggedIn) {
       setBookmarkedPostIds(new Set());
       setBookmarkedRepoIds(new Set());

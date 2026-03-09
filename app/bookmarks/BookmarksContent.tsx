@@ -220,17 +220,23 @@ export function BookmarksContent() {
 
   const handleLoadMore = async () => {
     if (loadingMore) return;
-    setLoadingMore(true);
-    try {
-      if (tab === "posts") {
-        if (postPage + 1 >= postTotalPages) return;
+
+    if (tab === "posts") {
+      if (postPage + 1 >= postTotalPages) return;
+      setLoadingMore(true);
+      try {
         await loadPosts(postPage + 1, true);
-        return;
+      } finally {
+        setLoadingMore(false);
       }
+    } else {
       if (repoPage + 1 >= repoTotalPages) return;
-      await loadRepos(repoPage + 1, true);
-    } finally {
-      setLoadingMore(false);
+      setLoadingMore(true);
+      try {
+        await loadRepos(repoPage + 1, true);
+      } finally {
+        setLoadingMore(false);
+      }
     }
   };
 
