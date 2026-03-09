@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { apiGet } from "@/lib/shared/api";
 import PostDetailFade from "@/components/post/PostDetailFade";
 import { fetchRecommendedPosts } from "@/lib/posts";
+import { fetchBackendJson } from "@/lib/shared/server-fetch";
 
 interface PostDetailProps {
   params: Promise<{
@@ -26,8 +26,9 @@ interface PostData {
 
 async function getPostData(postId: string): Promise<PostData | null> {
   try {
-    const res = await apiGet<PostData>(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts/${postId}`);
-    return res.data;
+    return await fetchBackendJson<PostData>(`/api/v1/posts/${postId}`, {
+      revalidate: 300,
+    });
   } catch (error) {
     console.error('Post fetch error:', error);
     return null;

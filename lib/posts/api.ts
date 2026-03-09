@@ -1,33 +1,34 @@
-import { isAxiosError } from "axios";
 import { redirect } from "next/navigation";
-import { apiGet } from "@/lib/shared/api";
 import { PagedResponse } from "@/lib/shared/types";
 import { Post, RecommendedPost } from "@/lib/posts/types";
+import { fetchBackendJson, isBackendFetchError } from "@/lib/shared/server-fetch";
 
 export async function fetchPosts(
   page: number = 0,
   category: string = "All"
 ): Promise<{ content: Post[]; totalPages: number }> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts`;
     const paramsObj = {
       page,
       size: 10,
       ...(category && category !== "All" ? { category } : {}),
     };
 
-    const res = await apiGet<PagedResponse<Post>>(url, { params: paramsObj });
+    const data = await fetchBackendJson<PagedResponse<Post>>("/api/v1/posts", {
+      params: paramsObj,
+      revalidate: 60,
+    });
 
-    if (res?.data?.content) {
+    if (data?.content) {
       return {
-        content: res.data.content,
-        totalPages: res.data.totalPages,
+        content: data.content,
+        totalPages: data.totalPages,
       };
     }
 
     return { content: [], totalPages: 1 };
   } catch (error: unknown) {
-    const status = isAxiosError(error) ? error.response?.status : undefined;
+    const status = isBackendFetchError(error) ? error.status : undefined;
     if (status === 503) {
       redirect("/maintenance.html");
     }
@@ -41,25 +42,27 @@ export async function fetchPostsByCompany(
   page: number = 0
 ): Promise<{ content: Post[]; totalPages: number }> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts`;
     const paramsObj = {
       page,
       size: 10,
       companyId,
     };
 
-    const res = await apiGet<PagedResponse<Post>>(url, { params: paramsObj });
+    const data = await fetchBackendJson<PagedResponse<Post>>("/api/v1/posts", {
+      params: paramsObj,
+      revalidate: 60,
+    });
 
-    if (res?.data?.content) {
+    if (data?.content) {
       return {
-        content: res.data.content,
-        totalPages: res.data.totalPages,
+        content: data.content,
+        totalPages: data.totalPages,
       };
     }
 
     return { content: [], totalPages: 1 };
   } catch (error: unknown) {
-    const status = isAxiosError(error) ? error.response?.status : undefined;
+    const status = isBackendFetchError(error) ? error.status : undefined;
     if (status === 503) {
       redirect("/maintenance.html");
     }
@@ -70,11 +73,13 @@ export async function fetchPostsByCompany(
 
 export async function fetchRecommendedPosts(): Promise<RecommendedPost[]> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/recommendations`;
-    const res = await apiGet<{ postId: string; title: string; logoImageName: string }[]>(url);
+    const data = await fetchBackendJson<{ postId: string; title: string; logoImageName: string }[]>(
+      "/api/v1/recommendations",
+      { revalidate: 300 },
+    );
 
-    if (Array.isArray(res?.data)) {
-      return res.data.map((item) => ({
+    if (Array.isArray(data)) {
+      return data.map((item) => ({
         postId: item.postId,
         title: item.title,
         logoImageName: item.logoImageName,

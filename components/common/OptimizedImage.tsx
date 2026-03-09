@@ -25,17 +25,19 @@ export function OptimizedImage({
   width,
   height,
 }: OptimizedImageProps) {
+  const normalizedSrc = src.trim();
   const useBlurPlaceholder = fill || (!!width && width >= 40 && !!height && height >= 40);
-  const isValidSrc = src && src.trim() !== '' && !src.includes('null') && !src.includes('undefined');
-  const isLogo = src && src.includes('/logos/');
+  const isSentinelSrc = normalizedSrc === "null" || normalizedSrc === "undefined";
+  const isValidSrc = normalizedSrc !== "" && !isSentinelSrc;
+  const isLogo = normalizedSrc.includes('/logos/');
   const [imgSrc, setImgSrc] = useState<string>(isValidSrc ? src : fallbackSrc);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
-  const shouldPrioritize = priority || isLogo;
+  const shouldPrioritize = Boolean(priority || isLogo);
 
   useEffect(() => {
-    const validSrc = src && src.trim() !== '' && !src.includes('null') && !src.includes('undefined');
+    const validSrc = normalizedSrc !== "" && normalizedSrc !== "null" && normalizedSrc !== "undefined";
     if (validSrc) {
       setImgSrc(src);
       setIsLoading(true);
@@ -45,7 +47,7 @@ export function OptimizedImage({
       setIsLoading(false);
       setHasError(false);
     }
-  }, [src, fallbackSrc]);
+  }, [src, fallbackSrc, normalizedSrc]);
 
   const handleError = () => {
     if (imgSrc !== fallbackSrc && !hasError) {

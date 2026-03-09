@@ -1,16 +1,17 @@
-import { apiGet } from "@/lib/shared/api";
 import { PagedResponse } from "@/lib/shared/types";
 import { Company, CompanyInfo, TrendingPost } from "@/lib/companies/types";
+import { fetchBackendJson } from "@/lib/shared/server-fetch";
 
 export async function fetchCompanyInfo(companyId: string): Promise<CompanyInfo | null> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies/${companyId}`;
-    const res = await apiGet<CompanyInfo>(url);
+    const data = await fetchBackendJson<CompanyInfo>(`/api/v1/companies/${companyId}`, {
+      revalidate: 300,
+    });
 
-    if (res?.data) {
+    if (data) {
       return {
-        name: res.data.name,
-        logoImageName: res.data.logoImageName,
+        name: data.name,
+        logoImageName: data.logoImageName,
       };
     }
 
@@ -23,14 +24,14 @@ export async function fetchCompanyInfo(companyId: string): Promise<CompanyInfo |
 
 export async function fetchTrendingCompanies(): Promise<TrendingPost[]> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies/top-by-views`;
     const paramsObj = { page: 0, size: 5 };
-    const res = await apiGet<PagedResponse<{ logoImageName: string; name: string; totalViewCount: number }>>(url, {
+    const data = await fetchBackendJson<PagedResponse<{ logoImageName: string; name: string; totalViewCount: number }>>("/api/v1/companies/top-by-views", {
       params: paramsObj,
+      revalidate: 300,
     });
 
-    if (Array.isArray(res?.data?.content)) {
-      return res.data.content
+    if (Array.isArray(data?.content)) {
+      return data.content
         .filter((company) => company.logoImageName && company.logoImageName.trim() !== "")
         .map(
           (company): TrendingPost => ({
@@ -55,14 +56,14 @@ export async function fetchTrendingCompanies(): Promise<TrendingPost[]> {
 
 export async function fetchCompanies(): Promise<Company[]> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companies`;
     const paramsObj = { page: 0, size: 30 };
-    const res = await apiGet<PagedResponse<{ name: string; logoImageName: string }>>(url, {
+    const data = await fetchBackendJson<PagedResponse<{ name: string; logoImageName: string }>>("/api/v1/companies", {
       params: paramsObj,
+      revalidate: 300,
     });
 
-    if (Array.isArray(res?.data?.content)) {
-      return res.data.content
+    if (Array.isArray(data?.content)) {
+      return data.content
         .filter((company) => company.logoImageName && company.logoImageName.trim() !== "")
         .map(
           (company): Company => ({

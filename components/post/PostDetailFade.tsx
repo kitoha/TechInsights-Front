@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { OptimizedImage } from "@/components/common/OptimizedImage";
 import { LogoImage } from "@/components/company/LogoImage";
+import { apiPost } from "@/lib/shared/api";
 import { ArrowLeft, Bookmark, ChevronRight, Heart, Share2, Sparkles } from "lucide-react";
 
 interface Post {
@@ -98,14 +99,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
 
     const controller = new AbortController();
     const timeout = setTimeout(() => {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!baseUrl) {
-        console.warn('NEXT_PUBLIC_API_URL is not configured; skip view recording');
-        return;
-      }
-
-      fetch(`${baseUrl}/api/v1/posts/${post.id}/view`, {
-        method: 'POST',
+      apiPost(`/api/v1/posts/${post.id}/view`, undefined, {
         signal: controller.signal,
       }).catch((error) => {
         if (error.name !== 'AbortError') {
