@@ -1,7 +1,10 @@
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BookmarksContent } from "./BookmarksContent";
+import { fetchSidebarData } from "@/lib/layout/sidebar";
 
-export default function BookmarksPage() {
+export default async function BookmarksPage() {
+  const sidebarData = await fetchSidebarData();
+
   return (
     <div className="bg-background min-h-full">
       <main className="max-w-[1600px] mx-auto px-6 py-8">
@@ -9,7 +12,11 @@ export default function BookmarksPage() {
           <div className="lg:col-span-3">
             <BookmarksContent />
           </div>
-          <Sidebar trendingPosts={[]} companies={[]} recommendedPosts={[]} />
+          <Sidebar
+            trendingPosts={sidebarData.trendingPosts}
+            companies={sidebarData.companies}
+            recommendedPosts={sidebarData.recommendedPosts}
+          />
         </div>
       </main>
     </div>
