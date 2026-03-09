@@ -15,6 +15,7 @@ import { getLoginRedirectUrl, type UserProfile } from "@/lib/shared/auth";
 
 const USERS_ME = "/api/v1/users/me";
 const LOGOUT_ENDPOINT = "/api/v1/auth/logout";
+const AUTH_PENDING_SYNC_KEY = "techinsights_auth_pending_sync";
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -40,6 +41,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 로그인 확인이 완료됐는지 추적 - 비로그인 확정 후 탭 전환 시 불필요한 재호출 차단
   const authCheckedRef = useRef(false);
   const isLoggedInRef = useRef(false);
+
+  const consumePendingAuthSync = useCallback((): boolean => {
+    if (typeof window === "undefined") return false;
+    const pending = window.sessionStorage.getItem(AUTH_PENDING_SYNC_KEY) === "1";
+    if (pending) {
+      window.sessionStorage.removeItem(AUTH_PENDING_SYNC_KEY);
+    }
+    return pending;
+  }, []);
+
+  const markPendingAuthSync = useCallback(() => {
+    if (typeof window === "undefined") return;
+    window.sessionStorage.setItem(AUTH_PENDING_SYNC_KEY, "1");
+  }, []);
 
   const clearAndRedirect = useCallback(() => {
     setState({
@@ -81,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       const profile = res.status === 200 ? parseUserProfile(res) : null;
       isLoggedInRef.current = !!profile;
+      authCheckedRef.current = true;
       setState((prev) => ({
         ...prev,
         isLoggedIn: !!profile,
@@ -89,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }));
     } catch {
       isLoggedInRef.current = false;
+      authCheckedRef.current = true;
       setState((prev) => ({
         ...prev,
         isLoggedIn: false,
@@ -107,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // validateStatus로 401을 정상 응답으로 처리 → 브라우저 콘솔 네트워크 에러 제거
   useEffect(() => {
     let cancelled = false;
+    const shouldForceSync = consumePendingAuthSync();
     const runMe = async () => {
       try {
         const res = await authGet<unknown>(USERS_ME, {
@@ -121,6 +139,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           userProfile: profile,
           isLoading: false,
         });
+        if (shouldForceSync && !profile) {
+          void refetchUser();
+        }
       } catch {
         if (cancelled) return;
         isLoggedInRef.current = false;
@@ -130,11 +151,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           userProfile: null,
           isLoading: false,
         });
+        if (shouldForceSync) {
+          void refetchUser();
+        }
       }
     };
     runMe();
     return () => { cancelled = true; };
-  }, [parseUserProfile]);
+  }, [consumePendingAuthSync, parseUserProfile, refetchUser]);
 
   // OAuth 리다이렉트 복귀 시 로그인 상태 재동기화
   // - visibilitychange만 사용 (focus와 중복 발화 방지)
@@ -143,6 +167,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const onVisible = () => {
       if (document.visibilityState !== "visible") return;
       if (!authCheckedRef.current) return;
+      if (consumePendingAuthSync()) {
+        refetchUser();
+        return;
+      }
       // 비로그인 상태가 확정된 경우에는 재호출 안 함
       // (OAuth 리다이렉트 후 돌아왔을 때는 페이지 자체가 reload되므로 커버됨)
       if (!isLoggedInRef.current) return;
@@ -152,11 +180,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [refetchUser]);
+  }, [consumePendingAuthSync, refetchUser]);
 
   const loginRedirect = useCallback(() => {
+    markPendingAuthSync();
     window.location.href = getLoginRedirectUrl();
-  }, []);
+  }, [markPendingAuthSync]);
 
   const logout = useCallback(async () => {
     try {

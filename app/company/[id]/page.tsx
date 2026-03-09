@@ -2,9 +2,9 @@ import { MainContent } from "@/components/post/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { 
   fetchPostsByCompany,
-  fetchRecommendedPosts
 } from "@/lib/posts";
-import { fetchCompanyInfo, fetchTrendingCompanies, fetchCompanies } from "@/lib/companies";
+import { fetchCompanyInfo } from "@/lib/companies";
+import { fetchSidebarData } from "@/lib/layout/sidebar";
 import { Post } from "@/lib/posts";
 import { notFound } from "next/navigation";
 
@@ -18,11 +18,9 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
   const searchParamsData = await searchParams;
   const page = Number(searchParamsData?.page) || 0;
   
-  const [postsData, trendingCompanies, companies, recommendedPosts, companyInfo] = await Promise.all([
+  const [postsData, sidebarData, companyInfo] = await Promise.all([
     fetchPostsByCompany(companyId, page),
-    fetchTrendingCompanies(),
-    fetchCompanies(),
-    fetchRecommendedPosts(),
+    fetchSidebarData(),
     fetchCompanyInfo(companyId)
   ]);
 
@@ -61,9 +59,9 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
           />
           {/* Sidebar */}
           <Sidebar
-            trendingPosts={trendingCompanies}
-            companies={companies}
-            recommendedPosts={recommendedPosts}
+            trendingPosts={sidebarData.trendingPosts}
+            companies={sidebarData.companies}
+            recommendedPosts={sidebarData.recommendedPosts}
           />
         </div>
       </div>

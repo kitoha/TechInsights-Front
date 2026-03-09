@@ -1,5 +1,5 @@
 export interface GithubTrendingRepoDto {
-    id: number;
+    id: string;
     repoName: string;
     fullName: string;
     description: string | null;
@@ -8,7 +8,7 @@ export interface GithubTrendingRepoDto {
     forkCount: number;
     primaryLanguage: string | null;
     ownerName: string;
-    ownerAvatarUrl: string;
+    ownerAvatarUrl: string | null;
     topics: string[];
     weeklyStarDelta: number;
     pushedAt: string;
@@ -35,6 +35,7 @@ export interface TrendingRepo {
     aiSummary?: string;
     updatedAt: string;
     relevance?: number;
+    isBookmarked?: boolean;
 }
 
 export type SortType = 'trending' | 'stars' | 'latest';

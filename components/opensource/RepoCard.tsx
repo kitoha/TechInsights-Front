@@ -7,9 +7,10 @@ interface RepoCardProps {
     repo: TrendingRepo;
     isFavorite?: boolean;
     onToggleFavorite?: (id: string) => void;
+    disabled?: boolean;
 }
 
-export function RepoCard({ repo, isFavorite, onToggleFavorite }: RepoCardProps) {
+export function RepoCard({ repo, isFavorite, onToggleFavorite, disabled = false }: RepoCardProps) {
     const displayLanguage = repo.language?.trim() || '언어 없음';
     const langColor = LANGUAGE_COLORS[displayLanguage] || '#6e7681';
 
@@ -92,9 +93,11 @@ export function RepoCard({ repo, isFavorite, onToggleFavorite }: RepoCardProps) 
                         onClick={() => {
                             onToggleFavorite?.(repo.id);
                         }}
+                        disabled={disabled}
                         aria-label={isFavorite ? `${repo.name} 즐겨찾기 해제` : `${repo.name} 즐겨찾기 추가`}
                         className={cn(
-                            "p-1.5 rounded-lg transition-all duration-300 cursor-pointer",
+                            "p-1.5 rounded-lg transition-all duration-300",
+                            disabled ? "cursor-wait opacity-60" : "cursor-pointer",
                             isFavorite
                                 ? "bg-amber-50 text-amber-500 dark:bg-amber-900/20 dark:text-amber-400"
                                 : "text-gray-300 hover:text-gray-400 hover:bg-gray-100 dark:text-gray-600 dark:hover:text-gray-500 dark:hover:bg-gray-800"

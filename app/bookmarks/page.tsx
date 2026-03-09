@@ -1,8 +1,8 @@
 import { Sidebar } from "@/components/layout/Sidebar";
-import { ProfileContent } from "./ProfileContent";
+import { BookmarksContent } from "./BookmarksContent";
 import { fetchSidebarData } from "@/lib/layout/sidebar";
 
-export default async function ProfilePage() {
+export default async function BookmarksPage() {
   const sidebarData = await fetchSidebarData();
 
   return (
@@ -10,7 +10,7 @@ export default async function ProfilePage() {
       <main className="max-w-[1600px] mx-auto px-6 py-8">
         <div className="lg:grid lg:grid-cols-4 lg:gap-8">
           <div className="lg:col-span-3">
-            <ProfileContent />
+            <BookmarksContent />
           </div>
           <Sidebar
             trendingPosts={sidebarData.trendingPosts}

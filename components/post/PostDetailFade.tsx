@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from "react";
+import { isAxiosError } from "axios";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from "react-markdown";
@@ -7,6 +8,10 @@ import remarkGfm from "remark-gfm";
 import { OptimizedImage } from "@/components/common/OptimizedImage";
 import { LogoImage } from "@/components/company/LogoImage";
 import { apiPost } from "@/lib/shared/api";
+import { togglePostBookmark } from "@/lib/bookmarks";
+import { LoginModal } from "@/components/auth/LoginModal";
+import { useAuth } from "@/context/AuthContext";
+import { useBookmarks } from "@/context/BookmarkContext";
 import { ArrowLeft, Bookmark, ChevronRight, Heart, Share2, Sparkles } from "lucide-react";
 
 interface Post {
@@ -23,6 +28,7 @@ interface Post {
   categories?: string[];
   viewCount?: number;
   blogUrl?: string;
+  isBookmarked?: boolean;
 }
 
 interface RecommendedPost {
@@ -41,8 +47,13 @@ interface PostDetailFadeProps {
 }
 
 export default function PostDetailFade({ post, recommendedPosts }: PostDetailFadeProps) {
+  const { isLoggedIn } = useAuth();
+  const { bookmarkedPostIds, markPostBookmark, isInitialized } = useBookmarks();
   const [isLoaded, setIsLoaded] = useState(false);
   const [displayViewCount, setDisplayViewCount] = useState<number | null>(null);
+  const [isBookmarked, setIsBookmarked] = useState(!!post.isBookmarked);
+  const [isBookmarkPending, setIsBookmarkPending] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const splitContent = (content: string) => {
     const lines = content.split('\n');
@@ -113,6 +124,53 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
       controller.abort();
     };
   }, [post?.id]);
+
+  useEffect(() => {
+    setIsBookmarked(!!post.isBookmarked);
+    setIsBookmarkPending(false);
+  }, [post.id, post.isBookmarked]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setIsBookmarked(false);
+      return;
+    }
+
+    if (isInitialized) {
+      setIsBookmarked(bookmarkedPostIds.has(post.id));
+    }
+  }, [bookmarkedPostIds, isLoggedIn, post.id, isInitialized]);
+
+  const handleBookmarkClick = async () => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+    if (isBookmarkPending || !isInitialized) {
+      return;
+    }
+
+    const previousBookmarked = isBookmarked;
+    setIsBookmarkPending(true);
+    setIsBookmarked(!previousBookmarked);
+    markPostBookmark(post.id, !previousBookmarked);
+
+    try {
+      const result = await togglePostBookmark(post.id);
+      setIsBookmarked(result.bookmarked);
+      markPostBookmark(post.id, result.bookmarked);
+    } catch (error: unknown) {
+      setIsBookmarked(previousBookmarked);
+      markPostBookmark(post.id, previousBookmarked);
+      if (isAxiosError(error) && error.response?.status === 401) {
+        setShowLoginModal(true);
+      } else {
+        console.error("[PostDetailFade] bookmark toggle failed", error);
+      }
+    } finally {
+      setIsBookmarkPending(false);
+    }
+  };
 
   return (
     <div className="relative">
@@ -331,9 +389,16 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                           <Share2 className="h-3.5 w-3.5" />
                           <span className="text-[10px]">공유</span>
                         </button>
-                        <button className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 transition-colors hover:border-gray-300 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:hover:text-gray-200" aria-label="북마크">
-                          <Bookmark className="h-3.5 w-3.5" />
-                          <span className="text-[10px]">저장</span>
+                        <button
+                          title={isBookmarked ? "저장됨" : "저장"}
+                          className={`inline-flex items-center justify-center rounded-full p-2 transition-all duration-200 ${isBookmarked
+                            ? "bg-blue-100 text-blue-600 shadow-sm dark:bg-blue-500/20 dark:text-blue-400"
+                            : "bg-gray-100/80 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"} ${!isBookmarkPending && isInitialized ? "hover:scale-105 active:scale-95" : ""} ${isBookmarkPending || !isInitialized ? "cursor-wait opacity-60" : "cursor-pointer"}`}
+                          aria-label={isBookmarked ? "북마크 해제" : "북마크"}
+                          onClick={handleBookmarkClick}
+                          disabled={isBookmarkPending || !isInitialized}
+                        >
+                          <Bookmark className="h-4 w-4" fill={isBookmarked ? "currentColor" : "none"} strokeWidth={isBookmarked ? 0 : 2} />
                         </button>
                       </div>
                     </div>
@@ -418,6 +483,7 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
           </div>
         )}
       </div>
+      <LoginModal open={showLoginModal} onOpenChange={setShowLoginModal} />
     </div>
   );
 }

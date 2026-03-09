@@ -8,11 +8,13 @@ const BFF_BASE_PATH = '/api/bff';
 
 const REFRESH_ENDPOINT = '/api/v1/auth/refresh';
 const USERS_ME_ENDPOINT = '/api/v1/users/me';
+const LOGOUT_ENDPOINT = '/api/v1/auth/logout';
 
-const AUTH_REQUIRED_PATTERNS = ['/api/v1/auth/'];
-function isAuthRequiredUrl(url: string | undefined): boolean {
+function shouldRetryWithRefresh(url: string | undefined): boolean {
   if (!url) return false;
-  return AUTH_REQUIRED_PATTERNS.some((p) => url.includes(p));
+  if (url.includes(USERS_ME_ENDPOINT)) return false;
+  if (url.includes(REFRESH_ENDPOINT)) return false;
+  return true;
 }
 
 export function getBackendApiBaseUrl(): string {
@@ -125,15 +127,12 @@ authApi.interceptors.response.use(
     }
 
     if (status === 401 && typeof window !== 'undefined' && config && !config._retry) {
-      if (config.url?.includes(USERS_ME_ENDPOINT)) {
-        return Promise.reject(error);
-      }
       const isRefreshRequest = config.url?.includes(REFRESH_ENDPOINT);
       if (isRefreshRequest) {
         onUnauthorized?.();
         return Promise.reject(error);
       }
-      if (!isAuthRequiredUrl(config.url)) {
+      if (!shouldRetryWithRefresh(config.url)) {
         return Promise.reject(error);
       }
       config._retry = true;

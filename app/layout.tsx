@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AuthProvider } from "@/context/AuthContext";
+import { BookmarkProvider } from "@/context/BookmarkContext";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 export const metadata: Metadata = {
@@ -37,9 +38,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <DashboardLayout>
-              {children}
-            </DashboardLayout>
+            <BookmarkProvider>
+              <DashboardLayout>
+                {children}
+              </DashboardLayout>
+            </BookmarkProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
