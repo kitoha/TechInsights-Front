@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/shared/utils";
-import { LogOut, User, Settings } from "lucide-react";
+import { Bookmark, LogOut, User, Settings } from "lucide-react";
 
 export function UserProfileDropdown() {
   const { userProfile, logout } = useAuth();
@@ -77,6 +77,15 @@ export function UserProfileDropdown() {
           >
             <Settings className="size-4 shrink-0" />
             Settings
+          </Link>
+          <Link
+            href="/bookmarks"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <Bookmark className="size-4 shrink-0" />
+            Bookmarks
           </Link>
           <div className="my-1 border-t border-border" />
           <button
