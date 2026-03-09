@@ -14,7 +14,6 @@ function shouldRetryWithRefresh(url: string | undefined): boolean {
   if (!url) return false;
   if (url.includes(USERS_ME_ENDPOINT)) return false;
   if (url.includes(REFRESH_ENDPOINT)) return false;
-  if (url.includes(LOGOUT_ENDPOINT)) return false;
   return true;
 }
 

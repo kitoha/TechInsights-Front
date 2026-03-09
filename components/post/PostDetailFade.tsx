@@ -131,9 +131,11 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
   }, [post.id, post.isBookmarked]);
 
   useEffect(() => {
-    if (!isLoggedIn || bookmarkedPostIds.size === 0) {
+    if (!isLoggedIn) {
+      setIsBookmarked(false);
       return;
     }
+
     setIsBookmarked(bookmarkedPostIds.has(post.id));
   }, [bookmarkedPostIds, isLoggedIn, post.id]);
 

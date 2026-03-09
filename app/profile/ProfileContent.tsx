@@ -58,7 +58,7 @@ export function ProfileContent() {
             href="/bookmarks"
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
           >
-            열기
+            북마크 열기
           </Link>
         </div>
       </div>

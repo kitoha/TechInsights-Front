@@ -79,7 +79,9 @@ export async function fetchAllBookmarkedPostIds(): Promise<Set<string>> {
       page,
       size: DEFAULT_BOOKMARK_ID_SYNC_PAGE_SIZE,
     });
-    result.content.forEach((post) => ids.add(post.id));
+    result.content.forEach((post) => {
+      ids.add(post.id);
+    });
     totalPages = result.totalPages;
     page += 1;
   } while (page < totalPages);
@@ -97,7 +99,9 @@ export async function fetchAllBookmarkedRepoIds(): Promise<Set<string>> {
       page,
       size: DEFAULT_BOOKMARK_ID_SYNC_PAGE_SIZE,
     });
-    result.content.forEach((repo) => ids.add(repo.id));
+    result.content.forEach((repo) => {
+      ids.add(repo.id);
+    });
     totalPages = result.totalPages;
     page += 1;
   } while (page < totalPages);
