@@ -1,10 +1,14 @@
 "use client";
 import Link from "next/link";
+import { isAxiosError } from "axios";
 import { Card, CardContent } from "@/components/ui/card";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/components/ui/pagination";
 import { OptimizedImage } from "@/components/common/OptimizedImage";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { LoginModal } from "@/components/auth/LoginModal";
+import { useAuth } from "@/context/AuthContext";
+import { togglePostBookmark } from "@/lib/bookmarks";
 
 
 interface Post {
@@ -34,6 +38,10 @@ interface PostListProps {
 const PostList = memo(function PostList({ posts, totalPages, page, selectedCategory, companyId }: PostListProps) {
 
   const router = useRouter();
+  const { isLoggedIn } = useAuth();
+  const [displayPosts, setDisplayPosts] = useState(posts);
+  const [pendingIds, setPendingIds] = useState<string[]>([]);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const maxVisible = 5;
 
@@ -42,6 +50,10 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
   const end = Math.min(totalPages, start + maxVisible);
 
   const pageNumbers = Array.from({ length: end - start }, (_, i) => start + i);
+
+  useEffect(() => {
+    setDisplayPosts(posts);
+  }, [posts]);
 
   const handlePageClick = useCallback((p: number) => {
 
@@ -64,6 +76,45 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
     }
 
   }, [selectedCategory, companyId, router]);
+
+  const handleToggleBookmark = useCallback(async (postId: string) => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+    if (pendingIds.includes(postId)) {
+      return;
+    }
+
+    const targetPost = displayPosts.find((item) => item.id === postId);
+    if (!targetPost) {
+      return;
+    }
+
+    const previousBookmarked = !!targetPost.isFavorite;
+    setPendingIds((prev) => [...prev, postId]);
+    setDisplayPosts((prev) =>
+      prev.map((item) => item.id === postId ? { ...item, isFavorite: !previousBookmarked } : item)
+    );
+
+    try {
+      const result = await togglePostBookmark(postId);
+      setDisplayPosts((prev) =>
+        prev.map((item) => item.id === postId ? { ...item, isFavorite: result.bookmarked } : item)
+      );
+    } catch (error: unknown) {
+      setDisplayPosts((prev) =>
+        prev.map((item) => item.id === postId ? { ...item, isFavorite: previousBookmarked } : item)
+      );
+      if (isAxiosError(error) && error.response?.status === 401) {
+        setShowLoginModal(true);
+      } else {
+        console.error("[PostList] bookmark toggle failed", error);
+      }
+    } finally {
+      setPendingIds((prev) => prev.filter((id) => id !== postId));
+    }
+  }, [displayPosts, isLoggedIn, pendingIds]);
 
 
 
@@ -117,8 +168,13 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
               )}
             </div>
           ) : (
-            posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+            displayPosts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                disabled={pendingIds.includes(post.id)}
+                onToggleBookmark={handleToggleBookmark}
+              />
             ))
           )}
         </div>
@@ -165,18 +221,33 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
           </PaginationContent>
         </Pagination>
       </section>
+      <LoginModal open={showLoginModal} onOpenChange={setShowLoginModal} />
     </>
   );
 });
 
-const PostCard = memo(function PostCard({ post }: { post: Post }) {
+const PostCard = memo(function PostCard({
+  post,
+  onToggleBookmark,
+  disabled = false,
+}: {
+  post: Post;
+  onToggleBookmark: (postId: string) => void;
+  disabled?: boolean;
+}) {
   const thumbnail = post.thumbnail || post.image;
 
   return (
     <Card className="group relative bg-white dark:bg-gray-800 border border-gray-200/60 dark:border-gray-700/60 hover:border-blue-400 dark:hover:border-blue-700 transition-all duration-300 rounded-xl overflow-hidden shadow-sm hover:shadow-md">
       {/* Bookmark Ribbon */}
       <div className="absolute top-0 right-6 z-10">
-        <div className="relative group/bookmark cursor-pointer">
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onToggleBookmark(post.id)}
+          className={`relative group/bookmark ${disabled ? "cursor-wait opacity-60" : "cursor-pointer"}`}
+          aria-label={post.isFavorite ? `${post.title} 북마크 해제` : `${post.title} 북마크 추가`}
+        >
           <svg
             width="28"
             height="38"
@@ -194,7 +265,7 @@ const PostCard = memo(function PostCard({ post }: { post: Post }) {
               className={post.isFavorite ? "" : "opacity-40 group-hover/bookmark:opacity-100"}
             />
           </svg>
-        </div>
+        </button>
       </div>
 
       <Link href={`/post/${post.id}`}>
