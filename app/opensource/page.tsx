@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { isAxiosError } from "axios";
+import { LoginModal } from "@/components/auth/LoginModal";
 import { FeaturedRepoCard } from "@/components/opensource/FeaturedRepoCard";
 import { RepoCard } from "@/components/opensource/RepoCard";
 import { formatCompactNumber, cn } from "@/lib/shared/utils";
@@ -9,40 +11,63 @@ import { SortTabs } from "@/components/opensource/SortTabs";
 import { SearchInput } from "@/components/opensource/SearchInput";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
 import { StateView } from "@/components/opensource/StateView";
-import { fetchTrendingRepos, fetchSemanticRepos } from "@/lib/opensource/api";
-import { useFavorites } from "@/hooks/opensource/useFavorites";
+import { fetchBookmarkedRepos, toggleGithubBookmark } from "@/lib/bookmarks";
+import { adaptGithubRepo, fetchTrendingRepos, fetchSemanticRepos } from "@/lib/opensource/api";
 import type { TrendingRepo, SortType, LanguageFilter as LanguageFilterType } from "@/lib/opensource/types";
+import { useAuth } from "@/context/AuthContext";
 
 const PAGE_SIZE = 8;
+const BOOKMARKS_PAGE_SIZE = 20;
 
 export default function OpensourcePage() {
     const [repos, setRepos] = useState<TrendingRepo[]>([]);
+    const [bookmarkedRepos, setBookmarkedRepos] = useState<TrendingRepo[]>([]);
     const [language, setLanguage] = useState<LanguageFilterType>("All Languages");
     const [sort, setSort] = useState<SortType>("trending");
     const [searchQuery, setSearchQuery] = useState("");
     const [submittedQuery, setSubmittedQuery] = useState("");
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState(false);
-    const [currentPage, setCurrentPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
+    const [mainCurrentPage, setMainCurrentPage] = useState(0);
+    const [mainTotalPages, setMainTotalPages] = useState(1);
+    const [bookmarkCurrentPage, setBookmarkCurrentPage] = useState(0);
+    const [bookmarkTotalPages, setBookmarkTotalPages] = useState(1);
+    const [pendingBookmarkIds, setPendingBookmarkIds] = useState<string[]>([]);
 
     const latestRequestId = useRef(0);
-    const { favorites, toggleFavorite, isFavorite } = useFavorites();
+    const { isLoggedIn } = useAuth();
+
+    const isBookmarkPending = useCallback(
+        (id: string) => pendingBookmarkIds.includes(id),
+        [pendingBookmarkIds]
+    );
+
+    const syncRepoBookmark = useCallback((repo: TrendingRepo, bookmarked: boolean) => {
+        setRepos((prev) =>
+            prev.map((item) => (item.id === repo.id ? { ...item, isBookmarked: bookmarked } : item))
+        );
+        setBookmarkedRepos((prev) => {
+            const nextRepo = { ...repo, isBookmarked: bookmarked };
+            const remaining = prev.filter((item) => item.id !== repo.id);
+            return bookmarked ? [nextRepo, ...remaining] : remaining;
+        });
+    }, []);
 
     const loadRepos = useCallback(async () => {
         const requestId = ++latestRequestId.current;
         setLoading(true);
         setError(false);
-        setCurrentPage(0);
         try {
             const result = submittedQuery
                 ? await fetchSemanticRepos(submittedQuery, PAGE_SIZE)
                 : await fetchTrendingRepos(language, sort, 0, PAGE_SIZE);
             if (requestId !== latestRequestId.current) return;
             setRepos(result.repos);
-            setTotalPages(result.totalPages);
+            setMainCurrentPage(0);
+            setMainTotalPages(result.totalPages);
         } catch {
             if (requestId !== latestRequestId.current) return;
             setError(true);
@@ -54,25 +79,120 @@ export default function OpensourcePage() {
     }, [language, sort, submittedQuery]);
 
     useEffect(() => {
+        if (showFavoritesOnly) {
+            return;
+        }
         loadRepos();
-    }, [loadRepos]);
+    }, [loadRepos, showFavoritesOnly]);
+
+    const loadBookmarkedRepoPage = useCallback(async (page: number, append: boolean) => {
+        const requestId = ++latestRequestId.current;
+        setLoading(true);
+        setError(false);
+        try {
+            const result = await fetchBookmarkedRepos({
+                page,
+                size: BOOKMARKS_PAGE_SIZE,
+            });
+            if (requestId !== latestRequestId.current) return;
+            const nextRepos = result.content.map((repo) => adaptGithubRepo(repo, { isBookmarked: true }));
+            setBookmarkedRepos((prev) => (append ? [...prev, ...nextRepos] : nextRepos));
+            setBookmarkCurrentPage(result.page);
+            setBookmarkTotalPages(result.totalPages);
+        } catch (error: unknown) {
+            if (requestId !== latestRequestId.current) return;
+            if (isAxiosError(error) && error.response?.status === 401) {
+                setShowFavoritesOnly(false);
+                setShowLoginModal(true);
+            } else {
+                setError(true);
+            }
+        } finally {
+            if (requestId === latestRequestId.current) {
+                setLoading(false);
+            }
+        }
+    }, []);
+
+    const handleFavoritesToggle = useCallback(async () => {
+        const nextValue = !showFavoritesOnly;
+        if (nextValue && !isLoggedIn) {
+            setShowLoginModal(true);
+            return;
+        }
+        setShowFavoritesOnly(nextValue);
+        if (nextValue) {
+            await loadBookmarkedRepoPage(0, false);
+        }
+    }, [isLoggedIn, loadBookmarkedRepoPage, showFavoritesOnly]);
+
+    const handleToggleFavorite = useCallback(async (repoId: string) => {
+        const sourceRepo = repos.find((repo) => repo.id === repoId) ?? bookmarkedRepos.find((repo) => repo.id === repoId);
+        if (!sourceRepo) return;
+        if (!isLoggedIn) {
+            setShowLoginModal(true);
+            return;
+        }
+        if (pendingBookmarkIds.includes(repoId)) {
+            return;
+        }
+
+        const previousBookmarked = !!sourceRepo.isBookmarked;
+        setPendingBookmarkIds((prev) => [...prev, repoId]);
+        syncRepoBookmark(sourceRepo, !previousBookmarked);
+
+        try {
+            const result = await toggleGithubBookmark(repoId);
+            syncRepoBookmark(sourceRepo, result.bookmarked);
+        } catch (error: unknown) {
+            syncRepoBookmark(sourceRepo, previousBookmarked);
+            if (isAxiosError(error) && error.response?.status === 401) {
+                setShowLoginModal(true);
+            } else {
+                console.error("[OpensourcePage] bookmark toggle failed", error);
+            }
+        } finally {
+            setPendingBookmarkIds((prev) => prev.filter((id) => id !== repoId));
+        }
+    }, [bookmarkedRepos, isLoggedIn, pendingBookmarkIds, repos, syncRepoBookmark]);
 
     const handleLoadMore = async () => {
-        if (loadingMore || currentPage + 1 >= totalPages) return;
+        const activePage = showFavoritesOnly ? bookmarkCurrentPage : mainCurrentPage;
+        const activeTotalPages = showFavoritesOnly ? bookmarkTotalPages : mainTotalPages;
+        if (loadingMore || activePage + 1 >= activeTotalPages) return;
         const requestId = ++latestRequestId.current;
         setLoadingMore(true);
         try {
-            const nextPage = currentPage + 1;
+            const nextPage = activePage + 1;
+            if (showFavoritesOnly) {
+                const result = await fetchBookmarkedRepos({
+                    page: nextPage,
+                    size: BOOKMARKS_PAGE_SIZE,
+                });
+                if (requestId !== latestRequestId.current) return;
+                setBookmarkedRepos((prev) => [
+                    ...prev,
+                    ...result.content.map((repo) => adaptGithubRepo(repo, { isBookmarked: true })),
+                ]);
+                setBookmarkCurrentPage(result.page);
+                setBookmarkTotalPages(result.totalPages);
+                return;
+            }
+
             const result = submittedQuery
                 ? { repos: [], totalPages: 1, totalElements: repos.length }
                 : await fetchTrendingRepos(language, sort, nextPage, PAGE_SIZE);
             if (requestId !== latestRequestId.current) return;
             setRepos((prev) => [...prev, ...result.repos]);
-            setCurrentPage(nextPage);
-            setTotalPages(result.totalPages);
-        } catch {
+            setMainCurrentPage(nextPage);
+            setMainTotalPages(result.totalPages);
+        } catch (error: unknown) {
             if (requestId !== latestRequestId.current) return;
-            console.error("[OpensourcePage] handleLoadMore failed");
+            if (isAxiosError(error) && error.response?.status === 401) {
+                setShowLoginModal(true);
+            } else {
+                console.error("[OpensourcePage] handleLoadMore failed", error);
+            }
         } finally {
             setLoadingMore(false);
         }
@@ -86,21 +206,19 @@ export default function OpensourcePage() {
         setShowFavoritesOnly(false);
     };
 
-    // Filter by favorites if active
-    const filteredRepos = showFavoritesOnly
-        ? repos.filter(repo => favorites.includes(repo.id))
-        : repos;
-
-    const hasMore = currentPage + 1 < totalPages && !showFavoritesOnly;
-    const totalStars = filteredRepos.reduce((sum, r) => sum + r.stars, 0);
+    const visibleRepos = showFavoritesOnly ? bookmarkedRepos : repos;
+    const hasMore = showFavoritesOnly
+        ? bookmarkCurrentPage + 1 < bookmarkTotalPages
+        : mainCurrentPage + 1 < mainTotalPages;
+    const totalStars = visibleRepos.reduce((sum, r) => sum + r.stars, 0);
 
     const summaryItems = [
-        { label: "Repositories", value: `${filteredRepos.length}개` },
+        { label: "Repositories", value: `${visibleRepos.length}개` },
         { label: "Total Stars", value: formatCompactNumber(totalStars) },
     ];
 
-    const featuredRepo = filteredRepos[0];
-    const gridRepos = filteredRepos.slice(1);
+    const featuredRepo = visibleRepos[0];
+    const gridRepos = visibleRepos.slice(1);
 
     return (
         <div className="min-h-full bg-gradient-to-b from-slate-50 via-slate-50 to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
@@ -117,7 +235,7 @@ export default function OpensourcePage() {
                         </p>
                     </div>
 
-                    {!loading && !error && repos.length > 0 && (
+                    {!loading && !error && visibleRepos.length > 0 && (
                         <div className="grid w-full max-w-md grid-cols-2 gap-3">
                             {summaryItems.map((item) => (
                                 <div
@@ -148,7 +266,9 @@ export default function OpensourcePage() {
                             <div className="flex items-center gap-2">
                                 <LanguageFilter selected={language} onChange={setLanguage} />
                                 <button
-                                    onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                                    onClick={() => {
+                                        void handleFavoritesToggle();
+                                    }}
                                     className={cn(
                                         "flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-300 border shadow-sm cursor-pointer",
                                         showFavoritesOnly
@@ -167,15 +287,15 @@ export default function OpensourcePage() {
                             <SortTabs selected={sort} onChange={setSort} />
                         </div>
                     </div>
-                    {submittedQuery && !loading && (
+                    {submittedQuery && !loading && !showFavoritesOnly && (
                         <div className="flex items-center justify-between px-2 animate-in fade-in slide-in-from-top-2 duration-500">
-                            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-800/20 mr-1">
-                                    <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-tight">✨ AI Discovery</span>
+                                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-800/20 mr-1">
+                                        <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-tight">✨ AI Discovery</span>
+                                    </div>
+                                    <span className="font-bold text-slate-900 dark:text-slate-100 italic">&ldquo;{submittedQuery}&rdquo;</span>
+                                    <span>의 시맨틱 검색 결과 {visibleRepos.length}개를 찾았습니다.</span>
                                 </div>
-                                <span className="font-bold text-slate-900 dark:text-slate-100 italic">&ldquo;{submittedQuery}&rdquo;</span>
-                                <span>의 시맨틱 검색 결과 {filteredRepos.length}개를 찾았습니다.</span>
-                            </div>
                             <button
                                 onClick={() => {
                                     setSearchQuery("");
@@ -190,11 +310,11 @@ export default function OpensourcePage() {
 
                     {showFavoritesOnly && !submittedQuery && (
                         <div className="flex items-center justify-between px-2 animate-in fade-in slide-in-from-top-2 duration-500">
-                            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/20 mr-1">
-                                    <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tight">★ Favorites Only</span>
-                                </div>
-                                <span>총 {filteredRepos.length}개의 즐겨찾기 프로젝트를 불러왔습니다.</span>
+                                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/20 mr-1">
+                                        <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tight">★ Bookmarked</span>
+                                    </div>
+                                <span>총 {visibleRepos.length}개의 북마크한 프로젝트를 불러왔습니다.</span>
                             </div>
                             <button
                                 onClick={() => setShowFavoritesOnly(false)}
@@ -221,14 +341,14 @@ export default function OpensourcePage() {
                         onActionPrimary={loadRepos}
                         onActionSecondary={() => window.open('https://techinsights.shop/support', '_blank', 'noopener,noreferrer')}
                     />
-                ) : filteredRepos.length === 0 ? (
-                    showFavoritesOnly && favorites.length === 0 ? (
+                ) : visibleRepos.length === 0 ? (
+                    showFavoritesOnly ? (
                         <StateView
                             type="empty"
-                            title="즐겨찾기한 프로젝트가 없습니다"
+                            title="북마크한 프로젝트가 없습니다"
                             description={
                                 <span>
-                                    마음에 드는 오픈소스 프로젝트의 <strong className="text-amber-500 dark:text-amber-400">★ 북마크 아이콘</strong>을 클릭하여 즐겨찾기에 추가해 보세요.
+                                    마음에 드는 오픈소스 프로젝트의 <strong className="text-amber-500 dark:text-amber-400">★ 북마크 아이콘</strong>을 클릭하여 저장해 보세요.
                                 </span>
                             }
                             onActionPrimary={() => setShowFavoritesOnly(false)}
@@ -254,8 +374,11 @@ export default function OpensourcePage() {
                             <div className="mb-5">
                                 <FeaturedRepoCard
                                     repo={featuredRepo}
-                                    isFavorite={isFavorite(featuredRepo.id)}
-                                    onToggleFavorite={toggleFavorite}
+                                    isFavorite={!!featuredRepo.isBookmarked}
+                                    onToggleFavorite={(id) => {
+                                        void handleToggleFavorite(id);
+                                    }}
+                                    disabled={isBookmarkPending(featuredRepo.id)}
                                 />
                             </div>
                         )}
@@ -266,8 +389,11 @@ export default function OpensourcePage() {
                                     <RepoCard
                                         key={repo.id}
                                         repo={repo}
-                                        isFavorite={isFavorite(repo.id)}
-                                        onToggleFavorite={toggleFavorite}
+                                        isFavorite={!!repo.isBookmarked}
+                                        onToggleFavorite={(id) => {
+                                            void handleToggleFavorite(id);
+                                        }}
+                                        disabled={isBookmarkPending(repo.id)}
                                     />
                                 ))}
                             </div>
@@ -281,6 +407,7 @@ export default function OpensourcePage() {
                     </div>
                 )}
             </div>
+            <LoginModal open={showLoginModal} onOpenChange={setShowLoginModal} />
         </div>
     );
 }

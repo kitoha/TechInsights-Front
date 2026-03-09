@@ -8,7 +8,7 @@ export interface GithubTrendingRepoDto {
     forkCount: number;
     primaryLanguage: string | null;
     ownerName: string;
-    ownerAvatarUrl: string;
+    ownerAvatarUrl: string | null;
     topics: string[];
     weeklyStarDelta: number;
     pushedAt: string;
