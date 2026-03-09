@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { isAxiosError } from "axios";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { FeaturedRepoCard } from "@/components/opensource/FeaturedRepoCard";
@@ -25,8 +26,11 @@ const TAB_BUTTON_STYLES =
   "rounded-full border px-4 py-2 text-sm font-semibold transition-colors";
 
 export function BookmarksContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { isLoggedIn } = useAuth();
-  const [tab, setTab] = useState<BookmarkTab>("posts");
+  const initialTab = searchParams.get("tab") === "repos" ? "repos" : "posts";
+  const [tab, setTab] = useState<BookmarkTab>(initialTab);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -35,8 +39,10 @@ export function BookmarksContent() {
   const [bookmarkedRepos, setBookmarkedRepos] = useState<TrendingRepo[]>([]);
   const [postPage, setPostPage] = useState(0);
   const [postTotalPages, setPostTotalPages] = useState(1);
+  const [postTotalElements, setPostTotalElements] = useState(0);
   const [repoPage, setRepoPage] = useState(0);
   const [repoTotalPages, setRepoTotalPages] = useState(1);
+  const [repoTotalElements, setRepoTotalElements] = useState(0);
   const [pendingPostIds, setPendingPostIds] = useState<string[]>([]);
   const [pendingRepoIds, setPendingRepoIds] = useState<string[]>([]);
 
@@ -54,6 +60,7 @@ export function BookmarksContent() {
       );
       setPostPage(result.page);
       setPostTotalPages(result.totalPages);
+      setPostTotalElements(result.totalElements);
     } catch (error: unknown) {
       if (requestId !== latestRequestId.current) return;
       if (isAxiosError(error) && error.response?.status === 401) {
@@ -79,6 +86,7 @@ export function BookmarksContent() {
       setBookmarkedRepos((prev) => (append ? [...prev, ...nextRepos] : nextRepos));
       setRepoPage(result.page);
       setRepoTotalPages(result.totalPages);
+      setRepoTotalElements(result.totalElements);
     } catch (error: unknown) {
       if (requestId !== latestRequestId.current) return;
       if (isAxiosError(error) && error.response?.status === 401) {
@@ -92,6 +100,19 @@ export function BookmarksContent() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    setTab(initialTab);
+  }, [initialTab]);
+
+  useEffect(() => {
+    if (searchParams.get("tab") === tab) {
+      return;
+    }
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    router.replace(`/bookmarks?${params.toString()}`);
+  }, [router, searchParams, tab]);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -113,8 +134,10 @@ export function BookmarksContent() {
     if (pendingPostIds.includes(postId)) return;
 
     const previousPosts = bookmarkedPosts;
+    const previousTotalElements = postTotalElements;
     setPendingPostIds((prev) => [...prev, postId]);
     setBookmarkedPosts((prev) => prev.filter((post) => post.id !== postId));
+    setPostTotalElements((prev) => Math.max(0, prev - 1));
 
     try {
       const result = await togglePostBookmark(postId);
@@ -123,6 +146,7 @@ export function BookmarksContent() {
       }
     } catch (error: unknown) {
       setBookmarkedPosts(previousPosts);
+      setPostTotalElements(previousTotalElements);
       if (isAxiosError(error) && error.response?.status === 401) {
         setShowLoginModal(true);
       } else {
@@ -131,7 +155,7 @@ export function BookmarksContent() {
     } finally {
       setPendingPostIds((prev) => prev.filter((id) => id !== postId));
     }
-  }, [bookmarkedPosts, isLoggedIn, loadPosts, pendingPostIds]);
+  }, [bookmarkedPosts, isLoggedIn, loadPosts, pendingPostIds, postTotalElements]);
 
   const handleToggleRepoBookmark = useCallback(async (repoId: string) => {
     if (!isLoggedIn) {
@@ -141,8 +165,10 @@ export function BookmarksContent() {
     if (pendingRepoIds.includes(repoId)) return;
 
     const previousRepos = bookmarkedRepos;
+    const previousTotalElements = repoTotalElements;
     setPendingRepoIds((prev) => [...prev, repoId]);
     setBookmarkedRepos((prev) => prev.filter((repo) => repo.id !== repoId));
+    setRepoTotalElements((prev) => Math.max(0, prev - 1));
 
     try {
       const result = await toggleGithubBookmark(repoId);
@@ -151,6 +177,7 @@ export function BookmarksContent() {
       }
     } catch (error: unknown) {
       setBookmarkedRepos(previousRepos);
+      setRepoTotalElements(previousTotalElements);
       if (isAxiosError(error) && error.response?.status === 401) {
         setShowLoginModal(true);
       } else {
@@ -159,7 +186,7 @@ export function BookmarksContent() {
     } finally {
       setPendingRepoIds((prev) => prev.filter((id) => id !== repoId));
     }
-  }, [bookmarkedRepos, isLoggedIn, loadRepos, pendingRepoIds]);
+  }, [bookmarkedRepos, isLoggedIn, loadRepos, pendingRepoIds, repoTotalElements]);
 
   const handleLoadMore = async () => {
     if (loadingMore) return;
@@ -225,6 +252,7 @@ export function BookmarksContent() {
               )}
             >
               게시글
+              <span className="ml-2 text-xs opacity-70">{postTotalElements}</span>
             </button>
             <button
               type="button"
@@ -237,6 +265,7 @@ export function BookmarksContent() {
               )}
             >
               GitHub 레포
+              <span className="ml-2 text-xs opacity-70">{repoTotalElements}</span>
             </button>
           </div>
         </div>
@@ -249,8 +278,21 @@ export function BookmarksContent() {
               ))}
             </div>
           ) : error ? (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
-              북마크 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
+              <p>북마크 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  if (tab === "posts") {
+                    void loadPosts(0, false);
+                    return;
+                  }
+                  void loadRepos(0, false);
+                }}
+                className="mt-3 rounded-md border border-red-300 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-red-100 dark:border-red-800 dark:hover:bg-red-950/40"
+              >
+                다시 시도
+              </button>
             </div>
           ) : activeItems.length === 0 ? (
             <div className="rounded-xl border border-dashed border-gray-300 px-6 py-12 text-center dark:border-gray-700">
