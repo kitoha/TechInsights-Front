@@ -8,9 +8,10 @@ import remarkGfm from "remark-gfm";
 import { OptimizedImage } from "@/components/common/OptimizedImage";
 import { LogoImage } from "@/components/company/LogoImage";
 import { apiPost } from "@/lib/shared/api";
-import { fetchAllBookmarkedPostIds, togglePostBookmark } from "@/lib/bookmarks";
+import { togglePostBookmark } from "@/lib/bookmarks";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { useAuth } from "@/context/AuthContext";
+import { useBookmarks } from "@/context/BookmarkContext";
 import { ArrowLeft, Bookmark, ChevronRight, Heart, Share2, Sparkles } from "lucide-react";
 
 interface Post {
@@ -47,6 +48,7 @@ interface PostDetailFadeProps {
 
 export default function PostDetailFade({ post, recommendedPosts }: PostDetailFadeProps) {
   const { isLoggedIn } = useAuth();
+  const { bookmarkedPostIds, markPostBookmark } = useBookmarks();
   const [isLoaded, setIsLoaded] = useState(false);
   const [displayViewCount, setDisplayViewCount] = useState<number | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(!!post.isBookmarked);
@@ -129,27 +131,11 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
   }, [post.id, post.isBookmarked]);
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || bookmarkedPostIds.size === 0) {
       return;
     }
-    let cancelled = false;
-    const syncBookmarkedState = async () => {
-      try {
-        const bookmarkedIds = await fetchAllBookmarkedPostIds();
-        if (!cancelled) {
-          setIsBookmarked(bookmarkedIds.has(post.id));
-        }
-      } catch (error) {
-        if (!cancelled) {
-          console.error("[PostDetailFade] failed to sync bookmarked post ids", error);
-        }
-      }
-    };
-    void syncBookmarkedState();
-    return () => {
-      cancelled = true;
-    };
-  }, [isLoggedIn, post.id]);
+    setIsBookmarked(bookmarkedPostIds.has(post.id));
+  }, [bookmarkedPostIds, isLoggedIn, post.id]);
 
   const handleBookmarkClick = async () => {
     if (!isLoggedIn) {
@@ -163,12 +149,15 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
     const previousBookmarked = isBookmarked;
     setIsBookmarkPending(true);
     setIsBookmarked(!previousBookmarked);
+    markPostBookmark(post.id, !previousBookmarked);
 
     try {
       const result = await togglePostBookmark(post.id);
       setIsBookmarked(result.bookmarked);
+      markPostBookmark(post.id, result.bookmarked);
     } catch (error: unknown) {
       setIsBookmarked(previousBookmarked);
+      markPostBookmark(post.id, previousBookmarked);
       if (isAxiosError(error) && error.response?.status === 401) {
         setShowLoginModal(true);
       } else {

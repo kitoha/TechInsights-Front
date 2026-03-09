@@ -11,10 +11,11 @@ import { SortTabs } from "@/components/opensource/SortTabs";
 import { SearchInput } from "@/components/opensource/SearchInput";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
 import { StateView } from "@/components/opensource/StateView";
-import { fetchAllBookmarkedRepoIds, fetchBookmarkedRepos, toggleGithubBookmark } from "@/lib/bookmarks";
+import { fetchBookmarkedRepos, toggleGithubBookmark } from "@/lib/bookmarks";
 import { adaptGithubRepo, fetchTrendingRepos, fetchSemanticRepos } from "@/lib/opensource/api";
 import type { TrendingRepo, SortType, LanguageFilter as LanguageFilterType } from "@/lib/opensource/types";
 import { useAuth } from "@/context/AuthContext";
+import { useBookmarks } from "@/context/BookmarkContext";
 
 const PAGE_SIZE = 8;
 const BOOKMARKS_PAGE_SIZE = 20;
@@ -39,6 +40,7 @@ export default function OpensourcePage() {
 
     const latestRequestId = useRef(0);
     const { isLoggedIn } = useAuth();
+    const { bookmarkedRepoIds, markRepoBookmark } = useBookmarks();
 
     const isBookmarkPending = useCallback(
         (id: string) => pendingBookmarkIds.includes(id),
@@ -89,25 +91,10 @@ export default function OpensourcePage() {
         if (!isLoggedIn || repos.length === 0) {
             return;
         }
-        let cancelled = false;
-        const syncBookmarkedState = async () => {
-            try {
-                const bookmarkedIds = await fetchAllBookmarkedRepoIds();
-                if (cancelled) return;
-                setRepos((prev) =>
-                    prev.map((repo) => ({ ...repo, isBookmarked: bookmarkedIds.has(repo.id) }))
-                );
-            } catch (error) {
-                if (!cancelled) {
-                    console.error("[OpensourcePage] failed to sync bookmarked repo ids", error);
-                }
-            }
-        };
-        void syncBookmarkedState();
-        return () => {
-            cancelled = true;
-        };
-    }, [isLoggedIn, repos.length]);
+        setRepos((prev) =>
+            prev.map((repo) => ({ ...repo, isBookmarked: bookmarkedRepoIds.has(repo.id) }))
+        );
+    }, [bookmarkedRepoIds, isLoggedIn, repos.length]);
 
     const loadBookmarkedRepoPage = useCallback(async (page: number, append: boolean) => {
         const requestId = ++latestRequestId.current;
@@ -164,12 +151,15 @@ export default function OpensourcePage() {
         const previousBookmarked = !!sourceRepo.isBookmarked;
         setPendingBookmarkIds((prev) => [...prev, repoId]);
         syncRepoBookmark(sourceRepo, !previousBookmarked);
+        markRepoBookmark(repoId, !previousBookmarked);
 
         try {
             const result = await toggleGithubBookmark(repoId);
             syncRepoBookmark(sourceRepo, result.bookmarked);
+            markRepoBookmark(repoId, result.bookmarked);
         } catch (error: unknown) {
             syncRepoBookmark(sourceRepo, previousBookmarked);
+            markRepoBookmark(repoId, previousBookmarked);
             if (isAxiosError(error) && error.response?.status === 401) {
                 setShowLoginModal(true);
             } else {
@@ -178,7 +168,7 @@ export default function OpensourcePage() {
         } finally {
             setPendingBookmarkIds((prev) => prev.filter((id) => id !== repoId));
         }
-    }, [bookmarkedRepos, isLoggedIn, pendingBookmarkIds, repos, syncRepoBookmark]);
+    }, [bookmarkedRepos, isLoggedIn, markRepoBookmark, pendingBookmarkIds, repos, syncRepoBookmark]);
 
     const handleLoadMore = async () => {
         const activePage = showFavoritesOnly ? bookmarkCurrentPage : mainCurrentPage;

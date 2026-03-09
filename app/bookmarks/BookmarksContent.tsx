@@ -9,6 +9,7 @@ import { FeaturedRepoCard } from "@/components/opensource/FeaturedRepoCard";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
 import { RepoCard } from "@/components/opensource/RepoCard";
 import { useAuth } from "@/context/AuthContext";
+import { useBookmarks } from "@/context/BookmarkContext";
 import {
   fetchBookmarkedPosts,
   fetchBookmarkedRepos,
@@ -29,6 +30,7 @@ export function BookmarksContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isLoggedIn } = useAuth();
+  const { markPostBookmark, markRepoBookmark } = useBookmarks();
   const initialTab = searchParams.get("tab") === "repos" ? "repos" : "posts";
   const [tab, setTab] = useState<BookmarkTab>(initialTab);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -138,15 +140,18 @@ export function BookmarksContent() {
     setPendingPostIds((prev) => [...prev, postId]);
     setBookmarkedPosts((prev) => prev.filter((post) => post.id !== postId));
     setPostTotalElements((prev) => Math.max(0, prev - 1));
+    markPostBookmark(postId, false);
 
     try {
       const result = await togglePostBookmark(postId);
       if (result.bookmarked) {
+        markPostBookmark(postId, true);
         await loadPosts(0, false);
       }
     } catch (error: unknown) {
       setBookmarkedPosts(previousPosts);
       setPostTotalElements(previousTotalElements);
+      markPostBookmark(postId, true);
       if (isAxiosError(error) && error.response?.status === 401) {
         setShowLoginModal(true);
       } else {
@@ -155,7 +160,7 @@ export function BookmarksContent() {
     } finally {
       setPendingPostIds((prev) => prev.filter((id) => id !== postId));
     }
-  }, [bookmarkedPosts, isLoggedIn, loadPosts, pendingPostIds, postTotalElements]);
+  }, [bookmarkedPosts, isLoggedIn, loadPosts, markPostBookmark, pendingPostIds, postTotalElements]);
 
   const handleToggleRepoBookmark = useCallback(async (repoId: string) => {
     if (!isLoggedIn) {
@@ -169,15 +174,18 @@ export function BookmarksContent() {
     setPendingRepoIds((prev) => [...prev, repoId]);
     setBookmarkedRepos((prev) => prev.filter((repo) => repo.id !== repoId));
     setRepoTotalElements((prev) => Math.max(0, prev - 1));
+    markRepoBookmark(repoId, false);
 
     try {
       const result = await toggleGithubBookmark(repoId);
       if (result.bookmarked) {
+        markRepoBookmark(repoId, true);
         await loadRepos(0, false);
       }
     } catch (error: unknown) {
       setBookmarkedRepos(previousRepos);
       setRepoTotalElements(previousTotalElements);
+      markRepoBookmark(repoId, true);
       if (isAxiosError(error) && error.response?.status === 401) {
         setShowLoginModal(true);
       } else {
@@ -186,7 +194,7 @@ export function BookmarksContent() {
     } finally {
       setPendingRepoIds((prev) => prev.filter((id) => id !== repoId));
     }
-  }, [bookmarkedRepos, isLoggedIn, loadRepos, pendingRepoIds, repoTotalElements]);
+  }, [bookmarkedRepos, isLoggedIn, loadRepos, markRepoBookmark, pendingRepoIds, repoTotalElements]);
 
   const handleLoadMore = async () => {
     if (loadingMore) return;
