@@ -12,6 +12,7 @@ interface BookmarkListParams {
 
 const DEFAULT_POST_BOOKMARKS_PAGE_SIZE = 10;
 const DEFAULT_REPO_BOOKMARKS_PAGE_SIZE = 20;
+const DEFAULT_BOOKMARK_ID_SYNC_PAGE_SIZE = 100;
 
 function normalizePage(page?: number): number {
   return Math.max(0, Math.floor(Number(page) || 0));
@@ -55,4 +56,40 @@ export async function fetchBookmarkedRepos({
     },
   });
   return res.data;
+}
+
+export async function fetchAllBookmarkedPostIds(): Promise<Set<string>> {
+  const ids = new Set<string>();
+  let page = 0;
+  let totalPages = 1;
+
+  do {
+    const result = await fetchBookmarkedPosts({
+      page,
+      size: DEFAULT_BOOKMARK_ID_SYNC_PAGE_SIZE,
+    });
+    result.content.forEach((post) => ids.add(post.id));
+    totalPages = result.totalPages;
+    page += 1;
+  } while (page < totalPages);
+
+  return ids;
+}
+
+export async function fetchAllBookmarkedRepoIds(): Promise<Set<string>> {
+  const ids = new Set<string>();
+  let page = 0;
+  let totalPages = 1;
+
+  do {
+    const result = await fetchBookmarkedRepos({
+      page,
+      size: DEFAULT_BOOKMARK_ID_SYNC_PAGE_SIZE,
+    });
+    result.content.forEach((repo) => ids.add(repo.id));
+    totalPages = result.totalPages;
+    page += 1;
+  } while (page < totalPages);
+
+  return ids;
 }

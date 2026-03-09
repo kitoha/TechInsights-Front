@@ -8,7 +8,7 @@ import { memo, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { useAuth } from "@/context/AuthContext";
-import { togglePostBookmark } from "@/lib/bookmarks";
+import { fetchAllBookmarkedPostIds, togglePostBookmark } from "@/lib/bookmarks";
 
 
 interface Post {
@@ -54,6 +54,30 @@ const PostList = memo(function PostList({ posts, totalPages, page, selectedCateg
   useEffect(() => {
     setDisplayPosts(posts);
   }, [posts]);
+
+  useEffect(() => {
+    if (!isLoggedIn || posts.length === 0) {
+      return;
+    }
+    let cancelled = false;
+    const syncBookmarkedState = async () => {
+      try {
+        const bookmarkedIds = await fetchAllBookmarkedPostIds();
+        if (cancelled) return;
+        setDisplayPosts((prev) =>
+          prev.map((post) => ({ ...post, isFavorite: bookmarkedIds.has(post.id) }))
+        );
+      } catch (error) {
+        if (!cancelled) {
+          console.error("[PostList] failed to sync bookmarked post ids", error);
+        }
+      }
+    };
+    void syncBookmarkedState();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn, posts.length]);
 
   const handlePageClick = useCallback((p: number) => {
 
