@@ -2,6 +2,7 @@ import { authGet, authPost } from "@/lib/shared/api";
 import type {
   BookmarkedPostsResponse,
   BookmarkedReposResponse,
+  BookmarkCountResponse,
   BookmarkToggleResponse,
 } from "./types";
 
@@ -56,6 +57,16 @@ export async function fetchBookmarkedRepos({
     },
   });
   return res.data;
+}
+
+export async function fetchBookmarkedPostsCount(): Promise<number> {
+  const res = await authGet<BookmarkCountResponse>("/api/v1/posts/me/bookmarks/count");
+  return Number(res.data?.count ?? 0);
+}
+
+export async function fetchBookmarkedReposCount(): Promise<number> {
+  const res = await authGet<BookmarkCountResponse>("/api/v1/github/me/bookmarks/count");
+  return Number(res.data?.count ?? 0);
 }
 
 export async function fetchAllBookmarkedPostIds(): Promise<Set<string>> {

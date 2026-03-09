@@ -386,15 +386,15 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                           <span className="text-[10px]">공유</span>
                         </button>
                         <button
-                          className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 transition-colors ${isBookmarked
-                            ? "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300"
-                            : "border-gray-200 bg-white hover:border-gray-300 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:hover:text-gray-200"} ${isBookmarkPending ? "cursor-wait opacity-60" : ""}`}
+                          title={isBookmarked ? "저장됨" : "저장"}
+                          className={`inline-flex items-center justify-center rounded-full p-2 transition-all duration-200 ${isBookmarked
+                            ? "bg-blue-100 text-blue-600 shadow-sm dark:bg-blue-500/20 dark:text-blue-400"
+                            : "bg-gray-100/80 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"} ${!isBookmarkPending ? "hover:scale-105 active:scale-95" : ""} ${isBookmarkPending ? "cursor-wait opacity-60" : "cursor-pointer"}`}
                           aria-label={isBookmarked ? "북마크 해제" : "북마크"}
                           onClick={handleBookmarkClick}
                           disabled={isBookmarkPending}
                         >
-                          <Bookmark className="h-3.5 w-3.5" fill={isBookmarked ? "currentColor" : "none"} />
-                          <span className="text-[10px]">저장</span>
+                          <Bookmark className="h-4 w-4" fill={isBookmarked ? "currentColor" : "none"} strokeWidth={isBookmarked ? 0 : 2} />
                         </button>
                       </div>
                     </div>
