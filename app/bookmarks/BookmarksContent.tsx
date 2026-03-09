@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { isAxiosError } from "axios";
 import { LoginModal } from "@/components/auth/LoginModal";
-import { FeaturedRepoCard } from "@/components/opensource/FeaturedRepoCard";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
 import { RepoCard } from "@/components/opensource/RepoCard";
 import { useAuth } from "@/context/AuthContext";
@@ -13,6 +12,8 @@ import { useBookmarks } from "@/context/BookmarkContext";
 import {
   fetchBookmarkedPosts,
   fetchBookmarkedRepos,
+  fetchBookmarkedPostsCount,
+  fetchBookmarkedReposCount,
   toggleGithubBookmark,
   togglePostBookmark,
 } from "@/lib/bookmarks";
@@ -49,6 +50,7 @@ export function BookmarksContent() {
   const [pendingRepoIds, setPendingRepoIds] = useState<string[]>([]);
 
   const latestRequestId = useRef(0);
+  const latestCountRequestId = useRef(0);
 
   const loadPosts = useCallback(async (page = 0, append = false) => {
     const requestId = ++latestRequestId.current;
@@ -103,6 +105,25 @@ export function BookmarksContent() {
     }
   }, []);
 
+  const loadCounts = useCallback(async () => {
+    if (!isLoggedIn) return;
+    const requestId = ++latestCountRequestId.current;
+    try {
+      const [postCount, repoCount] = await Promise.all([
+        fetchBookmarkedPostsCount(),
+        fetchBookmarkedReposCount(),
+      ]);
+      if (requestId !== latestCountRequestId.current) return;
+      setPostTotalElements(postCount);
+      setRepoTotalElements(repoCount);
+    } catch (err: unknown) {
+      if (requestId !== latestCountRequestId.current) return;
+      if (isAxiosError(err) && err.response?.status === 401) {
+        setShowLoginModal(true);
+      }
+    }
+  }, [isLoggedIn]);
+
   useEffect(() => {
     setTab(initialTab);
   }, [initialTab]);
@@ -121,12 +142,13 @@ export function BookmarksContent() {
       setLoading(false);
       return;
     }
+    void loadCounts();
     if (tab === "posts") {
       void loadPosts(0, false);
       return;
     }
     void loadRepos(0, false);
-  }, [isLoggedIn, loadPosts, loadRepos, tab]);
+  }, [isLoggedIn, loadCounts, loadPosts, loadRepos, tab]);
 
   const handleTogglePostBookmark = useCallback(async (postId: string) => {
     if (!isLoggedIn) {
@@ -214,8 +236,6 @@ export function BookmarksContent() {
 
   const activeItems = tab === "posts" ? bookmarkedPosts : bookmarkedRepos;
   const hasMore = tab === "posts" ? postPage + 1 < postTotalPages : repoPage + 1 < repoTotalPages;
-  const featuredRepo = tab === "repos" ? bookmarkedRepos[0] : null;
-  const gridRepos = tab === "repos" ? bookmarkedRepos.slice(1) : [];
 
   if (!isLoggedIn) {
     return (
@@ -291,6 +311,7 @@ export function BookmarksContent() {
               <button
                 type="button"
                 onClick={() => {
+                  void loadCounts();
                   if (tab === "posts") {
                     void loadPosts(0, false);
                     return;
@@ -313,7 +334,7 @@ export function BookmarksContent() {
               {bookmarkedPosts.map((post) => (
                 <article
                   key={post.id}
-                  className="rounded-xl border border-gray-200 bg-white p-5 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-gray-950 dark:hover:border-gray-700"
+                  className="flex min-h-[140px] flex-col rounded-xl border border-gray-200 bg-white p-5 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-gray-950 dark:hover:border-gray-700"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
@@ -353,32 +374,18 @@ export function BookmarksContent() {
               ))}
             </div>
           ) : (
-            <div className="space-y-5">
-              {featuredRepo && (
-                <FeaturedRepoCard
-                  repo={featuredRepo}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {bookmarkedRepos.map((repo) => (
+                <RepoCard
+                  key={repo.id}
+                  repo={repo}
                   isFavorite={true}
-                  disabled={pendingRepoIds.includes(featuredRepo.id)}
+                  disabled={pendingRepoIds.includes(repo.id)}
                   onToggleFavorite={(id) => {
                     void handleToggleRepoBookmark(id);
                   }}
                 />
-              )}
-              {gridRepos.length > 0 && (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {gridRepos.map((repo) => (
-                    <RepoCard
-                      key={repo.id}
-                      repo={repo}
-                      isFavorite={true}
-                      disabled={pendingRepoIds.includes(repo.id)}
-                      onToggleFavorite={(id) => {
-                        void handleToggleRepoBookmark(id);
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
+              ))}
             </div>
           )}
 

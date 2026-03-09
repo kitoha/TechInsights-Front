@@ -6,6 +6,10 @@ export interface BookmarkToggleResponse {
   bookmarked: boolean;
 }
 
+export interface BookmarkCountResponse {
+  count: number;
+}
+
 export type BookmarkedPostsResponse = PagedResponse<Post>;
 
 export type BookmarkedReposResponse = PagedResponse<GithubTrendingRepoDto>;

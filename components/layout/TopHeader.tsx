@@ -2,9 +2,10 @@
 
 import SearchBar from "@/components/search/SearchBar"
 import { Suspense, useState } from "react"
-import { Menu } from "lucide-react"
+import { Bookmark, Menu } from "lucide-react"
 import { ThemeToggle } from "@/components/layout/ThemeToggle"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { LoginModal } from "@/components/auth/LoginModal"
 import { UserProfileDropdown } from "@/components/auth/UserProfileDropdown"
@@ -25,6 +26,8 @@ export function TopHeader({
 }: TopHeaderProps) {
   const { isLoggedIn, isLoading } = useAuth()
   const [showLoginModal, setShowLoginModal] = useState(false)
+  const pathname = usePathname()
+  const isBookmarksPage = pathname?.startsWith("/bookmarks") ?? false
 
   return (
     <>
@@ -55,20 +58,26 @@ export function TopHeader({
             </Suspense>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <ThemeToggle />
+          <div className="flex items-center gap-2">
             {isLoading ? null : isLoggedIn ? (
               <>
-                <Link
-                  href="/bookmarks"
-                  className={`hidden sm:inline-flex px-2 py-1 ${compact ? "text-[11px]" : "text-xs"} text-muted-foreground hover:text-foreground transition-colors`}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`hidden sm:inline-flex gap-1.5 transition-all duration-200 ${compact ? "h-7 px-2.5 text-[11px]" : "h-8 px-3 text-xs"} ${isBookmarksPage ? "border-blue-200/70 bg-blue-50/90 text-blue-600 shadow-sm dark:border-blue-800/50 dark:bg-blue-950/30 dark:text-blue-400" : ""}`}
+                  asChild
                 >
-                  Bookmarks
-                </Link>
+                  <Link href="/bookmarks" aria-label="북마크" aria-current={isBookmarksPage ? "page" : undefined}>
+                    <Bookmark className="size-3.5 shrink-0" fill={isBookmarksPage ? "currentColor" : "none"} strokeWidth={isBookmarksPage ? 0 : 1.75} />
+                    <span>Bookmarks</span>
+                  </Link>
+                </Button>
+                <ThemeToggle />
                 <UserProfileDropdown />
               </>
             ) : (
               <>
+                <ThemeToggle />
                 <button
                   type="button"
                   onClick={() => setShowLoginModal(true)}
