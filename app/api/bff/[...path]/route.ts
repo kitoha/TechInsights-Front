@@ -13,6 +13,16 @@ const REQUEST_HEADER_ALLOWLIST = [
   "x-requested-with",
 ];
 
+const PUBLIC_API_ALLOWLIST = [
+  /^api\/v1\/posts(?:\/.*)?$/,
+  /^api\/v1\/recommendations(?:\/.*)?$/,
+  /^api\/v1\/companies(?:\/.*)?$/,
+  /^api\/v1\/companiesSummaries$/,
+  /^api\/v1\/categories\/summary$/,
+  /^api\/v1\/search(?:\/.*)?$/,
+  /^api\/v1\/github(?:\/.*)?$/,
+];
+
 const RESPONSE_HEADER_BLOCKLIST = new Set([
   "connection",
   "content-length",
@@ -24,6 +34,11 @@ const RESPONSE_HEADER_BLOCKLIST = new Set([
 function buildBackendUrl(path: string[], search: string): string {
   const joinedPath = path.join("/");
   return `${getBackendApiBaseUrl()}/${joinedPath}${search}`;
+}
+
+function isAllowedPublicPath(path: string[]): boolean {
+  const joinedPath = path.join("/");
+  return PUBLIC_API_ALLOWLIST.some((pattern) => pattern.test(joinedPath));
 }
 
 function copyRequestHeaders(request: NextRequest): Headers {
@@ -68,6 +83,19 @@ function copyResponseHeaders(upstreamHeaders: Headers): Headers {
 
 async function proxyRequest(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const { path } = await context.params;
+  if (!isAllowedPublicPath(path)) {
+    return new Response(
+      JSON.stringify({ message: "Blocked by BFF policy" }),
+      {
+        status: 403,
+        headers: new Headers({
+          "content-type": "application/json; charset=utf-8",
+          "cache-control": "no-store",
+        }),
+      },
+    );
+  }
+
   const targetUrl = buildBackendUrl(path, request.nextUrl.search);
   const method = request.method;
   const headers = copyRequestHeaders(request);
@@ -82,10 +110,15 @@ async function proxyRequest(request: NextRequest, context: { params: Promise<{ p
       redirect: "manual",
     });
   } catch (error) {
+    console.error("[bff] upstream request failed", {
+      targetUrl,
+      method,
+      error: error instanceof Error ? error.message : "Unknown upstream error",
+    });
+
     return new Response(
       JSON.stringify({
         message: "Upstream request failed",
-        detail: error instanceof Error ? error.message : "Unknown upstream error",
       }),
       {
         status: 502,
