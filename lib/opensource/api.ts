@@ -18,7 +18,7 @@ const SORT_MAP: Record<SortType, string> = {
 function adaptRepo(dto: GithubTrendingRepoDto & { relevance?: number }): TrendingRepo {
     const language = dto.primaryLanguage?.trim() || '언어 없음';
     return {
-        id: dto.fullName,
+        id: dto.id,
         name: dto.repoName,
         fullName: dto.fullName,
         owner: dto.ownerName,
@@ -94,6 +94,7 @@ export async function fetchTrendingRepos(
 export interface GithubSemanticSearchResponse {
     query: string;
     results: Array<{
+        id: string;
         fullName: string;
         repoName: string;
         description: string;
@@ -125,7 +126,7 @@ export async function fetchSemanticRepos(
                 repos: res.data.results.map(r => {
                     const language = r.primaryLanguage?.trim() || '언어 없음';
                     return {
-                        id: r.fullName,
+                        id: r.id,
                         name: r.repoName,
                         fullName: r.fullName,
                         owner: r.ownerName,

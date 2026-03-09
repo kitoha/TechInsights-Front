@@ -3,6 +3,7 @@ export interface Post {
   companyName: string;
   title: string;
   description?: string;
+  content?: string;
   image?: string;
   url: string;
   publishedAt: string;
@@ -10,6 +11,8 @@ export interface Post {
   categories?: string[];
   preview?: string;
   thumbnail?: string;
+  viewCount?: number;
+  isBookmarked?: boolean;
 }
 
 export interface RecommendedPost {
