@@ -8,7 +8,7 @@ import remarkGfm from "remark-gfm";
 import { OptimizedImage } from "@/components/common/OptimizedImage";
 import { LogoImage } from "@/components/company/LogoImage";
 import { apiPost } from "@/lib/shared/api";
-import { togglePostBookmark } from "@/lib/bookmarks";
+import { fetchAllBookmarkedPostIds, togglePostBookmark } from "@/lib/bookmarks";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { useAuth } from "@/context/AuthContext";
 import { ArrowLeft, Bookmark, ChevronRight, Heart, Share2, Sparkles } from "lucide-react";
@@ -127,6 +127,29 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
     setIsBookmarked(!!post.isBookmarked);
     setIsBookmarkPending(false);
   }, [post.id, post.isBookmarked]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      return;
+    }
+    let cancelled = false;
+    const syncBookmarkedState = async () => {
+      try {
+        const bookmarkedIds = await fetchAllBookmarkedPostIds();
+        if (!cancelled) {
+          setIsBookmarked(bookmarkedIds.has(post.id));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("[PostDetailFade] failed to sync bookmarked post ids", error);
+        }
+      }
+    };
+    void syncBookmarkedState();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn, post.id]);
 
   const handleBookmarkClick = async () => {
     if (!isLoggedIn) {

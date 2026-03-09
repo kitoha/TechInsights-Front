@@ -11,7 +11,7 @@ import { SortTabs } from "@/components/opensource/SortTabs";
 import { SearchInput } from "@/components/opensource/SearchInput";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
 import { StateView } from "@/components/opensource/StateView";
-import { fetchBookmarkedRepos, toggleGithubBookmark } from "@/lib/bookmarks";
+import { fetchAllBookmarkedRepoIds, fetchBookmarkedRepos, toggleGithubBookmark } from "@/lib/bookmarks";
 import { adaptGithubRepo, fetchTrendingRepos, fetchSemanticRepos } from "@/lib/opensource/api";
 import type { TrendingRepo, SortType, LanguageFilter as LanguageFilterType } from "@/lib/opensource/types";
 import { useAuth } from "@/context/AuthContext";
@@ -84,6 +84,30 @@ export default function OpensourcePage() {
         }
         loadRepos();
     }, [loadRepos, showFavoritesOnly]);
+
+    useEffect(() => {
+        if (!isLoggedIn || repos.length === 0) {
+            return;
+        }
+        let cancelled = false;
+        const syncBookmarkedState = async () => {
+            try {
+                const bookmarkedIds = await fetchAllBookmarkedRepoIds();
+                if (cancelled) return;
+                setRepos((prev) =>
+                    prev.map((repo) => ({ ...repo, isBookmarked: bookmarkedIds.has(repo.id) }))
+                );
+            } catch (error) {
+                if (!cancelled) {
+                    console.error("[OpensourcePage] failed to sync bookmarked repo ids", error);
+                }
+            }
+        };
+        void syncBookmarkedState();
+        return () => {
+            cancelled = true;
+        };
+    }, [isLoggedIn, repos.length]);
 
     const loadBookmarkedRepoPage = useCallback(async (page: number, append: boolean) => {
         const requestId = ++latestRequestId.current;
