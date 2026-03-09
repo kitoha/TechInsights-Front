@@ -15,14 +15,17 @@ const SORT_MAP: Record<SortType, string> = {
     latest: 'LATEST',
 };
 
-function adaptRepo(dto: GithubTrendingRepoDto & { relevance?: number }): TrendingRepo {
+export function adaptGithubRepo(
+    dto: GithubTrendingRepoDto & { relevance?: number },
+    options?: { isBookmarked?: boolean }
+): TrendingRepo {
     const language = dto.primaryLanguage?.trim() || '언어 없음';
     return {
         id: dto.id,
         name: dto.repoName,
         fullName: dto.fullName,
         owner: dto.ownerName,
-        ownerAvatar: dto.ownerAvatarUrl,
+        ownerAvatar: dto.ownerAvatarUrl ?? '',
         description: dto.description ?? '',
         stars: dto.starCount,
         forks: dto.forkCount,
@@ -35,6 +38,7 @@ function adaptRepo(dto: GithubTrendingRepoDto & { relevance?: number }): Trendin
         aiSummary: dto.readmeSummary ?? undefined,
         updatedAt: dto.pushedAt,
         relevance: dto.relevance,
+        isBookmarked: options?.isBookmarked,
     };
 }
 
@@ -75,7 +79,7 @@ export async function fetchTrendingRepos(
 
         if (Array.isArray(res?.data?.content)) {
             return {
-                repos: res.data.content.map(adaptRepo),
+                repos: res.data.content.map((repo) => adaptGithubRepo(repo)),
                 totalPages: res.data.totalPages,
                 totalElements: res.data.totalElements,
             };
@@ -123,28 +127,15 @@ export async function fetchSemanticRepos(
 
         if (res?.data?.results) {
             return {
-                repos: res.data.results.map(r => {
-                    const language = r.primaryLanguage?.trim() || '언어 없음';
-                    return {
-                        id: r.id,
-                        name: r.repoName,
-                        fullName: r.fullName,
-                        owner: r.ownerName,
-                        ownerAvatar: r.ownerAvatarUrl,
-                        description: r.description ?? '',
-                        stars: r.starCount,
-                        forks: 0,
-                        issues: 0,
-                        language,
-                        languageColor: LANGUAGE_COLORS[language] ?? '#6e7681',
-                        starsThisWeek: 0,
-                        topics: r.topics ?? [],
-                        url: r.htmlUrl,
-                        aiSummary: r.readmeSummary ?? undefined,
-                        updatedAt: new Date().toISOString(),
-                        relevance: r.similarityScore,
-                    };
-                }),
+                repos: res.data.results.map(r => adaptGithubRepo({
+                    ...r,
+                    forkCount: 0,
+                    weeklyStarDelta: 0,
+                    pushedAt: new Date().toISOString(),
+                    fetchedAt: new Date().toISOString(),
+                    readmeSummarizedAt: null,
+                    relevance: r.similarityScore,
+                })),
                 totalPages: 1,
                 totalElements: res.data.totalReturned,
             };
