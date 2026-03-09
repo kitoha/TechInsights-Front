@@ -1,7 +1,7 @@
 import { MainContent } from "@/components/post/MainContent";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { fetchPosts, fetchRecommendedPosts } from "@/lib/posts";
-import { fetchTrendingCompanies, fetchCompanies } from "@/lib/companies";
+import { fetchPosts } from "@/lib/posts";
+import { fetchSidebarData } from "@/lib/layout/sidebar";
 import { Post } from "@/lib/posts";
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
@@ -10,11 +10,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const categories = ["FrontEnd", "BackEnd", "AI", "Big Data", "Infra", "Architecture"];
   const selectedCategory = params?.category || "All";
 
-  const [postsData, trendingCompanies, companies, recommendedPosts] = await Promise.all([
+  const [postsData, sidebarData] = await Promise.all([
     fetchPosts(page, selectedCategory),
-    fetchTrendingCompanies(),
-    fetchCompanies(),
-    fetchRecommendedPosts()
+    fetchSidebarData(),
   ]);
 
   const latestPosts: Post[] = (postsData.content || []).map((item) => ({
@@ -45,9 +43,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           />
           {/* Sidebar */}
           <Sidebar
-            trendingPosts={trendingCompanies}
-            companies={companies}
-            recommendedPosts={recommendedPosts}
+            trendingPosts={sidebarData.trendingPosts}
+            companies={sidebarData.companies}
+            recommendedPosts={sidebarData.recommendedPosts}
           />
         </div>
       </div>
