@@ -236,21 +236,21 @@ export default function OpensourcePage() {
 
     return (
         <div className="min-h-full bg-gradient-to-b from-slate-50 via-slate-50 to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
-            <div className="mx-auto max-w-[1100px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+            <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
                 <div className="mb-10 flex flex-col gap-5">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
                             Daily Trending Repositories
                         </h1>
                         <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                            Discover the hottest open-source projects, summarized by AI in Korean.
+                            AI가 매일 요약하는 인기 오픈소스 레포지토리를 확인해보세요.
                             <br className="hidden sm:block" />
-                            Stay ahead of the curve with daily updates.
+                            최신 트렌드를 한발 앞서 만나보세요.
                         </p>
                     </div>
 
                     {!loading && !error && visibleRepos.length > 0 && (
-                        <div className="grid w-full max-w-md grid-cols-2 gap-3">
+                        <div className="grid w-full max-w-sm grid-cols-2 gap-3">
                             {summaryItems.map((item) => (
                                 <div
                                     key={item.label}
@@ -303,13 +303,13 @@ export default function OpensourcePage() {
                     </div>
                     {submittedQuery && !loading && !showFavoritesOnly && (
                         <div className="flex items-center justify-between px-2 animate-in fade-in slide-in-from-top-2 duration-500">
-                                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-800/20 mr-1">
-                                        <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-tight">✨ AI Discovery</span>
-                                    </div>
-                                    <span className="font-bold text-slate-900 dark:text-slate-100 italic">&ldquo;{submittedQuery}&rdquo;</span>
-                                    <span>의 시맨틱 검색 결과 {visibleRepos.length}개를 찾았습니다.</span>
+                            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-800/20 mr-1">
+                                    <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-tight">✨ AI Discovery</span>
                                 </div>
+                                <span className="font-bold text-slate-900 dark:text-slate-100 italic">&ldquo;{submittedQuery}&rdquo;</span>
+                                <span>의 시맨틱 검색 결과 {visibleRepos.length}개를 찾았습니다.</span>
+                            </div>
                             <button
                                 onClick={() => {
                                     setSearchQuery("");
@@ -324,10 +324,10 @@ export default function OpensourcePage() {
 
                     {showFavoritesOnly && !submittedQuery && (
                         <div className="flex items-center justify-between px-2 animate-in fade-in slide-in-from-top-2 duration-500">
-                                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/20 mr-1">
-                                        <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tight">★ Bookmarked</span>
-                                    </div>
+                            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/20 mr-1">
+                                    <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tight">★ Bookmarked</span>
+                                </div>
                                 <span>총 {visibleRepos.length}개의 북마크한 프로젝트를 불러왔습니다.</span>
                             </div>
                             <button
@@ -398,7 +398,7 @@ export default function OpensourcePage() {
                         )}
 
                         {gridRepos.length > 0 && (
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                                 {gridRepos.map((repo) => (
                                     <RepoCard
                                         key={repo.id}
