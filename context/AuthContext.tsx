@@ -13,8 +13,7 @@ import {
 import { authGet, authPost, setUnauthorizedHandler } from "@/lib/shared/api";
 import { getLoginRedirectUrl, type UserProfile } from "@/lib/shared/auth";
 
-const USERS_ME = "/api/v1/users/me";
-const LOGOUT_ENDPOINT = "/api/v1/auth/logout";
+import { USERS_ME_ENDPOINT, LOGOUT_ENDPOINT } from "@/lib/shared/endpoints";
 const AUTH_PENDING_SYNC_KEY = "techinsights_auth_pending_sync";
 
 interface AuthState {
@@ -38,7 +37,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading: true,
   });
 
-  // 로그인 확인이 완료됐는지 추적 - 비로그인 확정 후 탭 전환 시 불필요한 재호출 차단
   const authCheckedRef = useRef(false);
   const isLoggedInRef = useRef(false);
 
@@ -70,95 +68,75 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const parseUserProfile = useCallback((res: { data?: unknown }): UserProfile | null => {
     const raw = res.data;
-    const obj =
-      raw && typeof raw === "object"
-        ? (raw as Record<string, unknown>)
-        : null;
-    if (obj && ("id" in obj || "userId" in obj || "email" in obj)) {
+    if (!raw || typeof raw !== "object") return null;
+
+    const obj = raw as Record<string, unknown>;
+
+    // Check direct properties
+    if ("id" in obj || "userId" in obj || "email" in obj) {
       const id = obj.id ?? obj.userId;
       return { ...obj, id: id != null ? String(id) : "" } as UserProfile;
     }
-    const nested =
-      obj?.data ?? obj?.user ?? obj?.content ?? obj?.result;
-    if (nested && typeof nested === "object" && ("id" in nested || "userId" in nested || "email" in nested)) {
+
+    // Check nested properties
+    const nested = obj.data ?? obj.user ?? obj.content ?? obj.result;
+    if (nested && typeof nested === "object") {
       const n = nested as Record<string, unknown>;
-      const id = n.id ?? n.userId;
-      return { ...n, id: id != null ? String(id) : "" } as UserProfile;
+      if ("id" in n || "userId" in n || "email" in n) {
+        const id = n.id ?? n.userId;
+        return { ...n, id: id != null ? String(id) : "" } as UserProfile;
+      }
     }
     return null;
   }, []);
 
-  // 외부에서 명시적으로 호출하는 refetch - 로그인 후 상태 갱신 목적
-  const refetchUser = useCallback(async () => {
+  const fetchUserProfile = useCallback(async (): Promise<UserProfile | null> => {
     try {
-      const res = await authGet<unknown>(USERS_ME, {
+      const res = await authGet<unknown>(USERS_ME_ENDPOINT, {
         validateStatus: (s) => s < 500,
       });
-      const profile = res.status === 200 ? parseUserProfile(res) : null;
-      isLoggedInRef.current = !!profile;
-      authCheckedRef.current = true;
-      setState((prev) => ({
-        ...prev,
-        isLoggedIn: !!profile,
-        userProfile: profile,
-        isLoading: false,
-      }));
-    } catch {
-      isLoggedInRef.current = false;
-      authCheckedRef.current = true;
-      setState((prev) => ({
-        ...prev,
-        isLoggedIn: false,
-        userProfile: null,
-        isLoading: false,
-      }));
+      return res.status === 200 ? parseUserProfile(res) : null;
+    } catch (error) {
+      console.error("[AuthContext] fetchUserProfile failed", error);
+      return null;
     }
   }, [parseUserProfile]);
+
+  const updateAuthState = useCallback((profile: UserProfile | null) => {
+    isLoggedInRef.current = !!profile;
+    authCheckedRef.current = true;
+    setState((prev) => ({
+      ...prev,
+      isLoggedIn: !!profile,
+      userProfile: profile,
+      isLoading: false,
+    }));
+  }, []);
+
+  // 외부에서 명시적으로 호출하는 refetch - 로그인 후 상태 갱신 목적
+  const refetchUser = useCallback(async () => {
+    const profile = await fetchUserProfile();
+    updateAuthState(profile);
+  }, [fetchUserProfile, updateAuthState]);
 
   useEffect(() => {
     setUnauthorizedHandler(clearAndRedirect);
     return () => setUnauthorizedHandler(null);
   }, [clearAndRedirect]);
-
-  // 앱 마운트 시 1회만 호출 - 쿠키 기반 세션 확인
-  // validateStatus로 401을 정상 응답으로 처리 → 브라우저 콘솔 네트워크 에러 제거
   useEffect(() => {
     let cancelled = false;
     const shouldForceSync = consumePendingAuthSync();
     const runMe = async () => {
-      try {
-        const res = await authGet<unknown>(USERS_ME, {
-          validateStatus: (s) => s < 500,
-        });
-        if (cancelled) return;
-        const profile = res.status === 200 ? parseUserProfile(res) : null;
-        isLoggedInRef.current = !!profile;
-        authCheckedRef.current = true;
-        setState({
-          isLoggedIn: !!profile,
-          userProfile: profile,
-          isLoading: false,
-        });
-        if (shouldForceSync && !profile) {
-          void refetchUser();
-        }
-      } catch {
-        if (cancelled) return;
-        isLoggedInRef.current = false;
-        authCheckedRef.current = true;
-        setState({
-          isLoggedIn: false,
-          userProfile: null,
-          isLoading: false,
-        });
-        if (shouldForceSync) {
-          void refetchUser();
-        }
+      const profile = await fetchUserProfile();
+      if (cancelled) return;
+      updateAuthState(profile);
+      if (shouldForceSync && !profile) {
+        void refetchUser();
       }
     };
     runMe();
     return () => { cancelled = true; };
-  }, [consumePendingAuthSync, parseUserProfile, refetchUser]);
+  }, [consumePendingAuthSync, fetchUserProfile, refetchUser, updateAuthState]);
 
   // OAuth 리다이렉트 복귀 시 로그인 상태 재동기화
   // - visibilitychange만 사용 (focus와 중복 발화 방지)
