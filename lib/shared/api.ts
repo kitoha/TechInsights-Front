@@ -6,15 +6,24 @@ const PROD_API_URL = 'https://api.techinsights.shop';
 const DEFAULT_LOCAL_API_URL = 'http://localhost:8080';
 const BFF_BASE_PATH = '/api/bff';
 
-const REFRESH_ENDPOINT = '/api/v1/auth/refresh';
-const USERS_ME_ENDPOINT = '/api/v1/users/me';
-const LOGOUT_ENDPOINT = '/api/v1/auth/logout';
+import { REFRESH_ENDPOINT, USERS_ME_ENDPOINT, LOGOUT_ENDPOINT } from './endpoints';
 
 function shouldRetryWithRefresh(url: string | undefined): boolean {
   if (!url) return false;
   if (url.includes(USERS_ME_ENDPOINT)) return false;
   if (url.includes(REFRESH_ENDPOINT)) return false;
+  if (url.includes(LOGOUT_ENDPOINT)) return false;
   return true;
+}
+
+function handle503() {
+  if (typeof window !== 'undefined') {
+    try {
+      window.location.href = '/maintenance.html';
+    } catch {
+      // no-op
+    }
+  }
 }
 
 export function getBackendApiBaseUrl(): string {
@@ -96,13 +105,7 @@ publicApi.interceptors.response.use(
     const status = error?.response?.status;
 
     if (status === 503) {
-      if (typeof window !== 'undefined') {
-        try {
-          window.location.href = '/maintenance.html';
-        } catch {
-          // no-op
-        }
-      }
+      handle503();
     }
 
     return Promise.reject(error);
@@ -116,13 +119,7 @@ authApi.interceptors.response.use(
     const config = error.config as AxiosRequestConfig & { _retry?: boolean };
 
     if (status === 503) {
-      if (typeof window !== 'undefined') {
-        try {
-          window.location.href = '/maintenance.html';
-        } catch {
-          // no-op
-        }
-      }
+      handle503();
       return Promise.reject(error);
     }
 
