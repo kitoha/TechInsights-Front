@@ -85,13 +85,6 @@ export function TopHeader({
                 >
                   Sign In
                 </button>
-                <Button
-                  type="button"
-                  onClick={() => setShowLoginModal(true)}
-                  className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold ${compact ? "px-2.5 h-6 text-[11px]" : "px-3 h-7 text-xs"} rounded-md shadow-none`}
-                >
-                  Continue with Google
-                </Button>
               </>
             )}
           </div>

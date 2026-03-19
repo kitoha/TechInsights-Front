@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { LeftSidebar } from "@/components/layout/LeftSidebar"
 import { TopHeader } from "@/components/layout/TopHeader"
 import { ApiTargetBanner } from "@/components/layout/ApiTargetBanner"
 import { isProductionApiTarget } from "@/lib/shared/api"
 import { usePathname } from "next/navigation"
+import type { TopicLink } from "@/lib/categories/api"
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
+export function DashboardLayout({ children, topics = [] }: { children: React.ReactNode; topics?: TopicLink[] }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const pathname = usePathname()
   const isPostDetail = pathname.startsWith("/post/")
@@ -21,11 +22,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       style={{ ["--layout-top-offset" as string]: layoutTopOffset }}
     >
       {!isPostDetail && (
-        <LeftSidebar
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-          topOffsetClassName={showApiBanner ? "lg:top-[var(--layout-top-offset)]" : "lg:top-14"}
-        />
+        <Suspense fallback={<div className="w-56" />}>
+          <LeftSidebar
+            isOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
+            topOffsetClassName={showApiBanner ? "lg:top-[var(--layout-top-offset)]" : "lg:top-14"}
+            topics={topics}
+          />
+        </Suspense>
       )}
       <div className="flex-1 flex flex-col">
         <ApiTargetBanner />
