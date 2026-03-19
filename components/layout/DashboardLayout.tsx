@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { LeftSidebar } from "@/components/layout/LeftSidebar"
 import { TopHeader } from "@/components/layout/TopHeader"
 import { ApiTargetBanner } from "@/components/layout/ApiTargetBanner"
@@ -22,12 +22,14 @@ export function DashboardLayout({ children, topics = [] }: { children: React.Rea
       style={{ ["--layout-top-offset" as string]: layoutTopOffset }}
     >
       {!isPostDetail && (
-        <LeftSidebar
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-          topOffsetClassName={showApiBanner ? "lg:top-[var(--layout-top-offset)]" : "lg:top-14"}
-          topics={topics}
-        />
+        <Suspense fallback={<div className="w-56" />}>
+          <LeftSidebar
+            isOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
+            topOffsetClassName={showApiBanner ? "lg:top-[var(--layout-top-offset)]" : "lg:top-14"}
+            topics={topics}
+          />
+        </Suspense>
       )}
       <div className="flex-1 flex flex-col">
         <ApiTargetBanner />
