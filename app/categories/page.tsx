@@ -25,6 +25,8 @@ interface CategorySummaryResponse {
 
 export default async function CategoriesPage() {
   let categories: CategoryStats[] = [];
+  let totalPosts = 0;
+  let totalViews = 0;
 
   try {
     const data = await fetchBackendJson<CategorySummaryResponse[]>("/api/v1/categories/summary", {
@@ -32,6 +34,12 @@ export default async function CategoriesPage() {
     });
 
     if (Array.isArray(data)) {
+      const allCategory = data.find((c) => c.category.toLowerCase() === "all");
+      if (allCategory) {
+        totalPosts = allCategory.postCount;
+        totalViews = allCategory.totalViewCount;
+      }
+
       categories = data
         .filter((category) => category.category.toLowerCase() !== "all")
         .map(
@@ -108,8 +116,14 @@ export default async function CategoriesPage() {
 
   const topCategories = sortedCategories.slice(0, 3);
   const otherCategories = sortedCategories.slice(3);
-  const totalPosts = sortedCategories.reduce((sum, category) => sum + category.postCount, 0);
-  const totalViews = sortedCategories.reduce((sum, category) => sum + category.totalViews, 0);
+
+  // Fallback: API에 "ALL"이 없을 경우에만 기존처럼 합산
+  if (totalPosts === 0 && sortedCategories.length > 0) {
+    totalPosts = sortedCategories.reduce((sum, category) => sum + category.postCount, 0);
+  }
+  if (totalViews === 0 && sortedCategories.length > 0) {
+    totalViews = sortedCategories.reduce((sum, category) => sum + category.totalViews, 0);
+  }
 
   return (
     <div className="min-h-full bg-gray-50 dark:bg-gray-950">

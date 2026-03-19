@@ -1,14 +1,16 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { Home } from "lucide-react"
 import type { ComponentType, SVGProps } from "react"
+import type { TopicLink } from "@/lib/categories/api"
 
 interface LeftSidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
   topOffsetClassName?: string;
+  topics?: TopicLink[];
 }
 
 type MenuIconProps = SVGProps<SVGSVGElement>;
@@ -18,8 +20,10 @@ type MenuItem = {
   icon: ComponentType<MenuIconProps>;
 };
 
-export function LeftSidebar({ isOpen, onClose, topOffsetClassName = "lg:top-14" }: LeftSidebarProps) {
+export function LeftSidebar({ isOpen, onClose, topOffsetClassName = "lg:top-14", topics = [] }: LeftSidebarProps) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const currentCategory = searchParams.get("category")
 
   const menuItems: MenuItem[] = [
     { name: "Feed", href: "/", icon: Home },
@@ -38,13 +42,6 @@ export function LeftSidebar({ isOpen, onClose, topOffsetClassName = "lg:top-14" 
         <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
       )
     },
-  ]
-
-  const topics = [
-    { name: "FrontEnd", href: "/?category=FrontEnd" },
-    { name: "BackEnd", href: "/?category=BackEnd" },
-    { name: "AI & ML", href: "/?category=AI" },
-    { name: "DevOps", href: "/?category=Infra" },
   ]
 
   return (
@@ -97,20 +94,31 @@ export function LeftSidebar({ isOpen, onClose, topOffsetClassName = "lg:top-14" 
           </div>
 
           {/* Topics Section */}
-          <div className="space-y-0.5">
-            <h3 className="px-3 text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">Topics</h3>
-            {topics.map((topic) => (
-              <Link
-                key={topic.name}
-                href={topic.href}
-                onClick={onClose}
-                className="flex items-center space-x-2.5 px-3 py-2 rounded-md text-muted-foreground hover:bg-white dark:hover:bg-gray-900 transition-colors"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-current/60" />
-                <span className="text-[12px]">{topic.name}</span>
-              </Link>
-            ))}
-          </div>
+          {topics.length > 0 && (
+            <div className="space-y-0.5">
+              <h3 className="px-3 text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">Topics</h3>
+              {topics.map((topic) => {
+                const isTopicActive = pathname === "/" && currentCategory && topic.href === `/?category=${currentCategory}`;
+                const targetHref = isTopicActive ? "/" : topic.href;
+                
+                return (
+                  <Link
+                    key={topic.name}
+                    href={targetHref}
+                    onClick={onClose}
+                    className={`flex items-center space-x-2.5 px-3 py-2 rounded-md transition-colors ${
+                      isTopicActive
+                        ? "bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 font-medium"
+                        : "text-muted-foreground hover:bg-white dark:hover:bg-gray-900"
+                    }`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${isTopicActive ? "bg-blue-600 dark:bg-blue-400" : "bg-current/60"}`} />
+                    <span className="text-[12px]">{topic.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
       </aside>
     </>
