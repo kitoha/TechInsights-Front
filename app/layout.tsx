@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import { BookmarkProvider } from "@/context/BookmarkContext";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { fetchTopics } from "@/lib/categories/api";
 
 export const metadata: Metadata = {
   title: {
@@ -23,11 +24,12 @@ export const viewport: Viewport = {
   themeColor: "#ffffff",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const topics = await fetchTopics();
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className="antialiased">
@@ -39,7 +41,7 @@ export default function RootLayout({
         >
           <AuthProvider>
             <BookmarkProvider>
-              <DashboardLayout>
+              <DashboardLayout topics={topics}>
                 {children}
               </DashboardLayout>
             </BookmarkProvider>
