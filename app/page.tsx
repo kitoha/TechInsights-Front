@@ -1,25 +1,18 @@
-import { Header } from "@/components/Header";
-import { MainContent } from "@/components/MainContent";
-import { Sidebar } from "@/components/Sidebar";
-import { 
-  fetchPosts, 
-  fetchTrendingCompanies, 
-  fetchCompanies, 
-  fetchRecommendedPosts
-} from "@/lib/dataFetchers";
-import { Post } from "@/lib/types";
+import { MainContent } from "@/components/post/MainContent";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { fetchPosts } from "@/lib/posts";
+import { fetchSidebarData } from "@/lib/layout/sidebar";
+import { Post } from "@/lib/posts";
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
   const page = Number(params?.page) || 0;
   const categories = ["FrontEnd", "BackEnd", "AI", "Big Data", "Infra", "Architecture"];
   const selectedCategory = params?.category || "All";
-  
-  const [postsData, trendingCompanies, companies, recommendedPosts] = await Promise.all([
+
+  const [postsData, sidebarData] = await Promise.all([
     fetchPosts(page, selectedCategory),
-    fetchTrendingCompanies(),
-    fetchCompanies(),
-    fetchRecommendedPosts()
+    fetchSidebarData(),
   ]);
 
   const latestPosts: Post[] = (postsData.content || []).map((item) => ({
@@ -37,10 +30,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
+      <div className="w-full px-6 lg:px-8 xl:px-10 py-8 md:py-10">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Main Content */}
           <MainContent
             posts={latestPosts}
@@ -51,9 +43,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           />
           {/* Sidebar */}
           <Sidebar
-            trendingPosts={trendingCompanies}
-            companies={companies}
-            recommendedPosts={recommendedPosts}
+            trendingPosts={sidebarData.trendingPosts}
+            companies={sidebarData.companies}
+            recommendedPosts={sidebarData.recommendedPosts}
           />
         </div>
       </div>

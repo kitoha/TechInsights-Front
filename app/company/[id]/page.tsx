@@ -1,14 +1,11 @@
-import { Header } from "@/components/Header";
-import { MainContent } from "@/components/MainContent";
-import { Sidebar } from "@/components/Sidebar";
+import { MainContent } from "@/components/post/MainContent";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { 
   fetchPostsByCompany,
-  fetchCompanyInfo,
-  fetchTrendingCompanies, 
-  fetchCompanies, 
-  fetchRecommendedPosts
-} from "@/lib/dataFetchers";
-import { Post } from "@/lib/types";
+} from "@/lib/posts";
+import { fetchCompanyInfo } from "@/lib/companies";
+import { fetchSidebarData } from "@/lib/layout/sidebar";
+import { Post } from "@/lib/posts";
 import { notFound } from "next/navigation";
 
 interface CompanyPageProps {
@@ -21,11 +18,9 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
   const searchParamsData = await searchParams;
   const page = Number(searchParamsData?.page) || 0;
   
-  const [postsData, trendingCompanies, companies, recommendedPosts, companyInfo] = await Promise.all([
+  const [postsData, sidebarData, companyInfo] = await Promise.all([
     fetchPostsByCompany(companyId, page),
-    fetchTrendingCompanies(),
-    fetchCompanies(),
-    fetchRecommendedPosts(),
+    fetchSidebarData(),
     fetchCompanyInfo(companyId)
   ]);
 
@@ -49,10 +44,9 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-full">
+      <div className="max-w-[1600px] mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Main Content */}
           <MainContent
             posts={latestPosts}
@@ -65,9 +59,9 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
           />
           {/* Sidebar */}
           <Sidebar
-            trendingPosts={trendingCompanies}
-            companies={companies}
-            recommendedPosts={recommendedPosts}
+            trendingPosts={sidebarData.trendingPosts}
+            companies={sidebarData.companies}
+            recommendedPosts={sidebarData.recommendedPosts}
           />
         </div>
       </div>

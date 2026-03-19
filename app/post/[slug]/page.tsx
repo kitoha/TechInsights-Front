@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { apiGet } from "@/lib/api";
-import PostDetailFade from "@/components/PostDetailFade";
+import PostDetailFade from "@/components/post/PostDetailFade";
+import { fetchRecommendedPosts } from "@/lib/posts";
+import { fetchBackendJson } from "@/lib/shared/server-fetch";
 
 interface PostDetailProps {
   params: Promise<{
@@ -12,17 +13,22 @@ interface PostDetailProps {
 interface PostData {
   id: string
   title: string
+  preview?: string
   url: string
   content: string
   publishedAt: string
   thumbnail: string
   companyName: string
+  logoImageName?: string
+  categories?: string[]
+  viewCount?: number
 }
 
 async function getPostData(postId: string): Promise<PostData | null> {
   try {
-    const res = await apiGet<PostData>(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/posts/${postId}`);
-    return res.data;
+    return await fetchBackendJson<PostData>(`/api/v1/posts/${postId}`, {
+      revalidate: 300,
+    });
   } catch (error) {
     console.error('Post fetch error:', error);
     return null;
@@ -31,7 +37,11 @@ async function getPostData(postId: string): Promise<PostData | null> {
 
 export default async function PostDetailPage({ params }: PostDetailProps) {
   const resolvedParams = await params;
-  const post = await getPostData(resolvedParams.slug)
+
+  const [post, recommendedPosts] = await Promise.all([
+    getPostData(resolvedParams.slug),
+    fetchRecommendedPosts()
+  ]);
 
   if (!post) {
     return (
@@ -46,5 +56,10 @@ export default async function PostDetailPage({ params }: PostDetailProps) {
     )
   }
 
-  return <PostDetailFade post={post} />;
+  return (
+    <PostDetailFade
+      post={post}
+      recommendedPosts={recommendedPosts}
+    />
+  );
 }

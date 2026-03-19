@@ -1,8 +1,7 @@
-import { isAxiosError } from "axios";
-import { Header } from "@/components/Header";
-import { CompanyCard, CompanyStats } from "@/components/CompanyCard";
-import { apiGet } from "@/lib/api";
+import { CompanyCard, CompanyStats } from "@/components/company/CompanyCard";
 import { redirect } from "next/navigation";
+import { formatCompactNumber } from "@/lib/shared/utils";
+import { fetchBackendJson, isBackendFetchError } from "@/lib/shared/server-fetch";
 
 export interface ApiResponse<T> {
   content: T[];
@@ -12,14 +11,11 @@ export interface ApiResponse<T> {
   totalPages: number;
 }
 
-export const dynamic = 'force-dynamic';
-
 export default async function CompaniesPage() {
   let companies: (CompanyStats & { rank: number })[] = [];
 
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/companiesSummaries`;
-    const res = await apiGet<{
+    const data = await fetchBackendJson<{
       id: string;
       name: string;
       blogUrl: string;
@@ -28,11 +24,13 @@ export default async function CompaniesPage() {
       postCount: number;
       lastPostedAt: string | null;
       rank?: number;
-    }[]>(url);
+    }[]>("/api/v1/companiesSummaries", {
+      revalidate: 300,
+    });
 
-    if (res?.data && Array.isArray(res.data)) {
+    if (Array.isArray(data)) {
       let rank = 1;
-      companies = res.data
+      companies = data
         .filter((company) => (company.postCount ?? 0) > 0)
         .map((company): CompanyStats & { rank: number } => ({
           id: company.id,
@@ -45,15 +43,15 @@ export default async function CompaniesPage() {
           rank: rank++
         }));
     } else {
-      console.error('Invalid API response structure:', res);
+      console.error('Invalid API response structure:', data);
     }
   } catch (error: unknown) {
-    const status: number | undefined = isAxiosError(error) ? error.response?.status : undefined;
+    const status: number | undefined = isBackendFetchError(error) ? error.status : undefined;
     if (status === 503) {
       redirect('/maintenance.html');
     }
     console.error('Companies stats fetch error:', error);
-    
+
     // Fallback data for development
     const fallbackData = [
       {
@@ -129,7 +127,7 @@ export default async function CompaniesPage() {
         blogUrl: "https://blog.banksalad.com/rss.xml"
       }
     ];
-    
+
     companies = fallbackData
       .filter((company) => company.postCount > 0)
       .map((company) => ({
@@ -138,24 +136,57 @@ export default async function CompaniesPage() {
       }));
   }
 
+  const totalPosts = companies.reduce((sum, company) => sum + company.postCount, 0);
+  const totalViews = companies.reduce((sum, company) => sum + company.totalViews, 0);
+  const summaryItems = [
+    { label: "회사", value: `${companies.length}개` },
+    { label: "포스트", value: `${formatCompactNumber(totalPosts)}개` },
+    { label: "조회수", value: formatCompactNumber(totalViews) },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+    <div className="min-h-full bg-gradient-to-b from-slate-50 via-slate-50 to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
+      <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-7 flex flex-col gap-3 sm:mb-8">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
             회사별 포스트 현황
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="max-w-2xl text-sm text-slate-600 dark:text-slate-400 sm:text-base">
             각 기업의 기술 블로그 포스트 현황을 확인해보세요
           </p>
+          <div className="grid w-full max-w-xl grid-cols-3 gap-2">
+            {summaryItems.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+              >
+                <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  {item.label}
+                </p>
+                <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  {item.value}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3 2xl:grid-cols-4">
           {companies.map((company) => (
-            <CompanyCard key={company.id} company={company} rank={company.rank} />
+            <CompanyCard key={company.id} company={company} />
           ))}
         </div>
+
+        {companies.length === 0 && (
+          <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white/70 px-6 py-10 text-center dark:border-slate-700 dark:bg-slate-900/70">
+            <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              표시할 회사 데이터가 없습니다.
+            </p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+              잠시 후 다시 새로고침하거나 API 연결 상태를 확인해 주세요.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

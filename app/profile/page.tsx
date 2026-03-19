@@ -1,17 +1,22 @@
-import { Header } from "@/components/Header";
-import { Sidebar } from "@/components/Sidebar";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { ProfileContent } from "./ProfileContent";
+import { fetchSidebarData } from "@/lib/layout/sidebar";
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const sidebarData = await fetchSidebarData();
+
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="bg-background min-h-full">
+      <main className="max-w-[1600px] mx-auto px-6 py-8">
         <div className="lg:grid lg:grid-cols-4 lg:gap-8">
           <div className="lg:col-span-3">
             <ProfileContent />
           </div>
-          <Sidebar trendingPosts={[]} companies={[]} recommendedPosts={[]} />
+          <Sidebar
+            trendingPosts={sidebarData.trendingPosts}
+            companies={sidebarData.companies}
+            recommendedPosts={sidebarData.recommendedPosts}
+          />
         </div>
       </main>
     </div>
