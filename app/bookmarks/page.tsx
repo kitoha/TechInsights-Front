@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BookmarksContent } from "./BookmarksContent";
 import { fetchSidebarData } from "@/lib/layout/sidebar";
@@ -10,8 +11,11 @@ export default async function BookmarksPage() {
       <main className="max-w-[1600px] mx-auto px-6 py-8">
         <div className="lg:grid lg:grid-cols-4 lg:gap-8">
           <div className="lg:col-span-3">
-            <BookmarksContent />
+            <Suspense fallback={<div>Loading...</div>}>
+              <BookmarksContent />
+            </Suspense>
           </div>
+
           <Sidebar
             trendingPosts={sidebarData.trendingPosts}
             companies={sidebarData.companies}
