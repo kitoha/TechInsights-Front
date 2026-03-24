@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
 import PostDetailFade from "@/components/post/PostDetailFade";
 import { fetchRecommendedPosts } from "@/lib/posts";
@@ -22,12 +23,23 @@ interface PostData {
   logoImageName?: string
   categories?: string[]
   viewCount?: number
+  liked?: boolean
 }
 
 async function getPostData(postId: string): Promise<PostData | null> {
   try {
+    const headersList = await headers();
+    const forwardedHeaders: Record<string, string> = {};
+    
+    const cookie = headersList.get("cookie");
+    if (cookie) forwardedHeaders["cookie"] = cookie;
+    
+    const xff = headersList.get("x-forwarded-for");
+    if (xff) forwardedHeaders["x-forwarded-for"] = xff;
+
     return await fetchBackendJson<PostData>(`/api/v1/posts/${postId}`, {
-      revalidate: 300,
+      cache: "no-store",
+      headers: forwardedHeaders,
     });
   } catch (error) {
     console.error('Post fetch error:', error);

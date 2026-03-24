@@ -13,6 +13,7 @@ export interface Post {
   thumbnail?: string;
   viewCount?: number;
   isBookmarked?: boolean;
+  liked?: boolean;
 }
 
 export interface RecommendedPost {

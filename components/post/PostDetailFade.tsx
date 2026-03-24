@@ -12,6 +12,7 @@ import { togglePostBookmark } from "@/lib/bookmarks";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { useAuth } from "@/context/AuthContext";
 import { useBookmarks } from "@/context/BookmarkContext";
+import { fetchPostLikeStatus, togglePostLike } from "@/lib/posts/client-api";
 import { ArrowLeft, Bookmark, ChevronRight, Heart, Share2, Sparkles } from "lucide-react";
 
 interface Post {
@@ -29,6 +30,7 @@ interface Post {
   viewCount?: number;
   blogUrl?: string;
   isBookmarked?: boolean;
+  liked?: boolean;
 }
 
 interface RecommendedPost {
@@ -53,6 +55,9 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
   const [displayViewCount, setDisplayViewCount] = useState<number | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(!!post.isBookmarked);
   const [isBookmarkPending, setIsBookmarkPending] = useState(false);
+  const [isLiked, setIsLiked] = useState(!!post.liked);
+  const [likeCount, setLikeCount] = useState<number>(0);
+  const [isLikePending, setIsLikePending] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const splitContent = (content: string) => {
@@ -141,6 +146,19 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
     }
   }, [bookmarkedPostIds, isLoggedIn, post.id, isInitialized]);
 
+  useEffect(() => {
+    if (!post?.id) return;
+
+    fetchPostLikeStatus(post.id)
+      .then((data) => {
+        setIsLiked(data.liked);
+        setLikeCount(data.count);
+      })
+      .catch((err) => {
+        console.error("[PostDetailFade] failed to fetch like status", err);
+      });
+  }, [post?.id]);
+
   const handleBookmarkClick = async () => {
     if (!isLoggedIn) {
       setShowLoginModal(true);
@@ -169,6 +187,29 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
       }
     } finally {
       setIsBookmarkPending(false);
+    }
+  };
+
+  const handleLikeClick = async () => {
+    if (isLikePending) return;
+
+    const previousLiked = isLiked;
+    setIsLikePending(true);
+    setIsLiked(!previousLiked);
+    setLikeCount(prev => previousLiked ? prev - 1 : prev + 1);
+
+    try {
+      const result = await togglePostLike(post.id);
+      setIsLiked(result.liked);
+      // We don't get count from POST, so we trust our optimistic update or 
+      // we could re-fetch status if we want absolute accuracy, 
+      // but optimistic + local toggle is standard.
+    } catch (error) {
+      setIsLiked(previousLiked);
+      setLikeCount(prev => previousLiked ? prev + 1 : prev - 1);
+      console.error("[PostDetailFade] like toggle failed", error);
+    } finally {
+      setIsLikePending(false);
     }
   };
 
@@ -381,9 +422,16 @@ export default function PostDetailFade({ post, recommendedPosts }: PostDetailFad
                         )}
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <button className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 transition-colors hover:border-gray-300 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:hover:text-gray-200" aria-label="좋아요">
-                          <Heart className="h-3.5 w-3.5" />
-                          <span className="text-[10px]">좋아요</span>
+                        <button 
+                          className={`inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-white px-2.5 py-1 transition-colors hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 ${isLiked ? 'text-red-500 hover:text-red-600 dark:text-red-400' : 'hover:text-gray-700 dark:hover:text-gray-200'}`} 
+                          aria-label={isLiked ? "좋아요 취소" : "좋아요"}
+                          onClick={handleLikeClick}
+                          disabled={isLikePending}
+                        >
+                          <Heart className="h-3.5 w-3.5" fill={isLiked ? "currentColor" : "none"} />
+                          <span className="text-[10px] font-medium leading-none">
+                            좋아요{likeCount > 0 && <span className="ml-1 text-[11px] font-bold">{likeCount.toLocaleString()}</span>}
+                          </span>
                         </button>
                         <button className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 transition-colors hover:border-gray-300 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:hover:text-gray-200" aria-label="공유">
                           <Share2 className="h-3.5 w-3.5" />
