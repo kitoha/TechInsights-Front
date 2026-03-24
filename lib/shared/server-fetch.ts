@@ -8,6 +8,7 @@ interface FetchBackendJsonOptions {
   params?: Record<string, QueryValue>;
   cache?: RequestCache;
   revalidate?: number;
+  headers?: Record<string, string>;
 }
 
 export class BackendFetchError extends Error {
@@ -26,7 +27,7 @@ export function isBackendFetchError(error: unknown): error is BackendFetchError 
 
 export async function fetchBackendJson<T>(
   path: string,
-  { params, cache, revalidate }: FetchBackendJsonOptions = {},
+  { params, cache, revalidate, headers: customHeaders }: FetchBackendJsonOptions = {},
 ): Promise<T> {
   const url = new URL(path, getBackendApiBaseUrl());
 
@@ -40,6 +41,7 @@ export async function fetchBackendJson<T>(
 
   const headers = new Headers({
     accept: "application/json",
+    ...customHeaders,
   });
 
   const cloudflareSecret = process.env.CLOUDFLARE_SECRET_KEY;
