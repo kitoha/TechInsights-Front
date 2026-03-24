@@ -1,6 +1,5 @@
 "use client"
 
-import SearchBar from "@/components/search/SearchBar"
 import { Suspense, useState } from "react"
 import { Bookmark, Menu } from "lucide-react"
 import { ThemeToggle } from "@/components/layout/ThemeToggle"
@@ -52,11 +51,7 @@ export function TopHeader({
             </Link>
           </div>
 
-          <div className={`hidden md:block flex-1 ${compact ? "max-w-lg mx-4" : "max-w-xl mx-6"}`}>
-            <Suspense fallback={<div className={`${compact ? "h-9" : "h-10"} w-full rounded-full border border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-900/80`} />}>
-              <SearchBar className="w-full" />
-            </Suspense>
-          </div>
+          <div className="flex-1" />
 
           <div className="flex items-center gap-2">
             {isLoading ? null : isLoggedIn ? (

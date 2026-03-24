@@ -317,19 +317,19 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
         )}
         <div className="absolute right-2 top-1/2 z-10 -translate-y-1/2">
           <div
-            className="relative flex h-7 w-[106px] items-center overflow-hidden rounded-full border border-slate-200/90 bg-slate-100/90 p-0.5 shadow-sm dark:border-slate-700 dark:bg-slate-800/80"
+            className="relative flex h-8 w-[110px] items-center overflow-hidden rounded-lg border border-slate-200/90 bg-slate-100/90 p-0.5 shadow-sm dark:border-slate-700 dark:bg-slate-800/80"
             role="group"
             aria-label="검색 모드 전환"
           >
             <span
-              className={`pointer-events-none absolute top-0.5 h-6 w-[50px] rounded-full bg-gradient-to-r from-blue-600 to-blue-500 shadow-sm transition-transform duration-200 ease-out dark:from-blue-500 dark:to-blue-400 ${
-                mode === "semantic" ? "translate-x-0.5" : "translate-x-[54px]"
+              className={`pointer-events-none absolute top-0.5 h-7 w-[52px] rounded-md bg-gradient-to-r from-blue-600 to-blue-500 shadow-sm transition-transform duration-200 ease-out dark:from-blue-500 dark:to-blue-400 ${
+                mode === "semantic" ? "translate-x-0.5" : "translate-x-[56px]"
               }`}
             />
             <button
               type="button"
               aria-pressed={mode === "semantic"}
-              className={`relative z-10 flex h-6 w-[52px] items-center justify-center rounded-full px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
+              className={`relative z-10 flex h-7 w-[54px] items-center justify-center rounded-md px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
                 mode === "semantic" ? "text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
               }`}
               onClick={() => setMode((prev) => (prev === "semantic" ? "keyword" : "semantic"))}
@@ -344,7 +344,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
             <button
               type="button"
               aria-pressed={mode === "keyword"}
-              className={`relative z-10 flex h-6 w-[52px] items-center justify-center rounded-full px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
+              className={`relative z-10 flex h-7 w-[54px] items-center justify-center rounded-md px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
                 mode === "keyword" ? "text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
               }`}
               onClick={() => setMode((prev) => (prev === "keyword" ? "semantic" : "keyword"))}
@@ -359,7 +359,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
           onKeyDown={handleKeyDown}
           onFocus={() => query.trim() && setIsOpen(true)}
           placeholder={mode === "semantic" ? "AI 검색: 궁금한 내용을 질문해보세요" : "일반 검색: 키워드를 입력해보세요"}
-          className={`h-10 rounded-full border-slate-200 bg-slate-50/80 pl-10 pr-28 text-sm text-slate-700 placeholder:text-slate-500 transition-all duration-200 hover:bg-slate-50 focus:border-slate-300 focus:ring-2 focus:ring-blue-500/15 focus:shadow-sm dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 ${className}`}
+          className={`h-11 rounded-xl border-slate-200 bg-white/80 pl-10 pr-32 text-sm text-slate-700 placeholder:text-slate-500 transition-all duration-300 hover:bg-white focus:border-blue-400/50 focus:ring-4 focus:ring-blue-500/10 focus:shadow-md dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 ${className}`}
         />
       </div>
 
