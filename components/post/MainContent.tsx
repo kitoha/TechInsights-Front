@@ -1,6 +1,8 @@
 import PostListFade from "@/components/post/PostListFade";
 import { Post } from "@/lib/posts";
 import { OptimizedImage } from "@/components/common/OptimizedImage";
+import SearchBar from "@/components/search/SearchBar";
+import { Suspense } from "react";
 
 interface MainContentProps {
   posts: Post[];
@@ -41,6 +43,17 @@ export function MainContent({ posts, totalPages, page, selectedCategory, categor
         </div>
       )}
       
+      {/* Feed Search Bar: Enterprise Grade */}
+      <div className="mb-8 relative z-10 w-full">
+        <Suspense fallback={
+          <div className="h-11 w-full max-w-2xl rounded-xl border border-slate-200 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/50 animate-pulse" />
+        }>
+          <div className="max-w-2xl group transition-all duration-300">
+            <SearchBar className="w-full shadow-sm group-hover:shadow-md transition-all duration-300 rounded-xl" />
+          </div>
+        </Suspense>
+      </div>
+
       {/* Category Tabs + Post List (SSR) */}
       <PostListFade
         posts={posts}
