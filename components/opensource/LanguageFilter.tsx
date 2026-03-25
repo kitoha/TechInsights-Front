@@ -183,7 +183,7 @@ export function LanguageFilter({ selected, onChange }: LanguageFilterProps) {
                 </button>
 
                 {isOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-72 rounded-2xl border border-gray-100 bg-white shadow-2xl z-[60] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300 dark:border-gray-800 dark:bg-gray-900/95 dark:backdrop-blur-xl">
+                    <div className="absolute top-full left-0 mt-2 w-64 sm:w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-gray-100 bg-white shadow-2xl z-[60] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300 dark:border-gray-800 dark:bg-gray-900/95 dark:backdrop-blur-xl">
                         <div className="p-3 border-b border-gray-50 dark:border-gray-800">
                             <div className="relative group">
                                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">

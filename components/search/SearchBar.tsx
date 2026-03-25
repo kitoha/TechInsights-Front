@@ -313,23 +313,23 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-400" />
         {isLoading && (
-          <Loader2 className="absolute right-28 top-1/2 h-4 w-4 -translate-y-1/2 transform animate-spin text-slate-400" />
+          <Loader2 className="absolute right-[108px] sm:right-[120px] top-1/2 h-4 w-4 -translate-y-1/2 transform animate-spin text-slate-400" />
         )}
         <div className="absolute right-2 top-1/2 z-10 -translate-y-1/2">
           <div
-            className="relative flex h-8 w-[110px] items-center overflow-hidden rounded-lg border border-slate-200/90 bg-slate-100/90 p-0.5 shadow-sm dark:border-slate-700 dark:bg-slate-800/80"
+            className="relative flex h-8 w-[100px] sm:w-[110px] items-center overflow-hidden rounded-lg border border-slate-200/90 bg-slate-100/90 p-0.5 shadow-sm dark:border-slate-700 dark:bg-slate-800/80"
             role="group"
             aria-label="검색 모드 전환"
           >
             <span
-              className={`pointer-events-none absolute top-0.5 h-7 w-[52px] rounded-md bg-gradient-to-r from-blue-600 to-blue-500 shadow-sm transition-transform duration-200 ease-out dark:from-blue-500 dark:to-blue-400 ${
-                mode === "semantic" ? "translate-x-0.5" : "translate-x-[56px]"
+              className={`pointer-events-none absolute top-0.5 h-7 w-[48px] sm:w-[52px] rounded-md bg-gradient-to-r from-blue-600 to-blue-500 shadow-sm transition-transform duration-200 ease-out dark:from-blue-500 dark:to-blue-400 ${
+                mode === "semantic" ? "translate-x-0.5" : "translate-x-[50px] sm:translate-x-[56px]"
               }`}
             />
             <button
               type="button"
               aria-pressed={mode === "semantic"}
-              className={`relative z-10 flex h-7 w-[54px] items-center justify-center rounded-md px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
+              className={`relative z-10 flex h-7 w-[48px] sm:w-[54px] items-center justify-center rounded-md px-0 text-[10px] sm:text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
                 mode === "semantic" ? "text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
               }`}
               onClick={() => setMode((prev) => (prev === "semantic" ? "keyword" : "semantic"))}
@@ -344,7 +344,7 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
             <button
               type="button"
               aria-pressed={mode === "keyword"}
-              className={`relative z-10 flex h-7 w-[54px] items-center justify-center rounded-md px-0 text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
+              className={`relative z-10 flex h-7 w-[48px] sm:w-[54px] items-center justify-center rounded-md px-0 text-[10px] sm:text-[11px] font-semibold tracking-tight transition-colors duration-150 ${
                 mode === "keyword" ? "text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
               }`}
               onClick={() => setMode((prev) => (prev === "keyword" ? "semantic" : "keyword"))}
@@ -359,12 +359,12 @@ export default function SearchBar({ className = "" }: SearchBarProps) {
           onKeyDown={handleKeyDown}
           onFocus={() => query.trim() && setIsOpen(true)}
           placeholder={mode === "semantic" ? "AI 검색: 궁금한 내용을 질문해보세요" : "일반 검색: 키워드를 입력해보세요"}
-          className={`h-11 rounded-xl border-slate-200 bg-white/80 pl-10 pr-32 text-sm text-slate-700 placeholder:text-slate-500 transition-all duration-300 hover:bg-white focus:border-blue-400/50 focus:ring-4 focus:ring-blue-500/10 focus:shadow-md dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 ${className}`}
+          className={`h-11 rounded-xl border-slate-200 bg-white/80 pl-10 pr-[110px] sm:pr-32 text-sm text-slate-700 placeholder:text-slate-500 transition-all duration-300 hover:bg-white focus:border-blue-400/50 focus:ring-4 focus:ring-blue-500/10 focus:shadow-md dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 ${className}`}
         />
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 rounded-xl border border-gray-200 bg-white shadow-2xl backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900">
+        <div className="absolute left-0 right-0 top-full z-[60] mt-2 rounded-xl border border-gray-200 bg-white shadow-2xl backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
           {error ? (
             <div className="p-4 text-sm text-red-600 dark:text-red-400">{error}</div>
           ) : !query.trim() ? (

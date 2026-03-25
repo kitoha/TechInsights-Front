@@ -45,7 +45,7 @@ export default async function CompanyPage({ params, searchParams }: CompanyPageP
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-full">
-      <div className="max-w-[1600px] mx-auto px-6 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 md:px-6 py-6 md:py-8">
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Main Content */}
           <MainContent

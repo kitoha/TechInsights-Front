@@ -10,7 +10,7 @@ import {
 } from './types';
 
 const SORT_MAP: Record<SortType, string> = {
-    trending: 'TRENDING',
+    trending: 'DAILY_TRENDING',
     stars: 'STARS',
     latest: 'LATEST',
 };
@@ -32,7 +32,7 @@ export function adaptGithubRepo(
         issues: 0,
         language,
         languageColor: LANGUAGE_COLORS[language] ?? '#6e7681',
-        starsThisWeek: dto.weeklyStarDelta,
+        starsThisWeek: dto.dailyStarDelta ?? 0,
         topics: dto.topics ?? [],
         url: dto.htmlUrl,
         aiSummary: dto.readmeSummary ?? undefined,
@@ -131,6 +131,7 @@ export async function fetchSemanticRepos(
                     ...r,
                     forkCount: 0,
                     weeklyStarDelta: 0,
+                    dailyStarDelta: 0,
                     pushedAt: new Date().toISOString(),
                     fetchedAt: new Date().toISOString(),
                     readmeSummarizedAt: null,

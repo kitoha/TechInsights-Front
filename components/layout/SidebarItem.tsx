@@ -15,8 +15,8 @@ interface SidebarItemProps {
 export const SidebarItem = memo(function SidebarItem({ index, logoImage, title, subtitle, onClick, itemType = 'default', viewCount }: SidebarItemProps) {
   if (itemType === 'ranking') {
     return (
-      <div className="group cursor-pointer flex items-center space-x-3 py-0.5 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 rounded-lg px-1 -mx-1 transition-colors" onClick={onClick}>
-        <span className="text-[16px] font-bold text-muted-foreground/50 leading-none min-w-[24px]">
+      <div className="group cursor-pointer flex items-center space-x-3 sm:space-x-4 py-0.5 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 rounded-lg px-1 -mx-1 transition-colors" onClick={onClick}>
+        <span className="text-[16px] font-bold text-muted-foreground/50 leading-none min-w-[28px] text-center">
           {String(index + 1).padStart(2, '0')}
         </span>
         <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 border border-border/30">
