@@ -14,6 +14,8 @@ const REQUEST_HEADER_ALLOWLIST = [
 ];
 
 const PUBLIC_API_ALLOWLIST = [
+  /^api\/v1\/auth(?:\/.*)?$/,
+  /^api\/v1\/users\/me(?:\/.*)?$/,
   /^api\/v1\/posts(?:\/.*)?$/,
   /^api\/v1\/recommendations(?:\/.*)?$/,
   /^api\/v1\/companies(?:\/.*)?$/,

@@ -19,7 +19,7 @@ export function MainContent({ posts, totalPages, page, selectedCategory, categor
     <div className="lg:col-span-3">
       {/* Company Header */}
       {companyId && companyInfo && (
-        <div className="mb-6 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="mb-6 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm">
               <OptimizedImage

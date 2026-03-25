@@ -30,7 +30,7 @@ export function TopHeader({
 
   return (
     <>
-      <header className={`${compact ? "h-12" : "h-14"} ${stickyTopClassName} sticky z-40 bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700`}>
+      <header className={`${compact ? "h-12" : "h-14"} ${stickyTopClassName} sticky z-50 bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700`}>
         <div className={`h-full flex items-center justify-between ${compact ? "px-3 lg:px-5" : "px-4 lg:px-6"}`}>
           <div className="flex items-center space-x-3">
             {showMenuButton && (
@@ -76,7 +76,7 @@ export function TopHeader({
                 <button
                   type="button"
                   onClick={() => setShowLoginModal(true)}
-                  className={`hidden sm:inline-flex px-2 py-1 ${compact ? "text-[11px]" : "text-xs"} text-muted-foreground hover:text-foreground transition-colors`}
+                  className={`hidden lg:inline-flex items-center px-2 py-1 ${compact ? "text-[11px]" : "text-xs"} text-muted-foreground hover:text-foreground transition-colors font-medium`}
                 >
                   Sign In
                 </button>

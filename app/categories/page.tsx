@@ -131,9 +131,9 @@ export default async function CategoriesPage() {
         <section>
           <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{CATEGORY_PAGE_LABELS.title}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">{CATEGORY_PAGE_LABELS.title}</h1>
             </div>
-            <div className="grid grid-cols-3 gap-2 self-start text-xs sm:gap-3 sm:text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 self-start text-xs sm:gap-3 sm:text-sm w-full lg:w-auto">
               <SummaryChip label={CATEGORY_PAGE_LABELS.summaryCategories} value={sortedCategories.length.toLocaleString()} />
               <SummaryChip label={CATEGORY_PAGE_LABELS.summaryPosts} value={totalPosts.toLocaleString()} />
               <SummaryChip label={CATEGORY_PAGE_LABELS.summaryViews} value={totalViews.toLocaleString()} />

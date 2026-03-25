@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import SearchModeToggle from "@/components/search/SearchModeToggle"
 import { ChevronLeft, ChevronRight, Calendar, Eye } from "lucide-react"
 import Image from "next/image"
+import SearchBar from "@/components/search/SearchBar"
 
 interface SearchResultsProps {
   query: string;
@@ -155,7 +156,11 @@ export default function SearchResults({
 
     return (
       <div className="space-y-6">
-        <SearchModeToggle currentMode={mode} onChange={handleModeChange} />
+      <div className="mb-6">
+        <SearchBar className="shadow-md rounded-xl" />
+      </div>
+
+      <SearchModeToggle currentMode={mode} onChange={handleModeChange} />
 
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/50 dark:bg-blue-950/30">
           <div className="flex items-center gap-2">
@@ -201,31 +206,28 @@ export default function SearchResults({
                   className="cursor-pointer transition-shadow hover:shadow-md"
                   onClick={() => router.push(`/post/${post.id}`)}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex gap-4">
-                      <div className="flex-shrink-0">
-                        {post.thumbnail && !thumbnailErrors.has(post.id) ? (
-                          <Image
-                            src={post.thumbnail}
-                            alt={post.title}
-                            width={120}
-                            height={80}
-                            className="rounded-lg object-cover"
-                            onError={() => {
-                              setThumbnailErrors((prev) => new Set(prev).add(post.id))
-                            }}
-                          />
-                        ) : (
-                          <Image
-                            src={`/logos/${post.companyLogo}`}
-                            alt={post.companyName}
-                            width={120}
-                            height={80}
-                            className="rounded-lg object-cover bg-gray-100 p-2 dark:bg-gray-700"
-                          />
-                        )}
-                      </div>
-
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="relative w-full sm:w-[120px] h-[140px] sm:h-[80px]">
+                          {post.thumbnail && !thumbnailErrors.has(post.id) ? (
+                            <Image
+                              src={post.thumbnail}
+                              alt={post.title}
+                              fill
+                              className="rounded-lg object-cover"
+                              onError={() => {
+                                setThumbnailErrors((prev) => new Set(prev).add(post.id))
+                              }}
+                            />
+                          ) : (
+                            <Image
+                              src={`/logos/${post.companyLogo}`}
+                              alt={post.companyName}
+                              fill
+                              className="rounded-lg object-cover bg-gray-100 p-4 sm:p-2 dark:bg-gray-700"
+                            />
+                          )}
+                        </div>
                       <div className="flex-1 min-w-0">
                         <div className="mb-2 flex flex-wrap items-center gap-2">
                           <Badge variant="outline">#{result.rank}</Badge>
@@ -287,6 +289,10 @@ export default function SearchResults({
 
   return (
     <div className="space-y-6">
+      <div className="mb-6">
+        <SearchBar className="shadow-md rounded-xl" />
+      </div>
+
       <SearchModeToggle currentMode={mode} onChange={handleModeChange} />
 
       <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-900">
@@ -340,31 +346,28 @@ export default function SearchResults({
               className="hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => router.push(`/post/${post.id}`)}
             >
-              <CardContent className="p-6">
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    {post.thumbnail && !thumbnailErrors.has(post.id) ? (
-                      <Image
-                        src={post.thumbnail}
-                        alt={post.title}
-                        width={120}
-                        height={80}
-                        className="rounded-lg object-cover"
-                        onError={() => {
-                          setThumbnailErrors((prev) => new Set(prev).add(post.id))
-                        }}
-                      />
-                    ) : (
-                      <Image
-                        src={`/logos/${post.companyLogo}`}
-                        alt={post.companyName}
-                        width={120}
-                        height={80}
-                        className="rounded-lg object-cover bg-gray-100 dark:bg-gray-700 p-2"
-                      />
-                    )}
-                  </div>
-
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="relative w-full sm:w-[120px] h-[180px] sm:h-[80px]">
+                      {post.thumbnail && !thumbnailErrors.has(post.id) ? (
+                        <Image
+                          src={post.thumbnail}
+                          alt={post.title}
+                          fill
+                          className="rounded-lg object-cover"
+                          onError={() => {
+                            setThumbnailErrors((prev) => new Set(prev).add(post.id))
+                          }}
+                        />
+                      ) : (
+                        <Image
+                          src={`/logos/${post.companyLogo}`}
+                          alt={post.companyName}
+                          fill
+                          className="rounded-lg object-cover bg-gray-100 dark:bg-gray-700 p-4 sm:p-2"
+                        />
+                      )}
+                    </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-6 h-6 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden">

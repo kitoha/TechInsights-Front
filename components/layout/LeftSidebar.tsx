@@ -5,6 +5,10 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { Home } from "lucide-react"
 import type { ComponentType, SVGProps } from "react"
 import type { TopicLink } from "@/lib/categories/api"
+import { useAuth } from "@/context/AuthContext"
+import { useState, useEffect } from "react"
+import { LoginModal } from "@/components/auth/LoginModal"
+import { LogIn } from "lucide-react"
 
 interface LeftSidebarProps {
   isOpen?: boolean;
@@ -24,6 +28,10 @@ export function LeftSidebar({ isOpen, onClose, topOffsetClassName = "lg:top-14",
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const currentCategory = searchParams.get("category")
+  const { isLoggedIn, isLoading } = useAuth()
+  const [showLoginModal, setShowLoginModal] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
 
   const menuItems: MenuItem[] = [
     { name: "Feed", href: "/", icon: Home },
@@ -119,8 +127,25 @@ export function LeftSidebar({ isOpen, onClose, topOffsetClassName = "lg:top-14",
               })}
             </div>
           )}
+
+          {/* Social / Info Section or Login */}
+          {mounted && !isLoading && !isLoggedIn && (
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-800 lg:hidden">
+               <button
+                onClick={() => {
+                  setShowLoginModal(true)
+                  if (onClose) onClose()
+                }}
+                className="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-md shadow-blue-500/20 active:scale-[0.98]"
+              >
+                <LogIn className="w-4 h-4" />
+                <span className="text-[12px] font-semibold">Sign In</span>
+              </button>
+            </div>
+          )}
         </div>
       </aside>
+      <LoginModal open={showLoginModal} onOpenChange={setShowLoginModal} />
     </>
   )
 }

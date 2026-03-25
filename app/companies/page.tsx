@@ -148,21 +148,18 @@ export default async function CompaniesPage() {
     <div className="min-h-full bg-gradient-to-b from-slate-50 via-slate-50 to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
       <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="mb-7 flex flex-col gap-3 sm:mb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
-            회사별 포스트 현황
-          </h1>
-          <p className="max-w-2xl text-sm text-slate-600 dark:text-slate-400 sm:text-base">
-            각 기업의 기술 블로그 포스트 현황을 확인해보세요
-          </p>
-          <div className="grid w-full max-w-xl grid-cols-3 gap-2">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
+              기술 블로그 회사
+            </h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              국내 주요 IT 기업들의 기술 블로그를 한곳에서
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
             {summaryItems.map((item) => (
-              <div
-                key={item.label}
-                className="rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-slate-900"
-              >
-                <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                  {item.label}
-                </p>
+              <div key={item.label} className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
+                <span className="text-slate-500 dark:text-slate-400">{item.label}</span>
                 <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
                   {item.value}
                 </p>

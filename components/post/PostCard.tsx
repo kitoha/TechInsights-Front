@@ -53,10 +53,10 @@ export const PostCard = memo(function PostCard({
 
             <Link href={`/post/${post.id}`}>
                 <CardContent className="p-0">
-                    <div className="flex items-stretch gap-5 px-5 py-4 h-[130px]">
+                    <div className="flex items-start md:items-stretch gap-3 md:gap-5 px-3 md:px-5 py-4 min-h-[110px] md:h-[130px]">
                         {/* Thumbnail */}
                         {thumbnail ? (
-                            <div className="relative w-28 h-full flex-shrink-0 overflow-hidden bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800">
+                            <div className="relative w-28 h-[88px] md:h-full flex-shrink-0 overflow-hidden bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800">
                                 <OptimizedImage
                                     src={thumbnail}
                                     alt={post.title}
@@ -66,7 +66,7 @@ export const PostCard = memo(function PostCard({
                                 />
                             </div>
                         ) : (
-                            <div className="relative w-28 h-full flex-shrink-0 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden group-hover:bg-gray-100 dark:group-hover:bg-gray-800 transition-colors">
+                            <div className="relative w-28 h-[88px] md:h-full flex-shrink-0 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden group-hover:bg-gray-100 dark:group-hover:bg-gray-800 transition-colors">
                                 {post.logoImageName ? (
                                     <div className="relative w-full h-full transition-transform duration-700 ease-out">
                                         <OptimizedImage
@@ -113,8 +113,8 @@ export const PostCard = memo(function PostCard({
                                     </span>
                                     {post.viewCount !== undefined && (
                                         <>
-                                            <span className="text-[12px] text-gray-300 dark:text-gray-700">|</span>
-                                            <div className="flex items-center gap-1 text-[11px] font-medium text-gray-400 dark:text-gray-500">
+                                            <span className="hidden sm:inline text-[12px] text-gray-300 dark:text-gray-700">|</span>
+                                            <div className="hidden sm:flex items-center gap-1 text-[11px] font-medium text-gray-400 dark:text-gray-500">
                                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                 <span>{post.viewCount} Views</span>
                                             </div>
@@ -122,7 +122,7 @@ export const PostCard = memo(function PostCard({
                                     )}
                                 </div>
 
-                                <h2 className="text-[18px] md:text-[19px] font-bold text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
+                                <h2 className="text-[18px] md:text-[19px] font-bold text-gray-900 dark:text-white line-clamp-2 md:truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
                                     {post.title}
                                 </h2>
 
@@ -142,7 +142,7 @@ export const PostCard = memo(function PostCard({
                         </div>
 
                         {/* Right Spacer for Ribbon */}
-                        <div className="w-12 flex-shrink-0" />
+                        <div className="w-10 md:w-12 flex-shrink-0" />
                     </div>
                 </CardContent>
             </Link>

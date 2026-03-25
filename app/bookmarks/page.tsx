@@ -8,7 +8,7 @@ export default async function BookmarksPage() {
 
   return (
     <div className="bg-background min-h-full">
-      <main className="max-w-[1600px] mx-auto px-6 py-8">
+      <main className="max-w-[1600px] mx-auto px-4 md:px-6 py-6 md:py-8">
         <div className="lg:grid lg:grid-cols-4 lg:gap-8">
           <div className="lg:col-span-3">
             <Suspense fallback={<div>Loading...</div>}>
