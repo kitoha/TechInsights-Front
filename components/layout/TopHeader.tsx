@@ -1,6 +1,5 @@
 "use client"
 
-import SearchBar from "@/components/search/SearchBar"
 import { Suspense, useState } from "react"
 import { Bookmark, Menu } from "lucide-react"
 import { ThemeToggle } from "@/components/layout/ThemeToggle"
@@ -31,7 +30,7 @@ export function TopHeader({
 
   return (
     <>
-      <header className={`${compact ? "h-12" : "h-14"} ${stickyTopClassName} sticky z-40 bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700`}>
+      <header className={`${compact ? "h-12" : "h-14"} ${stickyTopClassName} sticky z-50 bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700`}>
         <div className={`h-full flex items-center justify-between ${compact ? "px-3 lg:px-5" : "px-4 lg:px-6"}`}>
           <div className="flex items-center space-x-3">
             {showMenuButton && (
@@ -52,11 +51,7 @@ export function TopHeader({
             </Link>
           </div>
 
-          <div className={`hidden md:block flex-1 ${compact ? "max-w-lg mx-4" : "max-w-xl mx-6"}`}>
-            <Suspense fallback={<div className={`${compact ? "h-9" : "h-10"} w-full rounded-full border border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-900/80`} />}>
-              <SearchBar className="w-full" />
-            </Suspense>
-          </div>
+          <div className="flex-1" />
 
           <div className="flex items-center gap-2">
             {isLoading ? null : isLoggedIn ? (
@@ -81,7 +76,7 @@ export function TopHeader({
                 <button
                   type="button"
                   onClick={() => setShowLoginModal(true)}
-                  className={`hidden sm:inline-flex px-2 py-1 ${compact ? "text-[11px]" : "text-xs"} text-muted-foreground hover:text-foreground transition-colors`}
+                  className={`hidden lg:inline-flex items-center px-2 py-1 ${compact ? "text-[11px]" : "text-xs"} text-muted-foreground hover:text-foreground transition-colors font-medium`}
                 >
                   Sign In
                 </button>

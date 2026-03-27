@@ -101,7 +101,7 @@ export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite, disabled 
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
                         </svg>
                         <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                            +{formatCompactNumber(repo.starsThisWeek)} this week
+                            +{formatCompactNumber(repo.starsThisWeek)} today
                         </span>
                     </div>
                 </div>
@@ -133,7 +133,7 @@ export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite, disabled 
                 </div>
             )}
 
-            <div className="flex items-center gap-5 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-5 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center gap-1.5">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
@@ -148,14 +148,14 @@ export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite, disabled 
                     <span className="font-medium">Forks</span>
                     <span className="font-bold text-gray-900 dark:text-gray-100">{formatCompactNumber(repo.forks)}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="hidden sm:flex items-center gap-1.5">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="font-medium">Issues</span>
                     <span className="font-bold text-gray-900 dark:text-gray-100">{formatCompactNumber(repo.issues)}</span>
                 </div>
-                <div className="flex items-center gap-1.5 ml-auto">
+                <div className="flex items-center gap-1.5 sm:ml-auto">
                     <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: langColor }} />
                     <span className="font-medium">Language</span>
                     <span className="font-bold text-gray-900 dark:text-gray-100">{displayLanguage}</span>

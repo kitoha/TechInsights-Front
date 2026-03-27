@@ -1,6 +1,8 @@
 import PostListFade from "@/components/post/PostListFade";
 import { Post } from "@/lib/posts";
 import { OptimizedImage } from "@/components/common/OptimizedImage";
+import SearchBar from "@/components/search/SearchBar";
+import { Suspense } from "react";
 
 interface MainContentProps {
   posts: Post[];
@@ -17,7 +19,7 @@ export function MainContent({ posts, totalPages, page, selectedCategory, categor
     <div className="lg:col-span-3">
       {/* Company Header */}
       {companyId && companyInfo && (
-        <div className="mb-6 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="mb-6 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm">
               <OptimizedImage
@@ -41,6 +43,17 @@ export function MainContent({ posts, totalPages, page, selectedCategory, categor
         </div>
       )}
       
+      {/* Feed Search Bar: Enterprise Grade */}
+      <div className="mb-8 relative z-10 w-full">
+        <Suspense fallback={
+          <div className="h-11 w-full max-w-2xl rounded-xl border border-slate-200 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/50 animate-pulse" />
+        }>
+          <div className="max-w-2xl group transition-all duration-300">
+            <SearchBar className="w-full shadow-sm group-hover:shadow-md transition-all duration-300 rounded-xl" />
+          </div>
+        </Suspense>
+      </div>
+
       {/* Category Tabs + Post List (SSR) */}
       <PostListFade
         posts={posts}

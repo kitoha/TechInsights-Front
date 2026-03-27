@@ -264,7 +264,7 @@ export function BookmarksContent() {
             onClick={() => setShowLoginModal(true)}
             className="mt-6 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 cursor-pointer"
           >
-            로그인하기
+            Sign In
           </button>
         </div>
         <LoginModal open={showLoginModal} onOpenChange={setShowLoginModal} />

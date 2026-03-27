@@ -59,8 +59,8 @@ export default function SettingsPage() {
 
   return (
     <div className="bg-background text-foreground transition-colors duration-300 min-h-full">
-      <main className="max-w-[1600px] mx-auto px-6 py-12">
-        <div className="max-w-3xl mx-auto space-y-8">
+      <main className="max-w-[1600px] mx-auto px-4 md:px-6 py-4 md:py-12">
+        <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">설정</h1>
             <p className="text-muted-foreground mt-2">

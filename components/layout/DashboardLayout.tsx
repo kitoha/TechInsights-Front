@@ -22,7 +22,7 @@ export function DashboardLayout({ children, topics = [] }: { children: React.Rea
       style={{ ["--layout-top-offset" as string]: layoutTopOffset }}
     >
       {!isPostDetail && (
-        <Suspense fallback={<div className="w-56" />}>
+        <Suspense fallback={<div className="hidden lg:block lg:w-56 flex-shrink-0" />}>
           <LeftSidebar
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}

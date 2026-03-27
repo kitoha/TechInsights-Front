@@ -11,6 +11,7 @@ export interface GithubTrendingRepoDto {
     ownerAvatarUrl: string | null;
     topics: string[];
     weeklyStarDelta: number;
+    dailyStarDelta: number;
     pushedAt: string;
     fetchedAt: string;
     readmeSummary: string | null;

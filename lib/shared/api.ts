@@ -86,7 +86,7 @@ export const publicApi = axios.create({
 });
 
 export const authApi = axios.create({
-  baseURL: getBackendApiBaseUrl(),
+  baseURL: isServer ? getBackendApiBaseUrl() : BFF_BASE_PATH,
   timeout: 10000,
   withCredentials: true,
 });

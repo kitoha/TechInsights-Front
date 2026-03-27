@@ -31,7 +31,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   return (
     <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
-      <div className="w-full px-6 lg:px-8 xl:px-10 py-8 md:py-10">
+      <div className="w-full px-4 md:px-6 lg:px-8 xl:px-10 py-8 md:py-10">
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Main Content */}
           <MainContent
