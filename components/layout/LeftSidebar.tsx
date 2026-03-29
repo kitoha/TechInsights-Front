@@ -81,7 +81,7 @@ export function LeftSidebar({ isOpen, onClose, topOffsetClassName = "lg:top-14",
         <div className="flex-1 overflow-y-auto px-3 py-5 space-y-6">
           {/* Menu Section */}
           <div className="space-y-0.5">
-            <h3 className="px-3 text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">Menu</h3>
+            <p className="px-2 text-[10px] font-semibold text-muted-foreground/40 uppercase tracking-[0.12em] mb-1.5">Menu</p>
             {menuItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
               return (
@@ -89,39 +89,57 @@ export function LeftSidebar({ isOpen, onClose, topOffsetClassName = "lg:top-14",
                   key={item.name}
                   href={item.href}
                   onClick={onClose}
-                  className={`flex items-center space-x-2.5 px-3 py-2 rounded-md transition-colors ${isActive
-                      ? "bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 font-medium"
-                      : "text-muted-foreground hover:bg-white dark:hover:bg-gray-900"
-                    }`}
+                  className={`group flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all duration-150 ${
+                    isActive
+                      ? "bg-foreground/[0.07] text-foreground font-medium"
+                      : "text-muted-foreground hover:text-foreground hover:bg-foreground/[0.04]"
+                  }`}
                 >
-                  <item.icon className="w-4 h-4" />
-                  <span className="text-[12px]">{item.name}</span>
+                  <span className={`flex items-center justify-center w-5 h-5 rounded-md transition-colors ${
+                    isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                  }`}>
+                    <item.icon className="w-[15px] h-[15px]" />
+                  </span>
+                  <span className="text-[12.5px] tracking-[-0.01em]">{item.name}</span>
                 </Link>
               )
             })}
           </div>
 
+          {/* Divider */}
+          <div className="h-px bg-border/40 mx-1" />
+
           {/* Topics Section */}
           {topics.length > 0 && (
-            <div className="space-y-0.5">
-              <h3 className="px-3 text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">Topics</h3>
-              {topics.map((topic) => {
+            <div className="space-y-[2px]">
+              <p className="px-2 text-[10px] font-semibold text-muted-foreground/40 uppercase tracking-[0.12em] mb-1.5">Topics</p>
+              {topics.map((topic, i) => {
                 const isTopicActive = pathname === "/" && currentCategory && topic.href === `/?category=${currentCategory}`;
                 const targetHref = isTopicActive ? "/" : topic.href;
-                
+
+                // Rotate through a curated palette for each topic dot
+                const dotColors = [
+                  "bg-blue-400", "bg-violet-400", "bg-emerald-400",
+                  "bg-amber-400", "bg-rose-400", "bg-cyan-400",
+                  "bg-orange-400", "bg-pink-400", "bg-teal-400", "bg-indigo-400",
+                ];
+                const dotColor = dotColors[i % dotColors.length];
+
                 return (
                   <Link
                     key={topic.name}
                     href={targetHref}
                     onClick={onClose}
-                    className={`flex items-center space-x-2.5 px-3 py-2 rounded-md transition-colors ${
+                    className={`group flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg transition-all duration-150 ${
                       isTopicActive
-                        ? "bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 font-medium"
-                        : "text-muted-foreground hover:bg-white dark:hover:bg-gray-900"
+                        ? "bg-foreground/[0.07] text-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground hover:bg-foreground/[0.04]"
                     }`}
                   >
-                    <span className={`w-1.5 h-1.5 rounded-full ${isTopicActive ? "bg-blue-600 dark:bg-blue-400" : "bg-current/60"}`} />
-                    <span className="text-[12px]">{topic.name}</span>
+                    <span className={`w-[7px] h-[7px] rounded-full flex-shrink-0 transition-all duration-150 ${dotColor} ${
+                      isTopicActive ? "opacity-100 scale-110" : "opacity-50 group-hover:opacity-80"
+                    }`} />
+                    <span className="text-[12.5px] tracking-[-0.01em] truncate">{topic.name}</span>
                   </Link>
                 );
               })}
