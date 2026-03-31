@@ -74,10 +74,28 @@ npm run start    # 프로덕션 서버 실행
 npm run lint     # ESLint 검사
 ```
 
-## 스크린샷
+## 화면 데모
 
-### 메인 피드
-![메인 피드](docs/screenshots/feed-list-view.png)
+### 메인 피드 및 게시글 탐색
+메인 피드에서는 필터링과 무한 스크롤을 통한 기술 블로그 탐색이 가능합니다.
+![메인 피드 데모](docs/demo/home_feed.webp)
 
-### 게시글 상세
-![게시글 상세](docs/screenshots/post-detail-view.png)
+### 게시글 상세 보기
+게시글의 상세 내용을 가독성 있게 최적화된 레이아웃으로 확인할 수 있습니다.
+![게시글 상세 데모](docs/demo/post_detail.webp)
+
+### 검색 기능 (일반/AI 검색)
+키워드 검색 및 AI 기반 의미 검색을 지원합니다.
+![검색 기능 데모](docs/demo/search.webp)
+
+### 회사별 탐색
+특정 회사의 기술 블로그만 모아서 볼 수 있습니다.
+![회사별 탐색 데모](docs/demo/companies.webp)
+
+### 오픈소스 트렌드
+최신 오픈소스 트렌드와 분석 내용을 확인할 수 있습니다.
+![오픈소스 트렌드 데모](docs/demo/opensource.webp)
+
+### 주요 기능 (카테고리, 북마크, 프로필, 설정)
+카테고리별 탐색, 북마크 관리, 프로필 관리 및 다크 모드 설정을 지원합니다.
+![기타 기능 데모](docs/demo/features_demo.webp)
