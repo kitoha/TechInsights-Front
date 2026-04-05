@@ -29,7 +29,6 @@ export function adaptGithubRepo(
         description: dto.description ?? '',
         stars: dto.starCount,
         forks: dto.forkCount,
-        issues: 0,
         language,
         languageColor: LANGUAGE_COLORS[language] ?? '#6e7681',
         starsThisWeek: dto.dailyStarDelta ?? 0,

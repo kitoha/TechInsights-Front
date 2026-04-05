@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: '**.socarcorp.kr' },
       { protocol: 'https', hostname: '**.github.io' },
+      { protocol: 'https', hostname: 'thefarmersfront.github.io' },
+      { protocol: 'http', hostname: 'thefarmersfront.github.io' },
       { protocol: 'https', hostname: '**.cloudfront.net' },
       { protocol: 'https', hostname: '**.toss.im' },
       { protocol: 'https', hostname: '**.lycorp.co.jp' },
