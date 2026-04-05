@@ -1,4 +1,5 @@
 const STORAGE_KEY = "ti_device_id";
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 5;
 
 function generateUUID(): string {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -29,8 +30,25 @@ export function getDeviceId(): string {
       id = generateUUID();
       localStorage.setItem(STORAGE_KEY, id);
     }
+    persistDeviceIdCookie(id);
     return id;
   } catch {
-    return generateUUID();
+    const id = generateUUID();
+    persistDeviceIdCookie(id);
+    return id;
   }
+}
+
+export function getDeviceIdCookieName(): string {
+  return STORAGE_KEY;
+}
+
+function persistDeviceIdCookie(id: string): void {
+  if (typeof document === "undefined" || !id) {
+    return;
+  }
+
+  const isSecureContext = typeof window !== "undefined" && window.location.protocol === "https:";
+  const secure = isSecureContext ? "; Secure" : "";
+  document.cookie = `${STORAGE_KEY}=${encodeURIComponent(id)}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
 }
