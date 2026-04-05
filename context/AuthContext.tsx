@@ -12,6 +12,7 @@ import {
 } from "react";
 import { authGet, authPost, setUnauthorizedHandler } from "@/lib/shared/api";
 import { getLoginRedirectUrl, type UserProfile } from "@/lib/shared/auth";
+import { getDeviceId } from "@/lib/shared/deviceId";
 
 import { USERS_ME_ENDPOINT, LOGOUT_ENDPOINT } from "@/lib/shared/endpoints";
 const AUTH_PENDING_SYNC_KEY = "techinsights_auth_pending_sync";
@@ -162,7 +163,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginRedirect = useCallback(() => {
     markPendingAuthSync();
-    window.location.href = getLoginRedirectUrl();
+    const loginUrl = new URL(getLoginRedirectUrl(), window.location.origin);
+    loginUrl.searchParams.set("deviceId", getDeviceId());
+    window.location.href = loginUrl.toString();
   }, [markPendingAuthSync]);
 
   const logout = useCallback(async () => {
