@@ -148,13 +148,6 @@ export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite, disabled 
                     <span className="font-medium">Forks</span>
                     <span className="font-bold text-gray-900 dark:text-gray-100">{formatCompactNumber(repo.forks)}</span>
                 </div>
-                <div className="hidden sm:flex items-center gap-1.5">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="font-medium">Issues</span>
-                    <span className="font-bold text-gray-900 dark:text-gray-100">{formatCompactNumber(repo.issues)}</span>
-                </div>
                 <div className="flex items-center gap-1.5 sm:ml-auto">
                     <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: langColor }} />
                     <span className="font-medium">Language</span>
