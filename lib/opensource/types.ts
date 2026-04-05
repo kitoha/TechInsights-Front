@@ -27,7 +27,6 @@ export interface TrendingRepo {
     description: string;
     stars: number;
     forks: number;
-    issues: number;
     language: string;
     languageColor: string;
     starsThisWeek: number;
