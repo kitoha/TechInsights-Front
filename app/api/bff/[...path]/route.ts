@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { getBackendApiBaseUrl } from "@/lib/shared/api";
+import { getDeviceIdCookieName } from "@/lib/shared/deviceId";
 
 const REQUEST_HEADER_ALLOWLIST = [
   "accept",
@@ -14,6 +15,7 @@ const REQUEST_HEADER_ALLOWLIST = [
 ];
 
 const PUBLIC_API_ALLOWLIST = [
+  /^oauth2(?:\/.*)?$/,
   /^api\/v1\/auth(?:\/.*)?$/,
   /^api\/v1\/users\/me(?:\/.*)?$/,
   /^api\/v1\/posts(?:\/.*)?$/,
@@ -50,6 +52,13 @@ function copyRequestHeaders(request: NextRequest): Headers {
     const value = request.headers.get(headerName);
     if (value) {
       headers.set(headerName, value);
+    }
+  }
+
+  if (!headers.has("x-device-id")) {
+    const deviceId = request.cookies.get(getDeviceIdCookieName())?.value;
+    if (deviceId) {
+      headers.set("x-device-id", deviceId);
     }
   }
 

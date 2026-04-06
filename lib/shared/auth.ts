@@ -1,5 +1,3 @@
-import { getBackendApiBaseUrl } from "./api";
-
 export interface UserProfile {
   id: string;
   email?: string;
@@ -11,6 +9,5 @@ export interface UserProfile {
 }
 
 export function getLoginRedirectUrl(): string {
-  const base = getBackendApiBaseUrl();
-  return `${base}/oauth2/authorization/google`;
+  return "/api/bff/oauth2/authorization/google";
 }

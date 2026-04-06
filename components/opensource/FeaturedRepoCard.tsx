@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
+
 import { TrendingRepo, LANGUAGE_COLORS } from "@/lib/opensource/types";
 import { formatCompactNumber, cn } from "@/lib/shared/utils";
 
@@ -11,8 +13,18 @@ interface FeaturedRepoCardProps {
 }
 
 export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite, disabled = false }: FeaturedRepoCardProps) {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [needsExpand, setNeedsExpand] = useState(false);
+    const textRef = useRef<HTMLParagraphElement>(null);
     const displayLanguage = repo.language?.trim() || '언어 없음';
     const langColor = LANGUAGE_COLORS[displayLanguage] || '#6e7681';
+
+    useEffect(() => {
+        const el = textRef.current;
+        if (el) {
+            setNeedsExpand(el.scrollHeight > el.clientHeight + 1);
+        }
+    }, [repo.aiSummary]);
 
     return (
         <article className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-900 dark:hover:border-gray-600">
@@ -114,9 +126,27 @@ export function FeaturedRepoCard({ repo, isFavorite, onToggleFavorite, disabled 
                             <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">AI Summary (KR)</span>
                         </div>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
+                    <p
+                        ref={textRef}
+                        className={`text-sm text-gray-600 dark:text-gray-300 leading-relaxed transition-all duration-300 ${isExpanded ? '' : 'line-clamp-3'}`}
+                    >
                         {repo.aiSummary}
                     </p>
+                    {needsExpand && (
+                        <button
+                            type="button"
+                            onClick={() => setIsExpanded((p: boolean) => !p)}
+                            className="mt-1.5 flex items-center gap-0.5 text-xs font-medium text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400 transition-colors duration-150 cursor-pointer"
+                        >
+                            <span>{isExpanded ? '접기' : '더 보기'}</span>
+                            <svg
+                                className={`w-3.5 h-3.5 transition-transform duration-300 ${isExpanded ? '-rotate-180' : ''}`}
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    )}
                 </div>
             )}
 
