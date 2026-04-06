@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
+
 import { TrendingRepo, LANGUAGE_COLORS } from "@/lib/opensource/types";
 import { formatCompactNumber, cn } from "@/lib/shared/utils";
 
@@ -11,11 +13,21 @@ interface RepoCardProps {
 }
 
 export function RepoCard({ repo, isFavorite, onToggleFavorite, disabled = false }: RepoCardProps) {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [needsExpand, setNeedsExpand] = useState(false);
+    const textRef = useRef<HTMLParagraphElement>(null);
     const displayLanguage = repo.language?.trim() || '언어 없음';
     const langColor = LANGUAGE_COLORS[displayLanguage] || '#6e7681';
 
     const isHighRelevance = repo.relevance !== undefined && repo.relevance >= 0.8;
     const isLowRelevance = repo.relevance !== undefined && repo.relevance < 0.65;
+
+    useEffect(() => {
+        const el = textRef.current;
+        if (el) {
+            setNeedsExpand(el.scrollHeight > el.clientHeight + 1);
+        }
+    }, [repo.aiSummary, repo.description]);
 
     return (
         <article
@@ -125,16 +137,54 @@ export function RepoCard({ repo, isFavorite, onToggleFavorite, disabled = false 
                             <span className="text-[9px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">AI Analysis (KR)</span>
                         </div>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2">
+                    <p
+                        ref={textRef}
+                        className={`text-xs text-gray-500 dark:text-gray-400 leading-relaxed transition-all duration-300 ${isExpanded ? '' : 'line-clamp-2'}`}
+                    >
                         {repo.aiSummary}
                     </p>
+                    {needsExpand && (
+                        <button
+                            type="button"
+                            onClick={() => setIsExpanded((p: boolean) => !p)}
+                            className="mt-1.5 flex items-center gap-0.5 text-[11px] font-medium text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400 transition-colors duration-150 cursor-pointer"
+                        >
+                            <span>{isExpanded ? '접기' : '더 보기'}</span>
+                            <svg
+                                className={`w-3 h-3 transition-transform duration-300 ${isExpanded ? '-rotate-180' : ''}`}
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    )}
                 </div>
             )}
 
             {!repo.aiSummary && repo.description && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-3">
-                    {repo.description}
-                </p>
+                <div className="mb-3">
+                    <p
+                        ref={textRef}
+                        className={`text-xs text-gray-500 dark:text-gray-400 leading-relaxed transition-all duration-300 ${isExpanded ? '' : 'line-clamp-2'}`}
+                    >
+                        {repo.description}
+                    </p>
+                    {needsExpand && (
+                        <button
+                            type="button"
+                            onClick={() => setIsExpanded((p: boolean) => !p)}
+                            className="mt-1.5 flex items-center gap-0.5 text-[11px] font-medium text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400 transition-colors duration-150 cursor-pointer"
+                        >
+                            <span>{isExpanded ? '접기' : '더 보기'}</span>
+                            <svg
+                                className={`w-3 h-3 transition-transform duration-300 ${isExpanded ? '-rotate-180' : ''}`}
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    )}
+                </div>
             )}
 
             <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500 pt-2 border-t border-gray-100 dark:border-gray-800">
