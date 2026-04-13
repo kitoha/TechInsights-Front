@@ -32,8 +32,8 @@ export default function OpensourcePage() {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState(false);
-    const [mainCurrentPage, setMainCurrentPage] = useState(0);
-    const [mainTotalPages, setMainTotalPages] = useState(1);
+    const [mainHasNext, setMainHasNext] = useState(false);
+    const [mainNextCursor, setMainNextCursor] = useState<string | null>(null);
     const [bookmarkCurrentPage, setBookmarkCurrentPage] = useState(0);
     const [bookmarkTotalPages, setBookmarkTotalPages] = useState(1);
     const [pendingBookmarkIds, setPendingBookmarkIds] = useState<string[]>([]);
@@ -65,11 +65,16 @@ export default function OpensourcePage() {
         try {
             const result = submittedQuery
                 ? await fetchSemanticRepos(submittedQuery, PAGE_SIZE)
-                : await fetchTrendingRepos(language, sort, 0, PAGE_SIZE);
+                : await fetchTrendingRepos(language, sort, PAGE_SIZE);
             if (requestId !== latestRequestId.current) return;
             setRepos(result.repos);
-            setMainCurrentPage(0);
-            setMainTotalPages(result.totalPages);
+            if ('hasNext' in result) {
+                setMainHasNext(result.hasNext);
+                setMainNextCursor(result.nextCursor);
+            } else {
+                setMainHasNext(false);
+                setMainNextCursor(null);
+            }
         } catch {
             if (requestId !== latestRequestId.current) return;
             setError(true);
@@ -171,14 +176,12 @@ export default function OpensourcePage() {
     }, [bookmarkedRepos, isLoggedIn, markRepoBookmark, pendingBookmarkIds, repos, syncRepoBookmark]);
 
     const handleLoadMore = async () => {
-        const activePage = showFavoritesOnly ? bookmarkCurrentPage : mainCurrentPage;
-        const activeTotalPages = showFavoritesOnly ? bookmarkTotalPages : mainTotalPages;
-        if (loadingMore || activePage + 1 >= activeTotalPages) return;
-        const requestId = ++latestRequestId.current;
-        setLoadingMore(true);
-        try {
-            const nextPage = activePage + 1;
-            if (showFavoritesOnly) {
+        if (showFavoritesOnly) {
+            if (loadingMore || bookmarkCurrentPage + 1 >= bookmarkTotalPages) return;
+            const requestId = ++latestRequestId.current;
+            setLoadingMore(true);
+            try {
+                const nextPage = bookmarkCurrentPage + 1;
                 const result = await fetchBookmarkedRepos({
                     page: nextPage,
                     size: BOOKMARKS_PAGE_SIZE,
@@ -190,16 +193,29 @@ export default function OpensourcePage() {
                 ]);
                 setBookmarkCurrentPage(result.page);
                 setBookmarkTotalPages(result.totalPages);
-                return;
+            } catch (error: unknown) {
+                if (requestId !== latestRequestId.current) return;
+                if (isAxiosError(error) && error.response?.status === 401) {
+                    setShowLoginModal(true);
+                } else {
+                    console.error("[OpensourcePage] handleLoadMore (bookmark) failed", error);
+                }
+            } finally {
+                setLoadingMore(false);
             }
+            return;
+        }
 
-            const result = submittedQuery
-                ? { repos: [], totalPages: 1, totalElements: repos.length }
-                : await fetchTrendingRepos(language, sort, nextPage, PAGE_SIZE);
+        // cursor-based load more for trending repos
+        if (loadingMore || !mainHasNext || !mainNextCursor) return;
+        const requestId = ++latestRequestId.current;
+        setLoadingMore(true);
+        try {
+            const result = await fetchTrendingRepos(language, sort, PAGE_SIZE, mainNextCursor);
             if (requestId !== latestRequestId.current) return;
             setRepos((prev) => [...prev, ...result.repos]);
-            setMainCurrentPage(nextPage);
-            setMainTotalPages(result.totalPages);
+            setMainHasNext(result.hasNext);
+            setMainNextCursor(result.nextCursor);
         } catch (error: unknown) {
             if (requestId !== latestRequestId.current) return;
             if (isAxiosError(error) && error.response?.status === 401) {
@@ -223,7 +239,7 @@ export default function OpensourcePage() {
     const visibleRepos = showFavoritesOnly ? bookmarkedRepos : repos;
     const hasMore = showFavoritesOnly
         ? bookmarkCurrentPage + 1 < bookmarkTotalPages
-        : mainCurrentPage + 1 < mainTotalPages;
+        : mainHasNext;
     const totalStars = visibleRepos.reduce((sum, r) => sum + r.stars, 0);
 
     const summaryItems = [
