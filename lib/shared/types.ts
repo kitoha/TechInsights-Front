@@ -6,6 +6,13 @@ export interface PagedResponse<T> {
   totalPages: number;
 }
 
+export interface CursorPagedResponse<T> {
+  content: T[];
+  size: number;
+  hasNext: boolean;
+  nextCursor: string | null;
+}
+
 export interface CategoryStats {
   id: string;
   name: string;

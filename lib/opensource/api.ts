@@ -1,6 +1,6 @@
 import { isAxiosError } from 'axios';
 import { apiGet } from '@/lib/shared/api';
-import { PagedResponse } from '@/lib/shared/types';
+import { CursorPagedResponse } from '@/lib/shared/types';
 import {
     GithubTrendingRepoDto,
     TrendingRepo,
@@ -43,8 +43,8 @@ export function adaptGithubRepo(
 
 export interface FetchTrendingResult {
     repos: TrendingRepo[];
-    totalPages: number;
-    totalElements: number;
+    hasNext: boolean;
+    nextCursor: string | null;
 }
 
 const TRENDING_URL = '/api/v1/github/trending';
@@ -52,19 +52,21 @@ const TRENDING_URL = '/api/v1/github/trending';
 export async function fetchTrendingRepos(
     language: LanguageFilter = 'All Languages',
     sort: SortType = 'trending',
-    page: number = 0,
     size: number = 8,
+    cursor?: string,
     query?: string,
 ): Promise<FetchTrendingResult> {
-    const safePage = Math.max(0, Math.floor(Number(page) || 0));
     const safeSize = Math.max(1, Math.min(100, Math.floor(Number(size) || 8)));
 
     try {
         const params: Record<string, string | number> = {
-            page: safePage,
             size: safeSize,
             sort: SORT_MAP[sort],
         };
+
+        if (cursor) {
+            params.cursor = cursor;
+        }
 
         if (language !== 'All Languages') {
             params.language = language;
@@ -74,17 +76,17 @@ export async function fetchTrendingRepos(
             params.query = query.trim();
         }
 
-        const res = await apiGet<PagedResponse<GithubTrendingRepoDto & { relevance?: number }>>(TRENDING_URL, { params });
+        const res = await apiGet<CursorPagedResponse<GithubTrendingRepoDto & { relevance?: number }>>(TRENDING_URL, { params });
 
         if (Array.isArray(res?.data?.content)) {
             return {
                 repos: res.data.content.map((repo) => adaptGithubRepo(repo)),
-                totalPages: res.data.totalPages,
-                totalElements: res.data.totalElements,
+                hasNext: res.data.hasNext,
+                nextCursor: res.data.nextCursor,
             };
         }
 
-        return { repos: [], totalPages: 1, totalElements: 0 };
+        return { repos: [], hasNext: false, nextCursor: null };
     } catch (error: unknown) {
         if (isAxiosError(error) && error.response?.status === 503) {
             throw error;
@@ -136,17 +138,17 @@ export async function fetchSemanticRepos(
                     readmeSummarizedAt: null,
                     relevance: r.similarityScore,
                 })),
-                totalPages: 1,
-                totalElements: res.data.totalReturned,
+                hasNext: false,
+                nextCursor: null,
             };
         }
 
-        return { repos: [], totalPages: 1, totalElements: 0 };
+        return { repos: [], hasNext: false, nextCursor: null };
     } catch (error: unknown) {
         if (isAxiosError(error) && error.response?.status === 503) {
             throw error;
         }
         console.error('[opensource/api] fetchSemanticRepos error:', error);
-        return { repos: [], totalPages: 1, totalElements: 0 };
+        return { repos: [], hasNext: false, nextCursor: null };
     }
 }
