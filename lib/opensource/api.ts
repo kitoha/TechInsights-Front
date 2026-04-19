@@ -152,3 +152,22 @@ export async function fetchSemanticRepos(
         return { repos: [], hasNext: false, nextCursor: null };
     }
 }
+
+export interface TrendingSummaryResponse {
+    totalRepositories: number;
+    totalStars: number;
+}
+
+export async function fetchTrendingSummary(language?: string): Promise<TrendingSummaryResponse | null> {
+    try {
+        const params: Record<string, string> = {};
+        if (language && language !== 'All Languages') {
+            params.language = language;
+        }
+        const res = await apiGet<TrendingSummaryResponse>('/api/v1/github/trending/summary', { params });
+        return res?.data ?? null;
+    } catch (error) {
+        console.error('[opensource/api] fetchTrendingSummary error:', error);
+        return null;
+    }
+}
