@@ -12,7 +12,8 @@ import { SearchInput } from "@/components/opensource/SearchInput";
 import { LoadMoreButton } from "@/components/opensource/LoadMoreButton";
 import { StateView } from "@/components/opensource/StateView";
 import { fetchBookmarkedRepos, toggleGithubBookmark } from "@/lib/bookmarks";
-import { adaptGithubRepo, fetchTrendingRepos, fetchSemanticRepos } from "@/lib/opensource/api";
+import { adaptGithubRepo, fetchTrendingRepos, fetchSemanticRepos, fetchTrendingSummary } from "@/lib/opensource/api";
+import type { TrendingSummaryResponse } from "@/lib/opensource/api";
 import type { TrendingRepo, SortType, LanguageFilter as LanguageFilterType } from "@/lib/opensource/types";
 import { useAuth } from "@/context/AuthContext";
 import { useBookmarks } from "@/context/BookmarkContext";
@@ -23,6 +24,7 @@ const BOOKMARKS_PAGE_SIZE = 20;
 export default function OpensourcePage() {
     const [repos, setRepos] = useState<TrendingRepo[]>([]);
     const [bookmarkedRepos, setBookmarkedRepos] = useState<TrendingRepo[]>([]);
+    const [trendingSummary, setTrendingSummary] = useState<TrendingSummaryResponse | null>(null);
     const [language, setLanguage] = useState<LanguageFilterType>("All Languages");
     const [sort, setSort] = useState<SortType>("trending");
     const [searchQuery, setSearchQuery] = useState("");
@@ -63,11 +65,17 @@ export default function OpensourcePage() {
         setLoading(true);
         setError(false);
         try {
-            const result = submittedQuery
-                ? await fetchSemanticRepos(submittedQuery, PAGE_SIZE)
-                : await fetchTrendingRepos(language, sort, PAGE_SIZE);
+            const [result, summaryResult] = await Promise.all([
+                submittedQuery
+                    ? fetchSemanticRepos(submittedQuery, PAGE_SIZE)
+                    : fetchTrendingRepos(language, sort, PAGE_SIZE),
+                !submittedQuery 
+                    ? fetchTrendingSummary(language) 
+                    : Promise.resolve(null)
+            ]);
             if (requestId !== latestRequestId.current) return;
             setRepos(result.repos);
+            setTrendingSummary(summaryResult);
             if ('hasNext' in result) {
                 setMainHasNext(result.hasNext);
                 setMainNextCursor(result.nextCursor);
@@ -240,11 +248,20 @@ export default function OpensourcePage() {
     const hasMore = showFavoritesOnly
         ? bookmarkCurrentPage + 1 < bookmarkTotalPages
         : mainHasNext;
-    const totalStars = visibleRepos.reduce((sum, r) => sum + r.stars, 0);
+        
+    const localTotalStars = visibleRepos.reduce((sum, r) => sum + r.stars, 0);
+
+    const displayRepositories = (!showFavoritesOnly && !submittedQuery && trendingSummary) 
+        ? trendingSummary.totalRepositories 
+        : visibleRepos.length;
+        
+    const displayStars = (!showFavoritesOnly && !submittedQuery && trendingSummary)
+        ? trendingSummary.totalStars
+        : localTotalStars;
 
     const summaryItems = [
-        { label: "Repositories", value: `${visibleRepos.length}개` },
-        { label: "Total Stars", value: formatCompactNumber(totalStars) },
+        { label: "Repositories", value: `${displayRepositories.toLocaleString()}개` },
+        { label: "Total Stars", value: formatCompactNumber(displayStars) },
     ];
 
     const featuredRepo = visibleRepos[0];
