@@ -1,7 +1,7 @@
 export type ApiResponse<T> = { data: T; meta?: { total?: number; page?: number } };
 
 import axios, { AxiosError, AxiosHeaders, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { getDeviceId } from './deviceId';
+import { getDeviceId } from './shared/deviceId';
 
 const isProd = process.env.VERCEL_ENV === 'production';
 const isServer = typeof window === 'undefined';
